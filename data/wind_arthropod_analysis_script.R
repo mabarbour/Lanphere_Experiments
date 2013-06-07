@@ -7,6 +7,7 @@ library("BiodiversityR")
 library("mvabund")
 library("MASS")
 library("bipartite")
+library("lme4")
 
 # source in managed data sets
 source('wind_manage_arthropod_dissection_data.R')
@@ -79,6 +80,18 @@ summary(aov_enemy_rich)
 
 aov_all_rich <- aov(log(all_rich+1) ~ Genotype * Wind.Exposure + Error(as.factor(Block)/Wind.Exposure), data= all_arthropods, qr=TRUE)
 summary(aov_all_rich)
+
+# genearalized mixed effect model for richness
+all_arthropods$block <- as.factor(all_arthropods$Block)
+glmer_all_rich_null <- glmer(all_rich ~ 1 + (1 | Wind.Exposure:block), data=all_arthropods, family=poisson)
+
+glmer_all_rich_genotype <- glmer(all_rich ~ Genotype + (1 | Wind.Exposure:block), data=all_arthropods, family=poisson)
+
+glmer_all_rich_exposure <- glmer(all_rich ~ Wind.Exposure + (1 | Wind.Exposure:block), data=all_arthropods, family=poisson)
+
+anova(glmer_all_rich_null, glmer_all_rich_genotype)
+
+#
 
 aov_predator_prey_rich_ratio <- aov(log(predator_prey_richness_ratio + 1) ~ Genotype * Wind.Exposure + Error(as.factor(Block)/Wind.Exposure), data= all_arthropods, qr=TRUE)
 summary(aov_predator_prey_rich_ratio)
