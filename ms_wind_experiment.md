@@ -23,6 +23,27 @@ II. Evidence for wind pruning in shaping plant traits and arthropod community
 1. What is the relative importance of plant genotype vs. environment in structuring arthropod food webs?  
 2. What are the underlying mechanisms shaping variation in arthropod food web structure?  
 
+**Research Questions: July 11, 2013**
+1. Do plant genotypes vary in their tolerance to wind exposure?  
+**Biomass estimates**
+- oven-dried (~60 C for 48 hrs) for: living shoot tissue, green plant tissue, living stem tissue, dead stem/shoot tissue.
+**Plant Traits**
+- C:N (leaf quality) **at least 5mg of tissue**
+- SLA
+- Height
+- Spodoptera Bioassay
+- Trichome density again?
+2. How does plant genotype and wind exposure interact to influence herbivory and arthropod community composition?
+**Herbivory**
+- counts of number of leaves on each plant
+- estimates of percent leaf area removed (PLAR) on each leaf by different herbivore species.  This will enable me to estimate PLAR for the entire plant.
+- oven-dried leaf biomass. This will enable me to determine the average biomass for each leaf.  **Not necessary, can use just a few leaves**
+- (SLA * PLAR)/(leaf biomass + SLA*PLAR) = Percent Biomass removed via herbivory! 
+- for galling insects, I will simply measure the oven dry mass of the gall and use that as the degree of biomass damage to the plant.
+**Arthropod Community Composition**
+- already have estimates of community composition for all species at 4 different sampling dates over 2 years.
+
+
 **Hypotheses**
 We hypothesize that wind exposure would decrease primary productivity, leaf quality, and plant height; however, we expected plant genotypes to vary in their susceptibility to wind exposure.  In turn, we hypothesized that variation in primary productivity, leaf quality and plant height would influence both the size of arthropod food webs as well as food chain length.
 
