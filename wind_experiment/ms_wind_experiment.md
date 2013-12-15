@@ -110,3 +110,65 @@ We chose these 10 genotypes because they vary significantly in carbon-nitrogen r
 
 On February 21, 2012 [DOUBLE CHECK DATE] we sacrificed 1-2 replicates from 10 of 26 genotypes that varied significantly in leaf carbon:nitrogen ratios (NEED STATS), a putative trait that influences aphid performance.   COMMON GARDEN DETAILS.  We took cuttings from shoots grown in the previous year and soaked cuttings in water overnight.  On February 22, 2012 we planted cuttings in a mixture of 80% perlite, 20% peat moss and ___ dolomite lime.  We grew cuttings under ambient weather conditions outside the greenhouse at Humboldt State University.  (do I need to mention that they were exposed to herbivory?)
 
+# Frome Genotype Wind Experiment May 17 document
+
+Goal: To examine how a major abiotic force (wind) interacts with the genotype of a foundation tree species (dune willow) to influence insect food webs and willow fitness.
+
+Overaching Question: How does wind exposure alter the effects of willow genotype on insect communities and willow performance?  
+
+Sub-questions:
+1)  How does willow genotype interact with wind exposure to influence willow growth?
+2)	How does willow genotype interact with wind exposure to influence ecological networks?
+a.	Investigate putative plant traits that may influence insect food webs.
+i.	Biomass (quantity)
+ii.	C:N ratio (quality)
+iii.	Other plant traits
+3)	How does wind exposure influence willow biomass and insect food webs?
+a.	Investigate patches exposed to and free of wind exposure (look at effects of intra-patch heterogeneity, on ecological network)
+
+Materials & Methods
+
+Study Site
+
+Natural History
+
+Experimental Design
+
+NEED TO CONFIRM WIND GRADIENT AT SITE.  See if Andrea Pickart has an anenometer that I can borrow.
+
+Experiment 1: Genotype-Wind Effects on Insect Community
+Completely Randomized Block Experimental Design 
+-	2 treatments
+o	Exposed (adjacent to willow patch)
+o	Unexposed (behind willow patch relative to prevailing winds)
+-	10 genotypes
+o	Genotypes vary significantly in how they allocate carbon and nitrogen to their leaves.  
+o	I will also measure more plant traits that likely exhibit heritable genetic variation.
+-	10 blocks
+o	10 different willow patches. 
+-	Experimental unit: 1 willow cutting planted directly into the ground per treatment per genotype per block.
+-	Summary of material
+o	200 cuttings (10 blocks * 2 treatments * 10 genotypes)
+-	After 2-3 months:
+o	Survey insects for their abundance and diversity.  
+o	Survey sedentary insects (galls, leaf miners, leaf folders, etc.) and rear them for their parasitoids.
+
+Experiment 2: Genotype-Wind Effects on Plant Traits
+Similar to above (treatments and genotypes), but all cuttings will be bagged for the duration of the study to prevent herbivory and explicitly examine the effects of wind exposure and willow genotype on plant traits. 
+-	4 blocks
+o	4 different willow patches
+-	Summary of material
+o	80 cuttings (4 blocks * 2 treatments * 10 genotypes)
+-	After 2-3 months:
+o	Quantify plant traits:
+•	Sample leaves to measure C:N ratio 
+•	Leaf area
+•	SLA (specific leaf area)
+•	Water content
+•	Trichome density
+•	Leaf toughness
+•	Leaf phenolic chemistry
+
+Observational Study:
+-	At end of experiments, survey sedentary insect densities within and among willow patches that vary in their degree of wind exposure 
+-	Rear galls and leaf miners to assess parasitism.
