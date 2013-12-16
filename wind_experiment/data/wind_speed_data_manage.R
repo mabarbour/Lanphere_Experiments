@@ -1,0 +1,2 @@
+# Some metadata and notes.
+# For wind measurements taken on Sep 10, 2012 between 3 and 4pm, the wind in Arcata was projected to be about 14mph around that time (if I remember correctly). Either way, it was a a very windy day and represents near the maximum wind gusting experienced by these plants. Wnd measurements were made with an anenometer (unknown make and model) in kilometers per hour at a height of about 37 cm aboveground.  Max and min measurement readings were taken over a 30 sec. period and haphazardly started on either an exposed or unexposed site first.
