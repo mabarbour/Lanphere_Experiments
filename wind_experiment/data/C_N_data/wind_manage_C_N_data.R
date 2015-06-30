@@ -1,13 +1,16 @@
 # load libraries
-library(reshape2)
-library(ggplot2)
-library(GGally)
+library(dplyr)
+library(lme4)
+library(car)
+#library(reshape2)
+#library(ggplot2)
+#library(GGally)
 
 # source in useful functions
-source("~/Documents/miscellaneous_R/summarySE_function.R")
+#source("~/Documents/miscellaneous_R/summarySE_function.R")
 
 # set working directory
-setwd("~/Documents/Lanphere_Experiments/wind_experiment/data/C_N_data/")
+#setwd("~/Documents/Lanphere_Experiments/wind_experiment/data/C_N_data/")
 
 ######## Upload datasets and clean them up. 
 # need to evaluate whether there are duplicates in the dataset or not. especially because excel may have messed up some of the sample IDs
@@ -40,31 +43,38 @@ combined$C_N <- combined$C.weight.percent/combined$N.weight.percent
 
 row.remove <- which(combined$sample.id %in% c("blind standard","blind std", "Blind Standard", "standard 1", "standard 2", "standard 3", "bypass", "std2", "std 3", "std1")) # identify data from standards and bypasses
 
-combined <- combined[-row.remove, ] # removes unecessary data from standards and bypasses
+#combined <- combined[-row.remove, ]
 
-wind_plant_info <- read.csv("~/Documents/Lanphere_Experiments/wind_experiment/data/wind_plant_info.csv")
+which(combined$sample.id %in% c("3E10","1E10")) # duplicated samples.
 
-##### Merge datasets. NEED TO INVESTIGATE DUPLICATES
-wind_CN_data <- merge(wind_plant_info, combined, by.x = "plant.id", by.y = "sample.id", all.y = TRUE) # retain all of C_N data
-dim(wind_CN_data)
+#combined <- combined[-c(7,36), ] # removing 2 of the duplicated samples. Both of these appeared to be outlying C_N values, but I should 
+
+#combined[which(combined$sample.id %in% c("3E10","1E10")), ]
+
+combined <- combined[-row.remove, ] %>% # removes unecessary data from standards and bypasses
+  tbl_df() %>%
+  select(plant.id = sample.id, C_N)
+
+wind_plant_info <- read.csv("~/Documents/Lanphere_Experiments/wind_experiment/data/wind_plant_info.csv") %>%
+  tbl_df() 
+
+## Join datasets. 
+wind_CN_data <- left_join(wind_plant_info, combined, by = "plant.id")
+
+# identify duplicates
+with(wind_CN_data, table(genotype, block, treatment)) # duplicates for Genotype G in Exposed treatments in Block 1 and 3
 duplicated(wind_CN_data$plant.id) # there are a few duplicates
 which(duplicated(wind_CN_data$plant.id))
 wind_CN_data$plant.id[which(duplicated(wind_CN_data$plant.id))]
+which(wind_CN_data$plant.id %in% c("3E10","1E10")) # duplicated samples.
 
-#### Explore data
-hist(wind_CN_data$C_N) # pretty broad distribution
-hist(log(wind_CN_data$C_N)) # log transformation normalizes data distribution more
-ggpairs(wind_CN_data[ ,c("C.weight.percent", "N.weight.percent", "C_N")])
 
-plot(C_N ~ genotype, wind_CN_data)
-plot(C_N ~ treatment, wind_CN_data)
-plot(C_N ~ as.factor(block), wind_CN_data)
+## exploratory analyses
+plot(log(C_N) ~ genotype, wind_CN_data) # clearly a strong genotype effect
 
-with(wind_CN_data, table(genotype, treatment))
+# strong genotype effect, but no GxE or E effect. Doesn't matter whether I log transform it or not and doesn't matter which duplicate samples I remove.
+CN.lmer <- lmer(log(C_N) ~ treatment + (treatment|genotype) + (1|block), data = wind_CN_data[-c(51,52), ])
+summary(CN.lmer)
+Anova(CN.lmer) # very strong genotype effect, no GxE or environmental effect.
+plot(CN.lmer)
 
-summarizeCN <- summarySE(data = wind_CN_data, measurevar = "C_N", groupvars = c("treatment","genotype")) # note that sample sizes are quite low for some of the genotypes
-ggplot(data = summarizeCN, aes(x = treatment, y = C_N, group = genotype, color = genotype)) + geom_line()
-
-# preliminary analyses for split plot design. need to triple check that this is the correct coding or whether a mixed effects model would be better
-aov_C_N <- aov(log(C_N) ~ genotype * treatment + Error(as.factor(block)/treatment), data= wind_CN_data, qr=TRUE)
-summary(aov_C_N) # does this not allow me examine the effect of treatment? Right now, genotype appears to have a strong effect. 

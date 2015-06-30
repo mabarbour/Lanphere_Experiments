@@ -1,56 +1,102 @@
-### load packages
-library("reshape")
+## load packages
+#library("reshape")
+library(dplyr)
+library(tidyr)
+library(lme4)
+library(car)
 
-#### upload data
-
-# soil moisture
-wind.sep.18.2012 <- read.csv("~/Dropbox/Willow Project for sharing/Wind Experiment/Lanphere Dunes - Soil Moisture-Temp-EC - Sep 18 2012.csv")
+## upload data
 
 # total organic matter
-windTOM <- read.csv("~/Dropbox/Willow Project for sharing/Wind Experiment/Wind - Soil Total Organic Matter.csv")
+windTOM <- read.csv("~/Documents/Lanphere_Experiments/wind_experiment/data/Lanphere Soil Measurements/Wind - Soil Total Organic Matter.csv") %>%
+  tbl_df() %>%
+  filter(BAD.Sample == "n") %>%
+  mutate(OvenWt = Cruc....Oven.Dry.Wt. - Crucible.Wt.,
+         IgniteWt = Cruc....Ignited.Wt. - Crucible.Wt.,
+         PercTOM = (OvenWt - IgniteWt)/OvenWt,
+         Block = as.factor(Wind.Site.No.)) %>%
+  select(Block, Wind.Treatment, PercTOM)
 
-# manage soil moisture data
-agg1 <- aggregate(cbind(moisture,temp,EC)~Site+Treatment,FUN=mean,wind.sep.18.2012)
+# Percent Total Organic Matter doesn't significantly vary among sites, although there is a trend for greater amount in unexposed treatments, which makes sense.
+PercTOM.lmer <- lmer(PercTOM ~ Wind.Treatment + (1|Block), data = windTOM)
+summary(PercTOM.lmer)
+Anova(PercTOM.lmer, test.statistic = "F")
+plot(PercTOM.lmer)
 
-agg2 <- aggregate(cbind(moisture.1,temp.1,EC.1)~Site+Treatment,FUN=mean,wind.sep.18.2012)
+# still no effect in a linear model.
+PercTOM.lm <- lm(PercTOM ~ Wind.Treatment, data = windTOM)
+summary(PercTOM.lm)
+anova(PercTOM.lm)
 
-agg3 <- aggregate(cbind(moisture.2,temp.2,EC.2)~Site+Treatment,FUN=mean,wind.sep.18.2012)
 
-total <- cbind.data.frame(agg1,agg2,agg3)
-total$avgMoist <- with(total,(moisture+moisture.1+moisture.2)/3)
+## soil moisture, temperature, and electrical conductivity for Sep 18
+wind.sep.18.2012 <- read.csv("~/Documents/Lanphere_Experiments/wind_experiment/data/Lanphere Soil Measurements/Lanphere Dunes - Soil Moisture-Temp-EC - Sep 18 2012.csv") %>%
+  tbl_df() %>%
+  filter(Treatment %in% c("unexposed","exposed")) %>%
+  select(Measurement.Time:EC.2) %>%
+  group_by(Site, Treatment) %>%
+  summarise_each(funs(mean.narm = mean(., na.rm = TRUE))) %>%
+  mutate(Moisture = (moisture + moisture.1 + moisture.2)/3,
+         Temp = (temp + temp.1 + temp.2)/3,
+         Elect.Conduct = (EC + EC.1 + EC.2)/3) %>%
+  select(Block = Site, Treatment, Moisture, Temp, Elect.Conduct)
 
-total$avgTemp <- with(total, (temp+temp.1+temp.2)/3)
+# moisture analysis. Trend for more moisture in unexposed plots, but this is not significant
+with(wind.sep.18.2012, interaction.plot(Treatment, Block, Moisture, fun=mean, col=1:10))
+sep.18.moist.lmer <- lmer(Moisture ~ Treatment + (1|Block), data = wind.sep.18.2012)
+summary(sep.18.moist.lmer) # no variation by block
+Anova(sep.18.moist.lmer, test.statistic = "F")
 
-total$avgEC <- with(total, (EC+EC.1+EC.2)/3)
+sep.18.moist.lm <- lm(Moisture ~ Treatment, data = wind.sep.18.2012)
+summary(sep.18.moist.lm) # no quite sig, but a trend for greater moisture in unexposed plots.
+plot(sep.18.moist.lm)
 
-plot(avgMoist~Treatment,total)
-plot(avgTemp~Treatment,total)
-plot(avgEC~Treatment,total)
+# temperature analysis. 
+with(wind.sep.18.2012, interaction.plot(Treatment, Block, Temp, fun=mean, col=1:10))
+plot(Temp ~ Block, wind.sep.18.2012) # Strong block effect which probably has to do with the day getting warmer.
+sep.18.temp.lmer <- lmer(Temp ~ Treatment + (1|Block), data = wind.sep.18.2012)
+summary(sep.18.temp.lmer) # huge block variation
+Anova(sep.18.temp.lmer, test.statistic = "F")
 
-with(subtotal, interaction.plot(Treatment,Site,avgMoist, fun=mean, col=1:10))
+# Electrical conductivity.
+with(wind.sep.18.2012, interaction.plot(Treatment, Block, Elect.Conduct, fun=mean, col=1:10))
+sep.18.EC.lmer <- lmer(Elect.Conduct ~ Treatment + (1|Block), data = wind.sep.18.2012)
+summary(sep.18.EC.lmer) # huge block variation
+Anova(sep.18.EC.lmer, test.statistic = "F")
 
-subtotal <- subset(total, select = c("Site","Treatment","avgMoist","avgTemp","avgEC"))
-msubtotal <- melt(subtotal, id=c("Site","Treatment"))
-treat <- cast(msubtotal, Site~variable+Treatment,mean)
+## soil moisture, temperature, and electrical conductivity for Sep 22
+wind.sep.22.2012 <- read.csv("~/Documents/Lanphere_Experiments/wind_experiment/data/Lanphere Soil Measurements/Lanphere Dunes - Soil Moisture-Temp-EC - Sep 22 2012.csv") %>%
+  tbl_df() %>%
+  filter(Treatment %in% c("unexposed","exposed")) %>%
+  select(Wind.Site:EC.2) %>%
+  group_by(Wind.Site, Treatment) %>%
+  summarise_each(funs(mean)) %>%
+  mutate(Moisture = (moisture + moisture.1 + moisture.2)/3,
+         Temp = (temp + temp.1 + temp.2)/3,
+         Elect.Conduct = (EC + EC.1 + EC.2)/3) %>%
+  select(Block = Wind.Site, Treatment, Moisture, Temp, Elect.Conduct)
 
-### data suggests that there is no difference in soil moisture, temperature, or EC between wind exposed and unexposed sites.
-t.test(treat$avgMoist_exposed,treat$avgMoist_unexposed,paired=T)
-t.test(treat$avgTemp_exposed,treat$avgTemp_unexposed,paired=T)
-t.test(treat$avgEC_exposed,treat$avgEC_unexposed,paired=T)
+# moisture analysis. Trend for more moisture in unexposed plots, but this is not significant
+with(wind.sep.22.2012, interaction.plot(Treatment, Block, Moisture, fun=mean, col=1:10))
+sep.22.moist.lmer <- lmer(Moisture ~ Treatment + (1|Block), data = wind.sep.22.2012)
+summary(sep.22.moist.lmer) # no variation by block
+Anova(sep.22.moist.lmer, test.statistic = "F")
 
-### total organic matter analysis
-windTOM$OvenWt <- windTOM$Cruc....Oven.Dry.Wt. - windTOM$Crucible.Wt.
-windTOM$IgniteWt <- windTOM$Cruc....Ignited.Wt. - windTOM$Crucible.Wt.
+sep.22.moist.lm <- lm(Moisture ~ Treatment, data = wind.sep.22.2012)
+summary(sep.22.moist.lm) # no quite sig, but a trend for greater moisture in unexposed plots.
+plot(sep.22.moist.lm)
 
-windTOM$PercTOM <- with(windTOM, (OvenWt - IgniteWt)/OvenWt)
+# temperature analysis. 
+with(wind.sep.22.2012, interaction.plot(Treatment, Block, Temp, fun=mean, col=1:10))
+plot(Temp ~ Block, wind.sep.22.2012) # Strong block effect which probably has to do with the day getting warmer.
+sep.22.temp.lmer <- lmer(Temp ~ Treatment + (1|Block), data = wind.sep.22.2012)
+summary(sep.22.temp.lmer) # huge block variation
+Anova(sep.22.temp.lmer, test.statistic = "F")
 
-TOMsub <- subset(windTOM, BAD.Sample == "n")
+# Electrical conductivity.
+with(wind.sep.22.2012, interaction.plot(Treatment, Block, Elect.Conduct, fun=mean, col=1:10))
+sep.22.EC.lmer <- lmer(Elect.Conduct ~ Treatment + (1|Block), data = wind.sep.22.2012)
+summary(sep.22.EC.lmer) # huge block variation
+Anova(sep.22.EC.lmer, test.statistic = "F")
 
-plot(PercTOM~Wind.Treatment, TOMsub)
 
-TOMmelt <- melt(TOMsub, id.vars=c("Wind.Site.No.","Wind.Treatment"), measure.vars="PercTOM")
-TOMcast <- cast(TOMmelt, Wind.Site.No.~Wind.Treatment+variable)
-
-with(TOMcast, t.test(exposed_PercTOM, unexposed_PercTOM, Tpaired=T))
-
-interaction.plot(TOMsub$Wind.Treatment,TOMsub$Wind.Site.No., TOMsub$PercTOM, col=1:10) # note that sites seven and 1 don't show up because I dropped samples from them.  Wind does not appear to influence percent organic matter in soil.

@@ -6,7 +6,7 @@ library(plyr)
 library(lme4)
 
 ###### upload and manage the data the data
-wind_arthropods_May_11_2013 <- read.csv("~/Documents/Lanphere_Experiments/data/Wind_Arthropod_data_survey_1_May_10_2013.csv", skip=4)
+wind_arthropods_May_11_2013 <- read.csv("~/Documents/Lanphere_Experiments/wind_experiment/data/Wind_Arthropod_data_survey_1_May_10_2013.csv", skip=4)
 
 str(wind_arthropods_May_11_2013)
 wind_arthropods_May_11_2013$Block <- as.factor(wind_arthropods_May_11_2013$Block)
@@ -24,7 +24,14 @@ with(wind_arthropods_May_11_2013_subset, table(Genotype, Wind.Exposure)) # Genot
 
 # create arthropod abundance and richness variables
 wind_arthropods_May_11_2013_subset$arthropod_abundance <- rowSums(wind_arthropods_May_11_2013_subset[ ,5:20])
-wind_arthropods_May_11_2013_subset$arthropod_richness <- specnumber(wind_arthropods_May_11_2013_subset[ ,5:20])
+wind_arthropods_May_11_2013_subset$arthropod_richness <- rowSums(wind_arthropods_May_11_2013_subset[ ,5:20] > 0)
+
+## updated data analysis
+arth.abund.lmer <- lmer(arthropod_abundance ~ Wind.Exposure*Genotype + (1|Block), data = wind_arthropods_May_11_2013_subset)
+summary(arth.abund.lmer)
+Anova(arth.abund.lmer) # clear effect of wind exposure on arthropod abundance
+
+
 
 # ggplot graphs
 abundance <- ggplot(wind_arthropods_May_11_2013_subset, aes(x=Wind.Exposure, y=arthropod_abundance, color=Genotype))

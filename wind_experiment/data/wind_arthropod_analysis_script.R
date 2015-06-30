@@ -1,7 +1,7 @@
 #### This script analyzes arthropod data collected from my wind experiment
 
 # set working directory and load required libraries
-setwd("~/Documents/Lanphere_Experiments/data")
+setwd("~/Documents/Lanphere_Experiments/wind_experiment/data")
 library("vegan")
 library("BiodiversityR")
 library("mvabund")

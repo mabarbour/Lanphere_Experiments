@@ -1,11 +1,11 @@
 # This code analyzes arthropod community data collected from my willow genotype-by-wind exposure experiment at Lanphere Dunes, California (May 2012 - ______)
 
 ######## Setup working directory and load required libraries
-setwd("~/Documents/Lanphere_Experiments/data")
+#setwd("~/Documents/Lanphere_Experiments/data")
 
 ######## Upload arthropod community data and do some data management
 # upload data
-wind_arthropod_visual_survey_data_summer_2012 <- read.csv("~/Documents/Lanphere_Experiments/data/wind_arthropod_data_summer_2012.csv", skip = 1, header=TRUE)
+wind_arthropod_visual_survey_data_summer_2012 <- read.csv("~/Documents/Lanphere_Experiments/wind_experiment/data/wind_arthropod_data_summer_2012.csv", skip = 1, header=TRUE)
 
 # change "parasitoid cocoon on aphids" column to "lacewing eggs" because that is what they actually area
 wind_arthropod_visual_survey_data_summer_2012$lacewing_eggs <- wind_arthropod_visual_survey_data_summer_2012$Parisatoid.cocoons.on.Aphids
@@ -31,4 +31,4 @@ plant_info_data_frame <- with(wind_arthropod_visual_survey_data_summer_2012, cbi
 arthropod_wind_visual_data_2012 <- cbind.data.frame(plant_info_data_frame, visual_predator_data_frame, visual_herbivore_data_frame)
 
 
-
+write.csv(arthropod_wind_visual_data_2012, "~/Documents/Lanphere_Experiments/wind_experiment/data/arthropod_wind_visual_data_2012.csv")
