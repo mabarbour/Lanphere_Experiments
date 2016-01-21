@@ -13,11 +13,18 @@ wind.df <- read.csv('~/Documents/Lanphere_Experiments/final_data/wind_trait_df.c
   tbl_df() %>%
   mutate(block = as.factor(block),
          Year = as.factor(Year),
-         plant.position = as.character(plant.position))
+         plant.position = as.character(plant.position),
+         X = as.factor(X))
 glimpse(wind.df)
+
+aa.df <- read.csv('~/Documents/Lanphere_Experiments/final_data/ant_aphid_trait_df.csv') %>%
+  tbl_df() 
+glimpse(aa.df)
 
 ## trait correlations
 scatterplotMatrix(filter(wind.df, Year == "2012")[ ,9:17])
+scatterplotMatrix(filter(wind.df, Year == "2012")[ ,c(9,12,14,17)])
+scatterplotMatrix(log(filter(wind.df, Year == "2013")[ ,c(9,12,14,17)]))
 scatterplotMatrix(filter(wind.df, Year == "2012")[ ,c(18:20)])
 scatterplotMatrix(filter(wind.df, Year == "2013")[ ,c(19,21:25,27)])
 corr.test(filter(wind.df, Year == "2013")[ ,c(19,21:25,27)])
@@ -27,10 +34,10 @@ corr.test(filter(wind.df, Year == "2013")[ ,9:17])
 
 ## PCA on plant architecture traits
 library(vegan)
-arch.pca.df <- na.omit(filter(wind.df, Year == "2012", Height < 80)[ ,c(9,10,11,15,16)])
+arch.pca.df <- na.omit(filter(wind.df, Year == "2012", Height < 80)[ ,c(9,12,14,17)])#[ ,c(9,10,11,15,16)])
 arch.pca <- princomp(arch.pca.df, cor = TRUE)
-arch.rda <- rda(arch.pca.df, scale = TRUE)
-plot(arch.rda, display = 'sp')
+arch.rda <- rda(arch.pca.df ~ genotype, scale = TRUE, filter(wind.df, Year == "2012", Height < 80))
+plot(arch.rda, display = c("sp","cn"))
 summary(arch.pca)
 loadings(arch.pca)
 varimax(loadings(arch.pca))
@@ -60,51 +67,73 @@ dead.2012.glmer <- lmer(Dead ~ treatment*genotype + (1|block/treatment),
 summary(dead.2012.glmer)
 anova(dead.2012.glmer, ddf = "Kenward-Roger")
 
-dead.2013.glmer <- glmer(Dead ~ treatment + (1|genotype) + (1|block),
-                         data = filter(wind.df, Year == "2013"), family = "binomial")
+dead.2013.glmer <- glmer(Dead ~ treatment + (1|genotype) + (1|block/treatment),
+                         data = filter(wind.df, Year == "2013"), 
+                         family = "binomial")
 summary(dead.2013.glmer)
+confint(profile(dead.2013.glmer))
 
 # plant height
-height.2012.lmer <- lmer(Height ~ treatment + (1|genotype) + (0 + treatment|genotype) + (1|block/treatment), 
+ggplot(wind.df, aes(x = genotype, y = Height, color = treatment)) +
+  geom_boxplot() +
+  facet_wrap(~Year, ncol = 2)
+
+height.2012.lmer <- lmer(log(Height) ~ treatment*genotype + (1|block/treatment), 
                          data = filter(wind.df, Year == "2012"))
 summary(height.2012.lmer)
 plot(height.2012.lmer)
 anova(height.2012.lmer, ddf = "Kenward-Roger") # get same qualitative answer whether or not I include the outlying Height data point (88 cm)
 
-height.2013.lmer <- lmer(Height ~ treatment*genotype + (1|block/treatment), 
-                         data = filter(wind.df, Year == "2013"))
+height.2013.lmer <- lmer((Height) ~ (1|treatment) + (1|genotype) + (1|Year) + (1|block/treatment), 
+                         data = filter(wind.df, Height < 80))
 summary(height.2013.lmer)
+30.345/(30.345+65.572+66.945+16.697+3.494+7.129)
+16.697/(30.345+65.572+66.945+16.697+3.494+7.129)
+confint(profile(height.2013.lmer))
+AIC(height.2013.lmer)
 plot(height.2013.lmer)
 anova(height.2013.lmer)
 anova(height.2013.lmer, ddf = "Kenward-Roger")
 
 # all.shoot.total.length
-all.shoot.total.length.2012.lmer <- lmer(all.shoot.total.length ~ treatment*genotype + (1|block), 
+ggplot(wind.df, aes(x = genotype, y = all.shoot.total.length, color = treatment)) +
+  geom_boxplot() +
+  facet_wrap(~Year, ncol = 2)
+
+all.shoot.total.length.2012.lmer <- lmer(all.shoot.total.length ~ treatment*genotype + (1|block/treatment), 
                          data = filter(wind.df, Year == "2012"))
 summary(all.shoot.total.length.2012.lmer)
 plot(all.shoot.total.length.2012.lmer)
 anova(all.shoot.total.length.2012.lmer, ddf = "Kenward-Roger")
 
-all.shoot.total.length.2013.lmer <- lmer(log(all.shoot.total.length) ~ treatment*genotype + (1|block), 
+all.shoot.total.length.2013.lmer <- lmer(log(all.shoot.total.length) ~ treatment*genotype + (1|block/treatment), 
                          data = filter(wind.df, Year == "2013"))
 summary(all.shoot.total.length.2013.lmer)
 plot(all.shoot.total.length.2013.lmer) # residual suggest log transformation is appropriate
 anova(all.shoot.total.length.2013.lmer, ddf = "Kenward-Roger")
 
-# shoot:height ratio
-shoot.height.2012.lmer <- lmer(all.shoot.total.length/Height ~ treatment*genotype + (1|block), 
+# shoot:height ratio. Don't know if this is capturing what I was hoping
+ggplot(wind.df, aes(x = genotype, y = all.shoot.total.length/Height, color = treatment)) +
+  geom_boxplot() +
+  facet_wrap(~Year, ncol = 2)
+
+shoot.height.2012.lmer <- lmer(all.shoot.total.length/Height ~ treatment*genotype + (1|block/treatment), 
                                          data = filter(wind.df, Year == "2012"))
 summary(shoot.height.2012.lmer)
 plot(shoot.height.2012.lmer)
 anova(shoot.height.2012.lmer, ddf = "Kenward-Roger")
 
-shoot.height.2013.lmer <-  lmer(log(all.shoot.total.length/Height) ~ treatment*genotype + (1|block), 
+shoot.height.2013.lmer <-  lmer(log(all.shoot.total.length/Height) ~ treatment*genotype + (1|block/treatment), 
                                data = filter(wind.df, Year == "2013"))
 summary(shoot.height.2013.lmer)
 plot(shoot.height.2013.lmer)
 anova(shoot.height.2013.lmer, ddf = "Kenward-Roger")
 
 # all.shoot.count
+ggplot(wind.df, aes(x = genotype, y = all.shoot.count, color = treatment)) +
+  geom_boxplot() +
+  facet_wrap(~Year, ncol = 2)
+
 all.shoot.count.2012.lmer <- lmer(all.shoot.count ~ treatment*genotype + (1|block), 
                                data = filter(wind.df, Year == "2012"))
 summary(all.shoot.count.2012.lmer)
@@ -118,6 +147,9 @@ plot(all.shoot.count.2013.lmer)
 anova(all.shoot.count.2013.lmer, ddf = "Kenward-Roger")
 
 # leaf C:N
+ggplot(wind.df, aes(x = genotype, y = leaf_C_N, color = treatment)) +
+  geom_boxplot()
+
 leaf_CN.2013.lmer <-  lmer(leaf_C_N ~ treatment*genotype + (1|block), 
                                 data = filter(wind.df, Year == "2013"))
 summary(leaf_CN.2013.lmer)
@@ -125,20 +157,27 @@ plot(leaf_CN.2013.lmer)
 anova(leaf_CN.2013.lmer, ddf = "Kenward-Roger") # qualitatively same results with or without log transformation
 
 # SLA
-SLA.2013.lmer <-  lmer(SLA ~ treatment*genotype + (1|block), 
+ggplot(wind.df, aes(x = genotype, y = SLA, color = treatment)) +
+  geom_boxplot()
+
+SLA.2013.lmer <-  lmer(SLA ~ treatment*genotype + (1|block/treatment), 
                            data = filter(wind.df, Year == "2013"))
 summary(SLA.2013.lmer)
 plot(SLA.2013.lmer)
 anova(SLA.2013.lmer, ddf = "Kenward-Roger") 
 
 # leaf_WC
-leaf_WC.2012.lmer <-  lmer(log(leaf_WC) ~ treatment*genotype + (1|block), 
+ggplot(wind.df, aes(x = genotype, y = leaf_WC, color = treatment)) +
+  geom_boxplot() +
+  facet_wrap(~Year, ncol = 2)
+
+leaf_WC.2012.lmer <-  lmer(log(leaf_WC) ~ treatment*genotype + (1|block/treatment), 
                            data = filter(wind.df, Year == "2012"))
 summary(leaf_WC.2012.lmer)
 plot(leaf_WC.2012.lmer)
 anova(leaf_WC.2012.lmer, ddf = "Kenward-Roger") 
 
-leaf_WC.2013.lmer <-  lmer(leaf_WC ~ treatment*genotype + (1|block), 
+leaf_WC.2013.lmer <-  lmer(leaf_WC ~ treatment*genotype + (1|block/treatment), 
                        data = filter(wind.df, Year == "2013"))
 summary(leaf_WC.2013.lmer)
 plot(leaf_WC.2013.lmer)
@@ -147,7 +186,10 @@ anova(leaf_WC.2013.lmer, ddf = "Kenward-Roger")
 # leaf percent.browned
 
 # leaf_trichome.density
-leaf_trichome.density.2012.lmer <-  lmer(log(leaf_trichome.density+1) ~ treatment*genotype + (1|block), 
+ggplot(wind.df, aes(x = genotype, y = leaf_trichome.density, color = treatment)) +
+  geom_boxplot()
+
+leaf_trichome.density.2012.lmer <-  lmer(log(leaf_trichome.density+1) ~ treatment*genotype + (1|block/treatment), 
                            data = filter(wind.df, Year == "2012"))
 summary(leaf_trichome.density.2012.lmer)
 plot(leaf_trichome.density.2012.lmer)
@@ -155,7 +197,10 @@ anova(leaf_trichome.density.2012.lmer, ddf = "Kenward-Roger")
 
 # larva wet weight exp. 1
 with(filter(wind.df, Year == "2013", larva.survival.exp1 == 1), table(treatment, genotype)) # lower sample sizes in first vs. second experiment.
-larva.wet.wt.exp1.lmer <-  lmer(larva.wet.wt.exp1 ~ treatment*genotype + (1|block), 
+ggplot(wind.df, aes(x = genotype, y = larva.wet.wt.exp1, color = treatment)) +
+  geom_boxplot()
+
+larva.wet.wt.exp1.lmer <- lmer(larva.wet.wt.exp1 ~ treatment*genotype + (1|block/treatment), 
                                          data = filter(wind.df, Year == "2013"))
 summary(larva.wet.wt.exp1.lmer)
 plot(larva.wet.wt.exp1.lmer)
@@ -163,7 +208,10 @@ anova(larva.wet.wt.exp1.lmer, ddf = "Kenward-Roger")
 
 # larva wet weight exp. 2
 with(filter(wind.df, Year == "2013", larva.survival.exp2 == 1), table(treatment, genotype))
-larva.wet.wt.exp2.lmer <-  lmer(log(larva.wet.wt.exp2+1) ~ treatment*genotype + (1|block), 
+ggplot(wind.df, aes(x = genotype, y = larva.wet.wt.exp2, color = treatment)) +
+  geom_boxplot()
+
+larva.wet.wt.exp2.lmer <-  lmer(log(larva.wet.wt.exp2+1) ~ treatment*genotype + (1|block/treatment), 
                                 data = filter(wind.df, Year == "2013"))
 summary(larva.wet.wt.exp2.lmer)
 plot(larva.wet.wt.exp2.lmer)
