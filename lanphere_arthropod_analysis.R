@@ -29,38 +29,102 @@ wind.arth.df <- read.csv('~/Documents/Lanphere_Experiments/final_data/wind_arthr
 ## wind arthropod community
 wind.arth.nonzero <- rowSums(
   select(wind.arth.df, Gracilliaridae_miner:Spider))
+wind.arth.rich <- rowSums(
+  select(wind.arth.df, Gracilliaridae_miner:Spider) > 0)
+
+wind.arth.df <- mutate(wind.arth.df, wind.arth.nonzero = wind.arth.nonzero,
+                       wind.arth.rich = wind.arth.rich)
 
 # 2012
 wind.arth.2012 <- wind.arth.df %>%
-  select(Year:plant_code, Gracilliaridae_miner:Spider) %>%
-  filter(Year == 2012, wind.arth.nonzero > 0)
+  select(Year:plant_code, Gracilliaridae_miner:Spider, wind.arth.rich, wind.arth.nonzero) %>%
+  filter(Year == 2012, wind.arth.nonzero > 0, Genotype != "J")
 
 wind.comm.2012 <- wind.arth.2012 %>%
   select(Gracilliaridae_miner:Spider) 
 colSums(wind.comm.2012)/sum(colSums(wind.comm.2012)) # dominant groups: aphids, leaf miners, leaf tiers, and spiders
 
-wind.2012.adonis <- adonis(wind.comm.2012 ~ Genotype*Wind.Exposure, data = wind.arth.2012, strata = wind.arth.2012$Block)
+wind.2012.adonis <- adonis(wind.comm.2012 ~ Genotype*Wind.Exposure, data = wind.arth.2012, strata = wind.arth.2012$Block, method = "bray")
 wind.2012.adonis # consider using euclidean distances to preserve all of the samples in the dataset.
 
+wind.12.cap <- capscale(wind.comm.2012 ~ Genotype + Wind.Exposure + Condition(Block), data = wind.arth.2012, distance = "bray")
+summary(wind.12.cap)
+plot(wind.12.cap, display = c("cn","sp"))
+
+anova(betadisper(vegdist(wind.comm.2012, method = "bray"), 
+                 group = wind.arth.2012$Genotype,
+                 bias.adjust = TRUE))
+boxplot(betadisper(vegdist(wind.comm.2012, method = "bray"), 
+                 group = wind.arth.2012$Genotype,
+                 bias.adjust = TRUE))
+
+wind.2012.rda <- rda(decostand(wind.comm.2012,
+                               method = "hellinger") ~ 
+                       Wind.Exposure +
+                       Condition(Block),
+                     data = wind.arth.2012)
+summary(wind.2012.rda)
+plot(wind.2012.rda, display = c("cn","sp"))
+
 # note that using wind.arth.2012 greatly reduces the size of the dataset.
+wind.arth.2012.lmer <- wind.arth.df %>%
+  select(Year:plant_code, Gracilliaridae_miner:Spider, wind.arth.nonzero, wind.arth.rich) %>%
+  filter(Year == 2012)
+
+rich.12 <- glmer((wind.arth.rich>0) ~ Wind.Exposure*Genotype + 
+                  (1|Block/Wind.Exposure),
+                family = "binomial",
+                wind.arth.2012.lmer)
+summary(rich.12)
+anova(rich.12, ddf = "Kenward-Roger")
+plot(rich.12)
+plot((wind.arth.rich) ~ Wind.Exposure + Genotype, wind.arth.2012.lmer)
+
+arth.abund.12 <- lmer(log(wind.arth.nonzero+1) ~ Wind.Exposure*Genotype + 
+                        (1|Block/Wind.Exposure),
+                      wind.arth.2012.lmer)
+anova(arth.abund.12, ddf = "Kenward-Roger")
+plot(arth.abund.12)
+plot(wind.arth.nonzero ~ Wind.Exposure, wind.arth.2012.lmer)
+
+hist(log(wind.arth.2012$Gracilliaridae_miner+1))
 w.Grac.12 <- lmer(log(Gracilliaridae_miner+1) ~ Wind.Exposure + Genotype + (1|Block/Wind.Exposure),
                   wind.arth.2012)
 summary(w.Grac.12)
+plot(w.Grac.12)
+anova(w.Grac.12, type = 3, ddf = "Kenward-Roger")
+plot(log(Gracilliaridae_miner+1) ~ Genotype, wind.arth.2012)
+table(wind.arth.2012$Genotype)
+plot(log(Gracilliaridae_miner+1) ~ Wind.Exposure, wind.arth.2012)
+
+w.Grac.12.glmer <- glmer((Gracilliaridae_miner>0) ~ Wind.Exposure + Genotype + (1|Block/Wind.Exposure), family = "binomial",
+                  wind.arth.2012.lmer)
+summary(w.Grac.12.glmer)
+plot(w.Grac.12.glmer)
+anova(w.Grac.12.glmer, update(w.Grac.12.glmer, .~. -Wind.Exposure))
 anova(w.Grac.12, type = 3, ddf = "Kenward-Roger")
 
-w.spid.12 <- lmer(log(Spider+1) ~ Wind.Exposure + Genotype + (1|Block/Wind.Exposure),
+w.spid.12 <- lmer(log(Spider+1) ~ Wind.Exposure*Genotype + (1|Block/Wind.Exposure),
                   wind.arth.2012)
 summary(w.spid.12)
 anova(w.spid.12, type = 3, ddf = "Kenward-Roger")
 plot(w.spid.12)
 
-w.Aphid.12 <- lmer(log(Aphididae+1) ~ Wind.Exposure + Genotype + (1|Block/Wind.Exposure),
+w.Aphid.12 <- lmer(log(Aphididae+1) ~ Wind.Exposure*Genotype + (1|Block/Wind.Exposure),
                    wind.arth.2012)
 summary(w.Aphid.12)
 anova(w.Aphid.12, type = 3, ddf = "Kenward-Roger")
 plot(w.Aphid.12)
+plot(log(Aphididae+1) ~ Wind.Exposure, wind.arth.2012)
 
-w.Tort.12 <- lmer(log(Tortricidiae_leaftier+1) ~ Wind.Exposure + Genotype + (1|Block/Wind.Exposure),
+w.Aphid.12 <- glmer(Aphididae ~ Wind.Exposure + Genotype + (1|Block/Wind.Exposure),
+                    family = "poisson",
+                   wind.arth.2012.lmer)
+summary(w.Aphid.12)
+anova(w.Aphid.12, type = 3, ddf = "Kenward-Roger")
+plot(w.Aphid.12)
+
+w.Tort.12 <- lmer(log(Tortricidiae_leaftier+1) ~ Wind.Exposure*Genotype + (1|Block/Wind.Exposure),
                   wind.arth.2012)
 summary(w.Tort.12)
 anova(w.Tort.12, type = 3, ddf = "Kenward-Roger")
@@ -85,30 +149,43 @@ colSums(wind.comm.2013)/sum(colSums(wind.comm.2013)) # dominant groups: leaf min
 wind.2013.adonis <- adonis(wind.comm.2013 ~ Genotype*Wind.Exposure, data = wind.arth.2013, strata = wind.arth.2013$Block)
 wind.2013.adonis # interesting... only an effect of wind exposure
 
-w.spid.13 <- lmer(log(Spider+1) ~ Wind.Exposure + (1|Genotype) + (1|Block/Wind.Exposure),
+w.spid.13 <- lmer(log(Spider+1) ~ Wind.Exposure*Genotype + (1|Block/Wind.Exposure),
                    wind.arth.2013)
 summary(w.spid.13)
 anova(w.spid.13, type = 3, ddf = "Kenward-Roger")
 plot(w.spid.13)
 
-w.Cecid.13 <- lmer(log(Cecidomyiidae_gall+1) ~ Wind.Exposure + (1|Genotype) + (1|Block/Wind.Exposure),
+hist(wind.arth.2013$Cecidomyiidae_gall)
+w.Cecid.13 <- lmer(log(Cecidomyiidae_gall+1) ~ Wind.Exposure + Genotype + (1|Block/Wind.Exposure),
                    wind.arth.2013)
 summary(w.Cecid.13)
 anova(w.Cecid.13, type = 3, ddf = "Kenward-Roger")
 plot(w.Cecid.13)
+plot(log(Cecidomyiidae_gall+1) ~ Wind.Exposure + Genotype, wind.arth.2013)
 
+w.Cecid.13.glmer <- glmer((Cecidomyiidae_gall>0) ~ Wind.Exposure + (1|Genotype) + (1|Block/Wind.Exposure), family = "binomial",
+                   wind.arth.2013)
+summary(w.Cecid.13.glmer)
+
+hist(log(wind.arth.2013$Tortricidiae_leaftier+1))
 w.Tort.13 <- lmer(log(Tortricidiae_leaftier+1) ~ Wind.Exposure + (1|Genotype) + (1|Block/Wind.Exposure),
                    wind.arth.2013)
 summary(w.Tort.13)
 anova(w.Tort.13, type = 3, ddf = "Kenward-Roger")
 plot(w.Tort.13)
+plot(log(Tortricidiae_leaftier+1) ~ Wind.Exposure, wind.arth.2013)
 
-anova(betadisper(vegdist(wind.comm.2013), 
+w.Tort.13.glmer <- glmer((Tortricidiae_leaftier>0) ~ Wind.Exposure + (1|Genotype) + (1|Block/Wind.Exposure), family = "binomial",
+                  wind.arth.2013)
+summary(w.Tort.13)
+anova(w.Tort.13, type = 3, ddf = "Kenward-Roger")
+
+plot(betadisper(vegdist(wind.comm.2013), 
                  group = wind.arth.2013$Wind.Exposure,
                  bias.adjust = TRUE)) # violates assumption of adonis
-anova(betadisper(vegdist(wind.comm.2013), 
+plot(betadisper(vegdist(wind.comm.2013), 
                  group = wind.arth.2013$Genotype,
-                 bias.adjust = TRUE)) # violates assumption of adonis...
+                 bias.adjust = TRUE)) # doesn't violates assumption of adonis...
 
 
 ## ant-aphid growth rates ----
