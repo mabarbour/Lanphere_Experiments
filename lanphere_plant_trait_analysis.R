@@ -83,61 +83,15 @@ height.lmer <- lmer(Height ~ treatment*Year*genotype +
 summary(height.lmer)
 plot(height.lmer) # diamond shaped...
 
-anova.table(height.lmer, experiment = "wind")
+# Kenward-Roger test
+height.anova <- anova.table(height.lmer, experiment = "wind")
 
 # calculate variance components for simplified model
 height.up <- update(height.lmer, .~. -treatment*Year*genotype + (1|genotype) + treatment*Year)
 
-var.table(height.up, "wind")
-plotREsim(REsim(height.up))
-sem.model.fits(height.up)
-
-# Kenward-Roger test
-height.anova <- anova(height.lmer, ddf = "Kenward-Roger") %>%
-  tidy() %>%
-  mutate(Response = "plant height",
-         Response.type = "phenotype",
-         Specific.type = "plant growth",
-         Test.type = "F (Kenward-Roger)",
-         Experiment = "wind",
-         Model.type = "LMM",
-         Error.dist = "gaussian",
-         Response.trans = "none") %>%
-  select(Experiment, Response.type, Specific.type, Response,
-         Factor = term, num_DF = NumDF, den_DF = DenDF, 
-         Statistic = statistic, P_value = p.value, Model.type, 
-         Test.type, Error.dist, Response.trans) %>%
-  mutate(Statistic = round(Statistic,2),
-         P_value = round(P_value,3),
-         den_DF = round(den_DF,1))
-
-## Calculate R2 for significant predictors
-height.2x <- update(height.lmer, .~. -treatment:genotype:Year)
-height.main <- update(height.lmer, .~. -treatment*genotype*Year + treatment + genotype + Year)
-
-height.R2 <- 
-  data.frame(Factor = c("treatment:Year:genotype","treatment:Year","treatment","genotype","Year"),
-             Response = "plant height",
-             Response.type = "phenotype",
-             Specific.type = "plant growth",
-             Experiment = "wind",
-             delta_R2 = round(c(deltaR2(height.lmer, update(height.2x, .~. -treatment:Year:genotype)),
-                                deltaR2(height.2x, update(height.2x, .~. -treatment:Year)),
-                                deltaR2(height.main, update(height.main, .~. -treatment)),
-                                deltaR2(height.main, update(height.main, .~. -genotype)),
-                                deltaR2(height.main, update(height.main, .~. -Year))),2))
+height.R2 <- var.table(height.up, experiment = "wind")
 
 ## Wind: shoot count analysis ----
-
-# explore 2-way interactions
-with(filter(wind.df, all.shoot.count > 0), interaction.plot(treatment, genotype, all.shoot.count))
-with(filter(wind.df, all.shoot.count > 0), interaction.plot(treatment, Year, all.shoot.count))
-with(filter(wind.df, all.shoot.count > 0), interaction.plot(Year, genotype, all.shoot.count))
-
-# explore main effects
-with(filter(wind.df, all.shoot.count > 0), plot(all.shoot.count ~ treatment))
-with(filter(wind.df, all.shoot.count > 0), plot(all.shoot.count ~ genotype))
-with(filter(wind.df, all.shoot.count > 0), plot(all.shoot.count ~ Year))
 
 # GLMM
 shoot.count.glmer <- glmer(all.shoot.count ~ treatment*genotype*Year +
@@ -152,71 +106,18 @@ shoot.count.glmer <- glmer(all.shoot.count ~ treatment*genotype*Year +
                          control=glmerControl(optimizer="bobyqa",
                                               optCtrl=list(maxfun=2e5)))
 summary(shoot.count.glmer)
-Anova(shoot.count.glmer, test = "Chisq", type = 3)
 overdisp_fun(shoot.count.glmer) # no overdispersion
-plot(shoot.count.glmer) # looks okay
+plot(shoot.count.glmer)
+
+## Wald-tests
+shoot.count.anova <- anova.table(shoot.count.glmer, test = "Chisq", type = 3, experiment = "wind")
 
 # calculate variance components for simplified model
 shoot.count.up <- update(shoot.count.glmer, .~. -treatment*Year*genotype + (1|genotype) + treatment*Year)
-Anova(shoot.count.up, test = "Chisq", type = 3)
 
-summary(shoot.count.up)
-var.calc(shoot.count.up)
-plotREsim(REsim(shoot.count.up))
-sem.model.fits(shoot.count.up) # not working....
-
-
-
-# Likelihood ratio tests
-w.sh.3 <- drop1(shoot.count.glmer, test = "Chisq") %>% tidy()
-w.sh.2 <- drop1(update(shoot.count.glmer, .~. -treatment:genotype:Year), test = "Chisq") %>% tidy()
-w.sh.1 <- drop1(update(shoot.count.glmer, .~. -treatment*genotype*Year + treatment + genotype + Year), test = "Chisq") %>% tidy()
-
-shoot.count.anova <- bind_rows(w.sh.1, w.sh.2, w.sh.3) %>%
-  filter(term != "<none>") %>%
-  mutate(Response = "shoot count",
-         Response.type = "phenotype",
-         Specific.type = "plant growth",
-         Test.type = "Chi-square",
-         Experiment = "wind",
-         Model.type = "GLMM",
-         Error.dist = "poisson",
-         Response.trans = "none") %>%
-  select(Experiment, Response.type, Specific.type, Response,
-         Factor = term, num_DF = df, #den_DF = DenDF, 
-         Statistic = LRT, P_value = Pr.Chi., Model.type, 
-         Test.type, Error.dist, Response.trans) %>%
-  mutate(Statistic = round(Statistic,2),
-         #den_DF = round(den_DF,1),
-         P_value = round(P_value,3))
-
-## Calculate R2 for significant predictors
-shoot.count.2x <- update(shoot.count.glmer, .~. -treatment:genotype:Year)
-shoot.count.main <- update(shoot.count.glmer, .~. -treatment*genotype*Year + treatment + genotype + Year)
-
-shoot.count.R2 <- 
-  data.frame(Factor = c("genotype:Year","treatment:Year","treatment","genotype","Year"),
-             Response = "shoot count",
-             Response.type = "phenotype",
-             Specific.type = "plant growth",
-             Experiment = "wind",
-             delta_R2 = round(c(deltaR2(shoot.count.2x, update(shoot.count.2x, .~. -genotype:Year)),
-                        deltaR2(shoot.count.2x, update(shoot.count.2x, .~. -treatment:Year)),
-                        deltaR2(shoot.count.main, update(shoot.count.main, .~. -treatment)),
-                        deltaR2(shoot.count.main, update(shoot.count.main, .~. -genotype)),
-                        deltaR2(shoot.count.main, update(shoot.count.main, .~. -Year))),2))
+shoot.count.R2 <- var.table(shoot.count.up, experiment = "wind")
 
 ## Wind: average shoot length analysis ----
-
-# plot 2-way interactions
-with(filter(wind.df, all.shoot.avg.length > 0), interaction.plot(treatment, genotype, all.shoot.avg.length))
-with(filter(wind.df, all.shoot.avg.length > 0), interaction.plot(treatment, Year, all.shoot.avg.length))
-with(filter(wind.df, all.shoot.avg.length > 0), interaction.plot(Year, genotype, all.shoot.avg.length))
-
-# plot main effects
-with(filter(wind.df, all.shoot.avg.length > 0), plot(all.shoot.avg.length ~ Year))
-with(filter(wind.df, all.shoot.avg.length > 0), plot(all.shoot.avg.length ~ genotype))
-with(filter(wind.df, all.shoot.avg.length > 0), plot(all.shoot.avg.length ~ treatment))
 
 # LMM 
 shoot.length.lmer <- lmer(log(all.shoot.avg.length) ~ treatment*genotype*Year +
@@ -229,47 +130,19 @@ shoot.length.lmer <- lmer(log(all.shoot.avg.length) ~ treatment*genotype*Year +
                                            Year = "contr.sum"))
 summary(shoot.length.lmer)
 plot(shoot.length.lmer) # looks okay
-Anova(shoot.length.lmer, test = "F", type = 3) %>% tidy()
 
 # Kenward-Roger tests 
-shoot.length.anova <- anova(shoot.length.lmer, ddf = "Kenward-Roger")   %>%
-  tidy() %>%
-  mutate(Response = "average shoot length",
-         Response.type = "phenotype",
-         Specific.type = "plant growth",
-         Test.type = "F (Kenward-Roger)",
-         Experiment = "wind",
-         Model.type = "LMM",
-         Error.dist = "gaussian",
-         Response.trans = "log") %>%
-  select(Experiment, Response.type, Specific.type, Response,
-         Factor = term, num_DF = NumDF, den_DF = DenDF, 
-         Statistic = statistic, P_value = p.value, Model.type, 
-         Test.type, Error.dist, Response.trans) %>%
-  mutate(Statistic = round(Statistic,2),
-         P_value = round(P_value,3),
-         den_DF = round(den_DF,1))
+shoot.length.anova <- anova.table(shoot.length.lmer, experiment = "wind")
 
 ## Calculate R2 for significant predictors
 # no interaction effects were significant so I didn't calculate R2
-shoot.length.main <- update(shoot.length.lmer, .~. -treatment*genotype*Year + treatment + genotype + Year)
+shoot.length.up <- update(shoot.length.lmer, .~. -treatment*genotype*Year + treatment + Year + (1|genotype))
 
-shoot.length.R2 <- 
-  data.frame(Factor = c("treatment","genotype","Year"),
-             Response = "average shoot length",
-             Response.type = "phenotype",
-             Specific.type = "plant growth",
-             Experiment = "wind",
-             delta_R2 = round(c(deltaR2(shoot.length.main, update(shoot.length.main, .~. -treatment)),
-                                deltaR2(shoot.length.main, update(shoot.length.main, .~. -genotype)),
-                                deltaR2(shoot.length.main, update(shoot.length.main, .~. -Year))),2))
+shoot.length.R2 <- var.table(shoot.length.up, experiment = "wind")
 
 ## Wind: leaf water content ----
 hist(wind.df$leaf_WC)
 WC_nonsense <- which(wind.df$leaf_WC < 0)
-
-plot(leaf_WC ~ genotype, wind.df[-WC_nonsense, ])
-with(filter(wind.df[-WC_nonsense, ], leaf_WC > 0), interaction.plot(Year, genotype, leaf_WC))
 
 leaf_WC.lmer <- lmer(log(leaf_WC) ~ treatment*genotype*Year +
                             (1|block) + 
@@ -279,44 +152,19 @@ leaf_WC.lmer <- lmer(log(leaf_WC) ~ treatment*genotype*Year +
                          contrast = list(treatment = "contr.sum",
                                          genotype = "contr.sum",
                                          Year = "contr.sum"))
-summary(leaf_WC.lmer)
+summary(leaf_WC.lmer)  # note that plant.id explains the least amount of variance
 plot(leaf_WC.lmer) # looks good
 
 # Kenward-Roger test
-leaf_WC.anova <- anova(leaf_WC.lmer, ddf = "Kenward-Roger")  %>%
-  tidy() %>%
-  mutate(Response = "leaf water content",
-         Response.type = "phenotype",
-         Specific.type = "leaf quality",
-         Test.type = "F (Kenward-Roger)",
-         Experiment = "wind",
-         Model.type = "LMM",
-         Error.dist = "gaussian",
-         Response.trans = "log") %>%
-  select(Experiment, Response.type, Specific.type, Response,
-         Factor = term, num_DF = NumDF, den_DF = DenDF, 
-         Statistic = statistic, P_value = p.value, Model.type, 
-         Test.type, Error.dist, Response.trans) %>%
-  mutate(Statistic = round(Statistic,2),
-         P_value = round(P_value,3),
-         den_DF = round(den_DF,1))
+leaf_WC.anova <- anova.table(leaf_WC.lmer, experiment = "wind")
 
 ## Calculate R2
-leaf_WC.2x <- update(leaf_WC.lmer, .~. -treatment:genotype:Year)
-leaf_WC.main <- update(leaf_WC.lmer, .~. -treatment*genotype*Year + treatment + genotype + Year)
+leaf_WC.up <- update(leaf_WC.lmer, .~. -treatment*genotype*Year + Year + (Year|genotype) - (1|plant.id)) # removed plant.id as random effect because it explained very little of the variance in the big model and it enabled this model to converge. Note though that the results are qualitatively similar if I remove other random effects to enable the model to converge 
+summary(leaf_WC.up)
 
-leaf_WC.R2 <- 
-  data.frame(Factor = c("genotype:Year","genotype"),
-             Response = "leaf water content",
-             Response.type = "phenotype",
-             Specific.type = "leaf quality",
-             Experiment = "wind",
-             delta_R2 = round(c(deltaR2(leaf_WC.2x, update(leaf_WC.2x, .~. -genotype:Year)),
-                                deltaR2(leaf_WC.main, update(leaf_WC.main, .~. -genotype))),2))
+leaf_WC.R2 <- var.table(leaf_WC.up, experiment = "wind")
 
 ## Wind: trichome density analysis ----
-with(filter(wind.df, leaf_trichome.density != "NA"), interaction.plot(treatment, genotype, leaf_trichome.density))
-
 leaf_trichome.density.glmer <- glmer(
   leaf_trichome.density ~ treatment*genotype +
     (1|block) + 
@@ -333,45 +181,16 @@ overdisp_fun(leaf_trichome.density.glmer)
 plot(leaf_trichome.density.glmer) # becomes rather skewed when I model the individual-level random effect
 
 # Likelihood-ratio tests
-w.td.2 <- drop1(leaf_trichome.density.glmer, 
-      test = "Chisq") %>% tidy()
-w.td.1 <- drop1(update(leaf_trichome.density.glmer, .~. -treatment:genotype), 
-      test = "Chisq") %>% tidy()
-
-trichome.density.anova <- bind_rows(w.td.1, w.td.2) %>%
-  filter(term != "<none>") %>%
-  mutate(Response = "leaf trichome density",
-         Response.type = "phenotype",
-         Specific.type = "leaf quality",
-         Test.type = "Chi-square",
-         Experiment = "wind",
-         Model.type = "GLMM",
-         Error.dist = "poisson",
-         Response.trans = "none") %>%
-  select(Experiment, Response.type, Specific.type, Response,
-         Factor = term, num_DF = df, #den_DF = DenDF, 
-         Statistic = LRT, P_value = Pr.Chi., Model.type, 
-         Test.type, Error.dist, Response.trans) %>%
-  mutate(Statistic = round(Statistic,2),
-         #den_DF = round(den_DF,1),
-         P_value = round(P_value,3))
+trichome.density.anova <- anova.table(leaf_trichome.density.glmer, test = "Chisq", experiment = "wind")
 
 ## Calculate R2
-leaf_trichome.density.main <- update(leaf_trichome.density.glmer, .~. -treatment*genotype + treatment + genotype)
+leaf_trichome.density.up <- update(leaf_trichome.density.glmer, .~. -treatment*genotype + (1|genotype) - (1|block)) # removed block as well because the updated model with block didn't explain any of the variance (therefore, over-specified). Note that this doesn't change the variance explained by Genotype either way.
 
-leaf_trichome.density.R2 <- 
-  data.frame(Factor = "genotype",
-             Response = "leaf trichome density",
-             Response.type = "phenotype",
-             Specific.type = "leaf quality",
-             Experiment = "wind",
-             delta_R2 = round(c(deltaR2(leaf_trichome.density.main, 
-                                        update(leaf_trichome.density.main, .~. -genotype))),2))
+leaf_trichome.density.R2 <- var.table(leaf_trichome.density.up, experiment = "wind")
 
 ## Wind: leaf C:N analysis ----
-hist(wind.df$leaf_C_N)
-plot(leaf_C_N ~ genotype, wind.df)
 
+# LMM
 leaf_CN.lmer <- lmer(log(leaf_C_N) ~ treatment*genotype +
                             (1|block) + (1|block:treatment),
                           data = wind.df,
@@ -381,37 +200,17 @@ summary(leaf_CN.lmer)
 plot(leaf_CN.lmer) # looks pretty good
 
 ## Kenwar-Roger test
-leaf_CN.anova <- anova(leaf_CN.lmer, ddf = "Kenward-Roger") %>%
-  tidy() %>%
-  mutate(Response = "leaf C:N",
-         Response.type = "phenotype",
-         Specific.type = "leaf quality",
-         Test.type = "F (Kenward-Roger)",
-         Experiment = "wind",
-         Model.type = "LMM",
-         Error.dist = "gaussian",
-         Response.trans = "log") %>%
-  select(Experiment, Response.type, Specific.type, Response,
-         Factor = term, num_DF = NumDF, den_DF = DenDF, 
-         Statistic = statistic, P_value = p.value, Model.type, 
-         Test.type, Error.dist, Response.trans) %>%
-  mutate(Statistic = round(Statistic,2),
-         P_value = round(P_value,3),
-         den_DF = round(den_DF,1))
+leaf_CN.anova <- anova.table(leaf_CN.lmer, experiment = "wind")
 
 ## Calculate R2
-leaf_CN.main <- update(leaf_CN.lmer, .~. -treatment*genotype + treatment + genotype)
+leaf_CN.up <- update(leaf_CN.lmer, .~. -treatment*genotype + (1|genotype))
 
-leaf_CN.R2 <- 
-  data.frame(Factor = c("genotype"),
-             Response = "leaf C:N",
-             Response.type = "phenotype",
-             Specific.type = "leaf quality",
-             Experiment = "wind",
-             delta_R2 = round(c(deltaR2(leaf_CN.main, update(leaf_CN.main, .~. -genotype))),2))
+leaf_CN.R2 <- var.table(leaf_CN.up, experiment = "wind")
 
 ## Wind: SLA analysis ----
 hist(wind.df$SLA)
+
+# LMM
 SLA.lmer <- lmer(SLA ~ treatment*genotype +
                             (1|block) + (1|block:treatment),
                           data = wind.df,
@@ -421,34 +220,12 @@ summary(SLA.lmer)
 plot(SLA.lmer) # residuals look okay
 
 ## Kenward-Roger test
-SLA.anova <- anova(SLA.lmer, ddf = "Kenward-Roger") %>%
-  tidy() %>%
-  mutate(Response = "SLA",
-         Response.type = "phenotype",
-         Specific.type = "leaf quality",
-         Test.type = "F (Kenward-Roger)",
-         Experiment = "wind",
-         Model.type = "LMM",
-         Error.dist = "gaussian",
-         Response.trans = "none") %>%
-  select(Experiment, Response.type, Specific.type, Response,
-         Factor = term, num_DF = NumDF, den_DF = DenDF, 
-         Statistic = statistic, P_value = p.value, Model.type, 
-         Test.type, Error.dist, Response.trans) %>%
-  mutate(Statistic = round(Statistic,2),
-         P_value = round(P_value,3),
-         den_DF = round(den_DF,1))
+SLA.anova <- anova.table(SLA.lmer, experiment = "wind")
 
 ## Calculate R2
-SLA.main <- update(SLA.lmer, .~. -treatment*genotype + treatment + genotype)
+SLA.up <- update(SLA.lmer, .~. -treatment*genotype + (1|genotype))
 
-SLA.R2 <- 
-  data.frame(Factor = c("genotype"),
-             Response = "SLA",
-             Response.type = "phenotype",
-             Specific.type = "leaf quality",
-             Experiment = "wind",
-             delta_R2 = round(c(deltaR2(SLA.main, update(SLA.main, .~. -genotype))),2))
+SLA.R2 <- var.table(SLA.up, experiment = "wind")
 
 ## Wind: larva wet weight exp. 1 analysis ----
 hist(wind.df$larva.wet.wt.exp1)
@@ -496,60 +273,28 @@ drop1(update(larva.wet.wt.exp2.glmer, .~. -treatment:genotype),
              test = "Chisq") # no genotype or treatment effect
 
 ## Ant-aphid: plant height analysis ----
-aa.df <- mutate(aa.df, scale.AntDist = scale(Ant.Mound.Dist))
-aa.height.lmer <- mixed(Height ~ Aphid.Treatment*scale.AntDist*Genotype +
+
+# LMM
+aa.height.lmer <- lmer(Height ~ Aphid.Treatment*scale(Ant.Mound.Dist)*Genotype +
                            (1|Block) + (1|Block:fact.Ant.Mound.Dist),
                          data = filter(aa.df, Year == "2012"),
                          contrasts = list(Aphid.Treatment = "contr.sum",
-                                          Genotype = "contr.sum"), )
-library(afex)
-mixed(aa.height.lmer)
-plot(aa.height.lmer) # not great...
+                                          Genotype = "contr.sum"))
 summary(aa.height.lmer)
-
-Anova(aa.height.lmer, test = "F", type = 3)
-
-aa.height.simp <- update(aa.height.lmer, .~. -Aphid.Treatment*scale(Ant.Mound.Dist)*Genotype + (1|Genotype))
-var.calc(aa.height.simp)
+plot(aa.height.lmer) # not great...
 
 ## Kenward-Roger test
-aa.height.anova <- anova(aa.height.lmer, ddf = "Kenward-Roger") %>%
-  tidy() %>%
-  mutate(Response = "plant height",
-         Response.type = "phenotype",
-         Specific.type = "plant growth",
-         Test.type = "F (Kenward-Roger)",
-         Experiment = "ant-aphid",
-         Model.type = "LMM",
-         Error.dist = "gaussian",
-         Response.trans = "none") %>%
-  select(Experiment, Response.type, Specific.type, Response,
-         Factor = term, num_DF = NumDF, den_DF = DenDF, 
-         Statistic = statistic, P_value = p.value, Model.type, 
-         Test.type, Error.dist, Response.trans) %>%
-  mutate(Statistic = round(Statistic,2),
-         P_value = round(P_value,3),
-         den_DF = round(den_DF,1))
+aa.height.anova <- anova.table(aa.height.lmer, experiment = "ant-aphid") 
 
 ## Calculate R2
-aa.height.main <- update(aa.height.lmer, 
-                         .~. -Aphid.Treatment*scale(Ant.Mound.Dist)*Genotype + 
-                           Aphid.Treatment + scale(Ant.Mound.Dist) + Genotype)
+aa.height.up <- update(aa.height.lmer, 
+                         .~. -Aphid.Treatment*scale(Ant.Mound.Dist)*Genotype + (1|Genotype))
 
-aa.height.R2 <- 
-  data.frame(Factor = "Genotype",
-             Response = "plant height",
-             Response.type = "phenotype",
-             Specific.type = "plant growth",
-             Experiment = "ant-aphid",
-             delta_R2 = round(c(deltaR2(aa.height.main, update(aa.height.main, .~. -Genotype))),2))
+aa.height.R2 <- var.table(aa.height.up, experiment = "ant-aphid")
 
 ## Ant-aphid: Shoot count analysis ----
-ggplot(filter(aa.df, Year == "2012"),
-       aes(x = Ant.Mound.Dist, y = log(all.shoot.count), color = Aphid.Treatment)) +
-  geom_point() + 
-  stat_smooth(method = "lm", family = "poisson", se = FALSE)
 
+# GLMM
 aa.shoot.count.glmer <- glmer(
   all.shoot.count ~ Aphid.Treatment*scale(Ant.Mound.Dist)*Genotype + 
     (1|Block) + (1|Block:fact.Ant.Mound.Dist),
@@ -563,44 +308,14 @@ plot(aa.shoot.count.glmer) # not great
 summary(aa.shoot.count.glmer)
 overdisp_fun(aa.shoot.count.glmer) # no overdispersion
 
-## Likelihood ratio tests
-aa.sh.3 <- drop1(aa.shoot.count.glmer, test = "Chisq") %>% tidy()
-aa.sh.2 <- drop1(update(aa.shoot.count.glmer, .~. -Aphid.Treatment:scale(Ant.Mound.Dist):Genotype), test = "Chisq") %>% tidy()
-aa.sh.1 <- drop1(update(aa.shoot.count.glmer, .~. -Aphid.Treatment*scale(Ant.Mound.Dist)*Genotype + Aphid.Treatment + scale(Ant.Mound.Dist) + Genotype), test = "Chisq") %>% tidy()
-
-aa.shoot.count.anova <- bind_rows(aa.sh.1, aa.sh.2, aa.sh.3) %>%
-  filter(term != "<none>") %>%
-  mutate(Response = "shoot count",
-         Response.type = "phenotype",
-         Specific.type = "plant growth",
-         Test.type = "Chi-square",
-         Experiment = "ant-aphid",
-         Model.type = "GLMM",
-         Error.dist = "poisson",
-         Response.trans = "none") %>%
-  select(Experiment, Response.type, Specific.type, Response,
-         Factor = term, num_DF = df, #den_DF = DenDF, 
-         Statistic = LRT, P_value = Pr.Chi., Model.type, 
-         Test.type, Error.dist, Response.trans) %>%
-  mutate(Statistic = round(Statistic,2),
-         #den_DF = round(den_DF,1),
-         P_value = round(P_value,3))
+## Wald Chi-square tests
+aa.shoot.count.anova <- anova.table(aa.shoot.count.glmer, test = "Chisq", experiment = "ant-aphid")
 
 ## Calculate R2 for significant predictors
-aa.shoot.count.2x <- update(aa.shoot.count.glmer, .~. -Aphid.Treatment:scale(Ant.Mound.Dist):Genotype)
-aa.shoot.count.main <- update(aa.shoot.count.glmer, 
-                         .~. -Aphid.Treatment*scale(Ant.Mound.Dist)*Genotype + 
-                           Aphid.Treatment + scale(Ant.Mound.Dist) + Genotype)
+aa.shoot.count.up <- update(aa.shoot.count.glmer, 
+                         .~. -Aphid.Treatment*scale(Ant.Mound.Dist)*Genotype + (1|Genotype))
 
-aa.shoot.count.R2 <- 
-  data.frame(Factor = c("Aphid.Treatment:scale(Ant.Mound.Dist)", "Aphid.Treatment", "Genotype"),
-             Response = "shoot count",
-             Response.type = "phenotype",
-             Specific.type = "plant growth",
-             Experiment = "ant-aphid",
-             delta_R2 = round(c(deltaR2(aa.shoot.count.2x, update(aa.shoot.count.2x, .~. -Aphid.Treatment:scale(Ant.Mound.Dist))),
-                                deltaR2(aa.shoot.count.main, update(aa.shoot.count.main, .~. -Aphid.Treatment)),
-                                deltaR2(aa.shoot.count.main, update(aa.shoot.count.main, .~. -Genotype))),2))
+aa.shoot.count.R2 <- var.table(aa.shoot.count.up, experiment = "ant-aphid")
 
 ## Ant-Aphid: Average shoot length analysis ----
 hist(aa.df$mature.shoot.avg.length)
@@ -613,39 +328,18 @@ plot(aa.mature.shoot.avg.length.lmer) # not great...
 summary(aa.mature.shoot.avg.length.lmer)
 
 ## Kenward-Roger
-aa.mature.shoot.avg.length.anova <- anova(aa.mature.shoot.avg.length.lmer, ddf = "Kenward-Roger") %>%
-  tidy() %>%
-  mutate(Response = "average shoot length",
-         Response.type = "phenotype",
-         Specific.type = "plant growth",
-         Test.type = "F (Kenward-Roger)",
-         Experiment = "ant-aphid",
-         Model.type = "LMM",
-         Error.dist = "gaussian",
-         Response.trans = "none") %>%
-  select(Experiment, Response.type, Specific.type, Response,
-         Factor = term, num_DF = NumDF, den_DF = DenDF, 
-         Statistic = statistic, P_value = p.value, Model.type, 
-         Test.type, Error.dist, Response.trans) %>%
-  mutate(Statistic = round(Statistic,2),
-         P_value = round(P_value,3),
-         den_DF = round(den_DF,1))
+aa.mature.shoot.avg.length.anova <- anova.table(aa.mature.shoot.avg.length.lmer, experiment = "ant-aphid")
 
 ## Calculate R2
-aa.mature.shoot.avg.length.main <- update(aa.mature.shoot.avg.length.lmer, 
-                         .~. -Aphid.Treatment*scale(Ant.Mound.Dist)*Genotype + 
-                           Aphid.Treatment + scale(Ant.Mound.Dist) + Genotype)
+aa.mature.shoot.avg.length.up <- update(aa.mature.shoot.avg.length.lmer, 
+                         .~. -Aphid.Treatment*scale(Ant.Mound.Dist)*Genotype + (1|Genotype))
 
-aa.mature.shoot.avg.length.R2 <- 
-  data.frame(Factor = "Genotype",
-             Response = "average shoot length",
-             Response.type = "phenotype",
-             Specific.type = "plant growth",
-             Experiment = "ant-aphid",
-             delta_R2 = round(c(deltaR2(aa.mature.shoot.avg.length.main, update(aa.mature.shoot.avg.length.main, .~. -Genotype))),2))
+aa.mature.shoot.avg.length.R2 <- var.table(aa.mature.shoot.avg.length.up, experiment = "ant-aphid")
 
 ## Ant-Aphid: leaf water content analysis ----
 hist(aa.df$leaf_WC)
+
+## LMM. Had to fix a less complex model because we didn't have enough replication of all treatment combinations
 aa.leaf_WC.lmer <- lmer(log(leaf_WC) ~ Aphid.Treatment*scale(Ant.Mound.Dist) + scale(Ant.Mound.Dist)*Genotype + (1|Block) + (1|Block:fact.Ant.Mound.Dist), 
                         data = filter(aa.df, Year == "2012"),
                         contrasts = list(Aphid.Treatment = "contr.sum",
@@ -654,45 +348,24 @@ summary(aa.leaf_WC.lmer)
 plot(aa.leaf_WC.lmer) # looks okay
 
 ## Kenward-Roger test
-aa.leaf_WC.anova <- anova(aa.leaf_WC.lmer, ddf = "Kenward-Roger") %>%
-  tidy() %>%
-  mutate(Response = "leaf water content",
-         Response.type = "phenotype",
-         Specific.type = "leaf quality",
-         Test.type = "F (Kenward-Roger)",
-         Experiment = "ant-aphid",
-         Model.type = "LMM",
-         Error.dist = "gaussian",
-         Response.trans = "log") %>%
-  select(Experiment, Response.type, Specific.type, Response,
-         Factor = term, num_DF = NumDF, den_DF = DenDF, 
-         Statistic = statistic, P_value = p.value, Model.type, 
-         Test.type, Error.dist, Response.trans) %>%
-  mutate(Statistic = round(Statistic,2),
-         P_value = round(P_value,3),
-         den_DF = round(den_DF,1))
+aa.leaf_WC.anova <- anova.table(aa.leaf_WC.lmer, experiment = "ant-aphid") # nothing significant, but genotype is the closest.
 
 ## Calculate R2
 # Genotype was not significant, but I'm still going to calculate its R2.
-aa.leaf_WC.main <- update(aa.leaf_WC.lmer, 
-                         .~. -Aphid.Treatment*scale(Ant.Mound.Dist) - scale(Ant.Mound.Dist)*Genotype + 
-                           Aphid.Treatment + scale(Ant.Mound.Dist) + Genotype)
+aa.leaf_WC.up <- update(aa.leaf_WC.lmer, 
+                         .~. -Aphid.Treatment*scale(Ant.Mound.Dist) - scale(Ant.Mound.Dist)*Genotype + (1|Genotype))
 
-aa.leaf_WC.R2 <- 
-  data.frame(Factor = "Genotype",
-             Response = "leaf water content",
-             Response.type = "phenotype",
-             Specific.type = "leaf quality",
-             Experiment = "ant-aphid",
-             delta_R2 = round(c(deltaR2(aa.leaf_WC.main, update(aa.leaf_WC.main, .~. -Genotype))),2))
+anova(aa.leaf_WC.up, update(aa.leaf_WC.up, .~. -(1|Genotype)))
+
+aa.leaf_WC.R2 <- var.table(aa.leaf_WC.up, experiment = "ant-aphid")
 
 ## Ant-aphid: leaf trichome density ----
-ggplot(filter(aa.df, Year == "2012"),
-       aes(x = Genotype, y = leaf_trichome.density)) +
-  geom_boxplot()
 
+# GLMM
 aa.leaf_trichome.density.glmer <- glmer(leaf_trichome.density ~ Aphid.Treatment*scale(Ant.Mound.Dist) + scale(Ant.Mound.Dist)*Genotype + 
-                                          (1|Block) + (1|Block:Ant.Mound.Dist) + (1|X),
+                                          (1|Block) + 
+                                          (1|X) +
+                                          (1|Block:Ant.Mound.Dist),
                                         data = filter(aa.df, Year == "2012"),
                                         family = "poisson",
                                         contrasts = list(Aphid.Treatment = "contr.sum",
@@ -701,43 +374,15 @@ aa.leaf_trichome.density.glmer <- glmer(leaf_trichome.density ~ Aphid.Treatment*
                                                              optCtrl=list(maxfun=2e5)))
 summary(aa.leaf_trichome.density.glmer)
 plot(aa.leaf_trichome.density.glmer) # not great
-overdisp_fun(aa.leaf_trichome.density.glmer)
+overdisp_fun(aa.leaf_trichome.density.glmer) # overdispersed so I modelled an individual-level random effect
 
-## Likelihood ratio tests
-aa.td.2 <- drop1(aa.leaf_trichome.density.glmer, test = "Chisq") %>% tidy()
-
-aa.leaf_trichome.density.main <- update(aa.leaf_trichome.density.glmer, 
-                                        .~. -Aphid.Treatment*scale(Ant.Mound.Dist) - scale(Ant.Mound.Dist)*Genotype + 
-                                          Aphid.Treatment + scale(Ant.Mound.Dist) + Genotype)
-
-aa.td.1 <- drop1(aa.leaf_trichome.density.main, test = "Chisq") %>% tidy()
-
-aa.trichome.density.anova <- bind_rows(aa.td.1, aa.td.2) %>%
-  filter(term != "<none>") %>%
-  mutate(Response = "leaf trichome density",
-         Response.type = "phenotype",
-         Specific.type = "leaf quality",
-         Test.type = "Chi-square",
-         Experiment = "ant-aphid",
-         Model.type = "GLMM",
-         Error.dist = "poisson",
-         Response.trans = "none") %>%
-  select(Experiment, Response.type, Specific.type, Response,
-         Factor = term, num_DF = df, #den_DF = DenDF, 
-         Statistic = LRT, P_value = Pr.Chi., Model.type, 
-         Test.type, Error.dist, Response.trans) %>%
-  mutate(Statistic = round(Statistic,2),
-         #den_DF = round(den_DF,1),
-         P_value = round(P_value,3))
+## Wald Chi-square tests
+aa.trichome.density.anova <- anova.table(aa.leaf_trichome.density.glmer, test = "Chisq", experiment = "ant-aphid")
 
 ## Calculate R2
-aa.leaf_trichome.density.R2 <- 
-  data.frame(Factor = "Genotype",
-             Response = "leaf trichome.density",
-             Response.type = "phenotype",
-             Specific.type = "leaf quality",
-             Experiment = "ant-aphid",
-             delta_R2 = round(c(deltaR2(aa.leaf_trichome.density.main, update(aa.leaf_trichome.density.main, .~. -Genotype))),2))
+aa.leaf_trichome.density.up <- update(aa.leaf_trichome.density.glmer, .~. -Aphid.Treatment*scale(Ant.Mound.Dist) - scale(Ant.Mound.Dist)*Genotype + (1|Genotype))
+
+aa.leaf_trichome.density.R2 <- var.table(aa.leaf_trichome.density.up, experiment = "ant-aphid")
 
 ## Print Summary ----
 trait.anovas <- bind_rows(height.anova, 
@@ -751,7 +396,9 @@ trait.anovas <- bind_rows(height.anova,
                           aa.shoot.count.anova,
                           aa.mature.shoot.avg.length.anova,
                           aa.leaf_WC.anova,
-                          aa.trichome.density.anova)
+                          aa.trichome.density.anova) %>%
+  dplyr::select(experiment, response, term, test, df, Df.res, statistic, p.value, Pr..Chisq.)
+
 trait.R2s <- bind_rows(height.R2,
                        shoot.count.R2,
                        shoot.length.R2,
@@ -765,11 +412,12 @@ trait.R2s <- bind_rows(height.R2,
                        aa.leaf_WC.R2,
                        aa.leaf_trichome.density.R2)
 #bind_cols(trait.anovas, trait.R2s)
-#write.csv(trait.anovas, "trait.anovas.csv")
+write.csv(trait.anovas, "trait.anovas.csv")
+write.csv(trait.R2s, "trait.R2s.csv")
 
-ggplot(trait.R2s, aes(x = Response, y = delta_R2, fill = Factor)) + geom_bar(stat = "identity", position = position_dodge()) +
-  #coord_flip() + 
-  facet_grid(Specific.type~Experiment) 
+ggplot(trait.R2s, aes(x = response, y = var_percent, fill = Factors)) + geom_bar(stat = "identity", position = position_dodge()) +
+  coord_flip() + 
+  facet_grid(~experiment) 
 
 ## Old ----
 ## Wind: Plant architecture 2012

@@ -1,22 +1,81 @@
-"","Experiment","Response.type","Specific.type","Response","Factor","num_DF","den_DF","Statistic","P_value","Model.type","Test.type","Error.dist","Response.trans"
-"1","wind","phenotype","plant growth","plant height","treatment",1,9.3,28.35,0,"LMM","F (Kenward-Roger)","gaussian","none"
-"2","wind","phenotype","plant growth","plant height","Year",1,163.6,192.85,0,"LMM","F (Kenward-Roger)","gaussian","none"
-"3","wind","phenotype","plant growth","plant height","genotype",9,148.5,8.13,0,"LMM","F (Kenward-Roger)","gaussian","none"
-"4","wind","phenotype","plant growth","plant height","treatment:Year",1,163.6,13.28,0,"LMM","F (Kenward-Roger)","gaussian","none"
-"5","wind","phenotype","plant growth","plant height","treatment:genotype",9,148.5,0.73,0.681,"LMM","F (Kenward-Roger)","gaussian","none"
-"6","wind","phenotype","plant growth","plant height","Year:genotype",9,160.8,0.97,0.465,"LMM","F (Kenward-Roger)","gaussian","none"
-"7","wind","phenotype","plant growth","plant height","treatment:Year:genotype",9,160.8,1.84,0.065,"LMM","F (Kenward-Roger)","gaussian","none"
-"8","wind","phenotype","plant growth","shoot count","treatment",1,NA,9.91,0.002,"GLMM","Chi-square","poisson","none"
-"9","wind","phenotype","plant growth","shoot count","genotype",9,NA,47.42,0,"GLMM","Chi-square","poisson","none"
-"10","wind","phenotype","plant growth","shoot count","Year",1,NA,5.68,0.017,"GLMM","Chi-square","poisson","none"
-"11","wind","phenotype","plant growth","shoot count","treatment:genotype",9,NA,10.7,0.297,"GLMM","Chi-square","poisson","none"
-"12","wind","phenotype","plant growth","shoot count","treatment:Year",1,NA,12.53,0,"GLMM","Chi-square","poisson","none"
-"13","wind","phenotype","plant growth","shoot count","genotype:Year",9,NA,18.26,0.032,"GLMM","Chi-square","poisson","none"
-"14","wind","phenotype","plant growth","shoot count","treatment:genotype:Year",9,NA,5.76,0.764,"GLMM","Chi-square","poisson","none"
-"15","wind","phenotype","plant growth","average shoot length","treatment",1,9.3,9.86,0.011,"LMM","F (Kenward-Roger)","gaussian","log"
-"16","wind","phenotype","plant growth","average shoot length","genotype",9,147,4.7,0,"LMM","F (Kenward-Roger)","gaussian","log"
-"17","wind","phenotype","plant growth","average shoot length","Year",1,166,75.07,0,"LMM","F (Kenward-Roger)","gaussian","log"
-"18","wind","phenotype","plant growth","average shoot length","treatment:genotype",9,147,0.8,0.615,"LMM","F (Kenward-Roger)","gaussian","log"
-"19","wind","phenotype","plant growth","average shoot length","treatment:Year",1,166,0.11,0.74,"LMM","F (Kenward-Roger)","gaussian","log"
-"20","wind","phenotype","plant growth","average shoot length","genotype:Year",9,163,1.43,0.179,"LMM","F (Kenward-Roger)","gaussian","log"
-"21","wind","phenotype","plant growth","average shoot length","treatment:genotype:Year",9,163,0.7,0.709,"LMM","F (Kenward-Roger)","gaussian","log"
+"","term","statistic","df","Df.res","p.value","response","test","experiment","Pr..Chisq."
+"1","(Intercept)",589.768701189222,1,9.16099209157191,1.24824379595893e-09,"Height","F","wind",NA
+"2","treatment",28.3460157786201,1,9.25153768829602,0.000436209079473703,"Height","F","wind",NA
+"3","Year",192.848161340133,1,163.613056701553,1.81578565257067e-29,"Height","F","wind",NA
+"4","genotype",8.12723143323829,9,148.500728198663,9.31608425501727e-10,"Height","F","wind",NA
+"5","treatment:Year",13.2777707324787,1,163.630358572976,0.000360252599981717,"Height","F","wind",NA
+"6","treatment:genotype",0.72954617554929,9,148.481577729991,0.681285607535123,"Height","F","wind",NA
+"7","Year:genotype",0.972021917788566,9,160.762092583432,0.465217463865786,"Height","F","wind",NA
+"8","treatment:Year:genotype",1.83761350864144,9,160.768308424287,0.0652290295389592,"Height","F","wind",NA
+"9","(Intercept)",796.993431650159,1,NA,NA,"all.shoot.count","Chisq","wind",2.43077484717065e-175
+"10","treatment",11.7437839302488,1,NA,NA,"all.shoot.count","Chisq","wind",0.000610467827208723
+"11","genotype",54.0219484919225,9,NA,NA,"all.shoot.count","Chisq","wind",1.86977774600469e-08
+"12","Year",2.38970878020497,1,NA,NA,"all.shoot.count","Chisq","wind",0.12213637938923
+"13","treatment:genotype",11.5830049397365,9,NA,NA,"all.shoot.count","Chisq","wind",0.237850860995291
+"14","treatment:Year",9.91016894679021,1,NA,NA,"all.shoot.count","Chisq","wind",0.00164368029034149
+"15","genotype:Year",15.1158656000022,9,NA,NA,"all.shoot.count","Chisq","wind",0.08780212010724
+"16","treatment:genotype:Year",5.78425239028738,9,NA,NA,"all.shoot.count","Chisq","wind",0.761301973941466
+"17","(Intercept)",18.834797140898,1,9.09939436910948,0.00182982887924495,"all.shoot.avg.length","F","wind",NA
+"18","treatment",9.86481979954009,1,9.29475231307913,0.0114545135296808,"all.shoot.avg.length","F","wind",NA
+"19","genotype",4.70276252526668,9,147.030271333997,1.70188314316864e-05,"all.shoot.avg.length","F","wind",NA
+"20","Year",75.0706167543253,1,165.973510315065,3.89394027493586e-15,"all.shoot.avg.length","F","wind",NA
+"21","treatment:genotype",0.802029302068573,9,146.983520720405,0.614982628262624,"all.shoot.avg.length","F","wind",NA
+"22","treatment:Year",0.110447678807023,1,166.002512157577,0.740054309753665,"all.shoot.avg.length","F","wind",NA
+"23","genotype:Year",1.43071001546303,9,162.985657158642,0.178798187192088,"all.shoot.avg.length","F","wind",NA
+"24","treatment:genotype:Year",0.699603558613381,9,162.990916809901,0.708600246042601,"all.shoot.avg.length","F","wind",NA
+"25","(Intercept)",2025.67266196026,1,9.53823679058361,1.96668991166819e-12,"leaf_WC","F","wind",NA
+"26","treatment",0.929906120422568,1,9.54226971169257,0.358688518889563,"leaf_WC","F","wind",NA
+"27","genotype",4.88574510872789,9,132.138241033692,1.18475474289667e-05,"leaf_WC","F","wind",NA
+"28","Year",2.50912043736911,1,147.153018828918,0.115335866878601,"leaf_WC","F","wind",NA
+"29","treatment:genotype",0.440503895540575,9,132.153482901422,0.910836918144834,"leaf_WC","F","wind",NA
+"30","treatment:Year",1.79602948826238,1,147.119674681572,0.182259333662916,"leaf_WC","F","wind",NA
+"31","genotype:Year",2.72933598678146,9,144.12833531665,0.00571650670156044,"leaf_WC","F","wind",NA
+"32","treatment:genotype:Year",1.56352809517137,9,144.126824576807,0.131576751532742,"leaf_WC","F","wind",NA
+"33","(Intercept)",2203.07161284839,1,9.4548953757719,1.59587058116943e-12,"SLA","F","wind",NA
+"34","treatment",0.438873156547845,1,9.49383675944388,0.523422379792603,"SLA","F","wind",NA
+"35","genotype",5.88622400111889,9,123.08547614229,8.24000009827635e-07,"SLA","F","wind",NA
+"36","treatment:genotype",0.858291781729401,9,123.077675612389,0.564399751108016,"SLA","F","wind",NA
+"37","(Intercept)",150.961439106535,1,NA,NA,"leaf_trichome.density","Chisq","wind",1.06860291274783e-34
+"38","treatment",0.113992894717407,1,NA,NA,"leaf_trichome.density","Chisq","wind",0.735643284194032
+"39","genotype",81.3526142713131,9,NA,NA,"leaf_trichome.density","Chisq","wind",8.70144520594448e-14
+"40","treatment:genotype",10.7713710496835,9,NA,NA,"leaf_trichome.density","Chisq","wind",0.291706463440843
+"41","(Intercept)",8359.18091511678,1,10.3443970125028,2.20598236399891e-16,"leaf_C_N","F","wind",NA
+"42","treatment",0.736001346570999,1,9.74683595572176,0.411543901090571,"leaf_C_N","F","wind",NA
+"43","genotype",4.98423871806072,9,71.6353890305209,3.30508933593642e-05,"leaf_C_N","F","wind",NA
+"44","treatment:genotype",1.30105134896217,9,71.6373168602129,0.251698053276476,"leaf_C_N","F","wind",NA
+"45","(Intercept)",246.717394047462,1,4.04765019908434,8.85742157236504e-05,"Height","F","ant-aphid",NA
+"46","Aphid.Treatment",0.193217943109395,1,204.753192107331,0.660715316761905,"Height","F","ant-aphid",NA
+"47","scale(Ant.Mound.Dist)",0.377605090590203,1,9.15940040758074,0.553843724613231,"Height","F","ant-aphid",NA
+"48","Genotype",15.3942921853981,9,204.38787824346,4.73944096480752e-19,"Height","F","ant-aphid",NA
+"49","Aphid.Treatment:scale(Ant.Mound.Dist)",0.164711447086114,1,204.748380896003,0.685279137514081,"Height","F","ant-aphid",NA
+"50","Aphid.Treatment:Genotype",0.933283585742232,9,204.591357307159,0.497190492854813,"Height","F","ant-aphid",NA
+"51","scale(Ant.Mound.Dist):Genotype",0.954343482111709,9,204.450737264849,0.47917929088498,"Height","F","ant-aphid",NA
+"52","Aphid.Treatment:scale(Ant.Mound.Dist):Genotype",1.6231221644336,9,204.650857712132,0.110435916435998,"Height","F","ant-aphid",NA
+"53","(Intercept)",212.113976856285,1,NA,NA,"all.shoot.count","Chisq","ant-aphid",4.74970576749278e-48
+"54","Aphid.Treatment",0.597499228458138,1,NA,NA,"all.shoot.count","Chisq","ant-aphid",0.439533777593241
+"55","scale(Ant.Mound.Dist)",0.377630869645503,1,NA,NA,"all.shoot.count","Chisq","ant-aphid",0.53887388989778
+"56","Genotype",60.3981037071074,9,NA,NA,"all.shoot.count","Chisq","ant-aphid",1.12351808368961e-09
+"57","Aphid.Treatment:scale(Ant.Mound.Dist)",2.76380533273372,1,NA,NA,"all.shoot.count","Chisq","ant-aphid",0.0964186440636487
+"58","Aphid.Treatment:Genotype",10.6726411956371,9,NA,NA,"all.shoot.count","Chisq","ant-aphid",0.298816655573024
+"59","scale(Ant.Mound.Dist):Genotype",8.28562473276946,9,NA,NA,"all.shoot.count","Chisq","ant-aphid",0.505638189326047
+"60","Aphid.Treatment:scale(Ant.Mound.Dist):Genotype",9.17364419162666,9,NA,NA,"all.shoot.count","Chisq","ant-aphid",0.421402291997943
+"61","(Intercept)",48.2367981512011,1,4.0277369927923,0.00220050180479543,"mature.shoot.avg.length","F","ant-aphid",NA
+"62","Aphid.Treatment",1.70518151754154,1,204.658356120323,0.193077625395732,"mature.shoot.avg.length","F","ant-aphid",NA
+"63","scale(Ant.Mound.Dist)",0.187357223975783,1,9.15193569405526,0.675146972172427,"mature.shoot.avg.length","F","ant-aphid",NA
+"64","Genotype",6.5780479817423,9,204.322072565701,3.1107802028342e-08,"mature.shoot.avg.length","F","ant-aphid",NA
+"65","Aphid.Treatment:scale(Ant.Mound.Dist)",0.903038010167247,1,204.61635774207,0.343089489685964,"mature.shoot.avg.length","F","ant-aphid",NA
+"66","Aphid.Treatment:Genotype",1.06374830163207,9,204.514352224245,0.391135407802987,"mature.shoot.avg.length","F","ant-aphid",NA
+"67","scale(Ant.Mound.Dist):Genotype",0.684054208023348,9,204.376323947887,0.72291831617156,"mature.shoot.avg.length","F","ant-aphid",NA
+"68","Aphid.Treatment:scale(Ant.Mound.Dist):Genotype",0.558186361388474,9,204.55441279547,0.830160989252042,"mature.shoot.avg.length","F","ant-aphid",NA
+"69","(Intercept)",320.824667449971,1,4.23120476268074,3.76917789322537e-05,"leaf_WC","F","ant-aphid",NA
+"70","Aphid.Treatment",0.00632039716593944,1,84.3502263924867,0.936822505510667,"leaf_WC","F","ant-aphid",NA
+"71","scale(Ant.Mound.Dist)",0.168973061293987,1,9.82538900928078,0.689847946719827,"leaf_WC","F","ant-aphid",NA
+"72","Genotype",1.55721640652835,9,84.9384182272229,0.141490658912009,"leaf_WC","F","ant-aphid",NA
+"73","Aphid.Treatment:scale(Ant.Mound.Dist)",0.438319309039813,1,85.794386866006,0.509709219226882,"leaf_WC","F","ant-aphid",NA
+"74","scale(Ant.Mound.Dist):Genotype",0.86980130066463,9,84.267548877962,0.555335695200548,"leaf_WC","F","ant-aphid",NA
+"75","(Intercept)",115.126235746197,1,NA,NA,"leaf_trichome.density","Chisq","ant-aphid",7.38439181044837e-27
+"76","Aphid.Treatment",0.222770222821885,1,NA,NA,"leaf_trichome.density","Chisq","ant-aphid",0.636937205996072
+"77","scale(Ant.Mound.Dist)",0.337666446816689,1,NA,NA,"leaf_trichome.density","Chisq","ant-aphid",0.561179300007766
+"78","Genotype",46.9893860987561,9,NA,NA,"leaf_trichome.density","Chisq","ant-aphid",3.94256372258173e-07
+"79","Aphid.Treatment:scale(Ant.Mound.Dist)",0.428778110542645,1,NA,NA,"leaf_trichome.density","Chisq","ant-aphid",0.512589120612124
+"80","scale(Ant.Mound.Dist):Genotype",8.7859665721418,9,NA,NA,"leaf_trichome.density","Chisq","ant-aphid",0.457261503869336
