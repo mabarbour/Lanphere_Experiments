@@ -4,8 +4,9 @@ library(reshape2)
 library(ggplot2)
 library(psych)
 library(pbkrtest) # for some reason, I have to hve pbkrtest loaded with lmerTest for it to run the Kenward-Roger test appropriately.
-library(lmerTest)
+#library(lmerTest)
 #library(RLRsim)
+library(lme4)
 library(car)
 library(vegan)
 library(mvabund)
@@ -153,75 +154,93 @@ w.effect.13 <- w.arth.13.pos %>%
   group_by(Block, Wind.Exposure, Plot_code) %>%
   summarise_each(funs(mean))
 
-## Wind community analyses ----
+## Wind community analyses
 
 ## Wind: arthropod abundance analysis ----
 
 # GLMM
-arth.abund.glmer <- glmer(total.abund ~ Wind.Exposure*Year +
-                            (1|Genotype) + 
+arth.abund.glmer <- glmer(total.abund ~ Wind.Exposure*Year*Genotype +
                              (1|Block) + 
                              (1|Block:Wind.Exposure) +
-                             (1|plant_code) +
-                             (1|X),
+                             (1|X) +
+                             (1|plant_code),
                            data = wind.arth.df,
                            contrasts = list(Wind.Exposure = "contr.sum",
-                                            #Genotype = "contr.sum",
+                                            Genotype = "contr.sum",
                                             Year = "contr.sum"),
                            family = "poisson",
                            control=glmerControl(optimizer="bobyqa",
                                                 optCtrl=list(maxfun=2e5)))
 summary(arth.abund.glmer)
-overdisp_fun(arth.abund.glmer) 
+overdisp_fun(arth.abund.glmer) # accounted for overdispersion by modelling individual-level random effect.
 plot(arth.abund.glmer) 
 
-plotFEsim(FEsim(arth.abund.glmer))
-
-var.calc(update(arth.abund.glmer, .~. -(1|X))) # removed individual-level random effect, because this is already calculated in var.calc
-
 # Likelihood ratio tests
-w.arth.3 <- drop1(arth.abund.glmer, test = "Chisq") %>% tidy()
-w.arth.2 <- drop1(update(arth.abund.glmer, .~. -Wind.Exposure:Genotype:Year), test = "Chisq") %>% tidy()
-w.arth.1 <- drop1(update(arth.abund.glmer, .~. -Wind.Exposure*Genotype*Year + Wind.Exposure + Genotype + Year), test = "Chisq") %>% tidy()
-
-arth.abund.anova <- bind_rows(w.arth.1, w.arth.2, w.arth.3) %>%
-  filter(term != "<none>") %>%
-  mutate(Response = "arthropod abundance",
-         Response.type = "community",
-         Specific.type = "arthropods",
-         Test.type = "Chi-square",
-         Experiment = "wind",
-         Model.type = "GLMM",
-         Error.dist = "poisson",
-         Response.trans = "none") %>%
-  select(Experiment, Response.type, Specific.type, Response,
-         Factor = term, num_DF = df, #den_DF = DenDF, 
-         Statistic = LRT, P_value = Pr.Chi., Model.type, 
-         Test.type, Error.dist, Response.trans) %>%
-  mutate(Statistic = round(Statistic,2),
-         #den_DF = round(den_DF,1),
-         P_value = round(P_value,3))
+arth.abund.anova <- anova.table(arth.abund.glmer, test = "Chisq", experiment = "wind")
 
 ## Calculate R2 for significant predictors
-arth.abund.main <- update(arth.abund.glmer, .~. -Wind.Exposure*Genotype*Year + Wind.Exposure + Genotype + Year)
+arth.abund.up <- update(arth.abund.glmer, .~. -Wind.Exposure*Genotype*Year + Wind.Exposure*Year + (1|Genotype) - (1|X))
 
-sem.model.fits(list(arth.abund.glmer, arth.abund.main))
+arth.abund.R2 <- var.table(arth.abund.up, experiment = "wind")
 
-arth.abund.R2 <- 
-  data.frame(Factor = c("Wind.Exposure","Genotype","Year"),
-             Response = "arthropod abundance",
-             Response.type = "community",
-             Specific.type = "arthropods",
-             Experiment = "wind",
-             delta_R2 = round(c(deltaR2(arth.abund.main, update(arth.abund.main, .~. -Wind.Exposure)),
-                                deltaR2(arth.abund.main, update(arth.abund.main, .~. -Genotype)),
-                                deltaR2(arth.abund.main, update(arth.abund.main, .~. -Year))),2))
-
-## Wind: herbivore abundance analysis ----
+## Wind: arthropod richness analysis ----
+plot(total.rich ~ total.abund, wind.arth.df)
 
 # GLMM
-herb.abund.glmer <- lme4::glmer(herb.abund ~ Wind.Exposure*Year +
-                            (1|Genotype) +
+arth.rich.glmer <- glmer(total.rich ~ Wind.Exposure*Year*Genotype +
+                            (1|Block) + 
+                            (1|Block:Wind.Exposure) +
+                            #(1|X) +
+                            (1|plant_code),
+                          data = wind.arth.df,
+                          contrasts = list(Wind.Exposure = "contr.sum",
+                                           Genotype = "contr.sum",
+                                           Year = "contr.sum"),
+                          family = "poisson",
+                          control=glmerControl(optimizer="bobyqa",
+                                               optCtrl=list(maxfun=2e5)))
+print(summary(arth.rich.glmer), correlation = TRUE)
+overdisp_fun(arth.rich.glmer) # no overdispersion
+plot(arth.rich.glmer) 
+
+arth.rich.anova <- anova.table(arth.rich.glmer, test = "Chisq", experiment = "wind")
+
+arth.rich.up <- update(arth.rich.glmer, .~. -Wind.Exposure*Genotype*Year + Wind.Exposure + Year + (1|Genotype))
+
+arth.rich.R2 <- var.table(arth.rich.up, experiment = "wind")
+
+## Wind: rarefied arthropod richness analysis ----
+wind.arth.df$total.rarerich <- rarefy(wind.arth.df[ ,wind.arth.names], 2) - 1
+
+hist(filter(wind.arth.df, total.abund > 2)$total.rarerich)
+
+# GLMM
+arth.rarerich.glmer <- lmer(total.rarerich ~ Wind.Exposure*Year+ Wind.Exposure*Genotype +
+                           (1|Block) + 
+                           (1|Block:Wind.Exposure) +
+                           #(1|X) +
+                           (1|plant_code),
+                         data = filter(wind.arth.df, total.abund > 2),
+                         contrasts = list(Wind.Exposure = "contr.sum",
+                                          Genotype = "contr.sum",
+                                          Year = "contr.sum"))
+print(summary(arth.rarerich.glmer), correlation = TRUE)
+overdisp_fun(arth.rarerich.glmer) # no overdispersion
+plot(arth.rarerich.glmer) 
+
+arth.rarerich.anova <- anova.table(arth.rarerich.glmer, test = "F", experiment = "wind")
+
+arth.rarerich.up <- update(arth.rarerich.glmer, .~. -Wind.Exposure*Year -Wind.Exposure*Genotype + Wind.Exposure -(1|plant_code) -(1|Block:Wind.Exposure))
+
+plotFEsim(FEsim(arth.rarerich.up))
+
+arth.rarerich.R2 <- var.table(arth.rarerich.up, experiment = "wind")
+
+## Wind: herbivore abundance analysis ----
+hist(wind.arth.df$herb.abund)
+
+# GLMM
+herb.abund.glmer <- glmer(herb.abund ~ (Wind.Exposure + Year + Genotype)^2 + # solves the problem with the model being identified
                             (1|Block) + 
                             (1|Block:Wind.Exposure) +
                             (1|X) +
@@ -233,122 +252,23 @@ herb.abund.glmer <- lme4::glmer(herb.abund ~ Wind.Exposure*Year +
                           family = "poisson",
                           control=glmerControl(optimizer="bobyqa",
                                                optCtrl=list(maxfun=2e5)))
-summary(herb.abund.glmer)
-plotFEsim(FEsim(herb.abund.glmer))
-
-var.calc(update(herb.abund.glmer, .~. -(1|X)))
-
+print(summary(herb.abund.glmer), correlation = TRUE) 
 overdisp_fun(herb.abund.glmer) 
 plot(herb.abund.glmer) 
 
-# Likelihood ratio tests
-#w.herb.3 <- drop1(herb.abund.glmer, test = "Chisq") %>% tidy() # marginal effect, but note that full model had difficulty converging
-w.herb.2 <- drop1(herb.abund.glmer, test = "Chisq") %>% tidy() # 2-way model runs without warnings.
-w.herb.1 <- drop1(update(herb.abund.glmer, .~. -Wind.Exposure:Year), test = "Chisq") %>% tidy()
+# Wald Chi-square test
+herb.abund.anova <- anova.table(herb.abund.glmer, test = "Chisq", experiment = "wind")
 
-herb.abund.anova <- bind_rows(w.herb.1, w.herb.2, w.herb.3) %>%
-  filter(term != "<none>") %>%
-  mutate(Response = "herbivore abundance",
-         Response.type = "community",
-         Specific.type = "arthropods",
-         Test.type = "Chi-square",
-         Experiment = "wind",
-         Model.type = "GLMM",
-         Error.dist = "poisson",
-         Response.trans = "none") %>%
-  select(Experiment, Response.type, Specific.type, Response,
-         Factor = term, num_DF = df, #den_DF = DenDF, 
-         Statistic = LRT, P_value = Pr.Chi., Model.type, 
-         Test.type, Error.dist, Response.trans) %>%
-  mutate(Statistic = round(Statistic,2),
-         #den_DF = round(den_DF,1),
-         P_value = round(P_value,3))
 
 ## Calculate R2 for significant predictors
-herb.abund.main <- update(herb.abund.glmer, .~. -Wind.Exposure*Genotype*Year + Wind.Exposure + Genotype + Year)
+herb.abund.up <- update(herb.abund.glmer, .~. -Wind.Exposure*Genotype*Year + Wind.Exposure + (1|Genotype) - (1|X)) # removing individual-level effect, because the R2 calculation already accounts for overdispersion.
 
-sem.model.fits(list(herb.abund.glmer, herb.abund.main))
-
-herb.abund.R2 <- 
-  data.frame(Factor = c("Wind.Exposure","Genotype","Year"),
-             Response = "herbivore abundance",
-             Response.type = "community",
-             Specific.type = "arthropods",
-             Experiment = "wind",
-             delta_R2 = round(c(deltaR2(herb.abund.main, update(herb.abund.main, .~. -Wind.Exposure)),
-                                deltaR2(herb.abund.main, update(herb.abund.main, .~. -Genotype)),
-                                deltaR2(herb.abund.main, update(herb.abund.main, .~. -Year))),2))
+herb.abund.R2 <- var.table(herb.abund.up, "wind")
 
 ## Wind: predator abundance analysis ----
 
 # GLMM
-pred.abund.glmer <- glmer(pred.abund ~ Wind.Exposure*Year +
-                            (1|Genotype) + # data don't support more complex interactions with Genotype.
-                            (1|Block) + 
-                            (1|Block:Wind.Exposure) +
-                            #(1|X) +
-                            (1|plant_code),
-                          data = wind.arth.df,
-                          contrasts = list(Wind.Exposure = "contr.sum",
-                                           #Genotype = "contr.sum",
-                                           Year = "contr.sum"),
-                          family = "poisson",
-                          control=glmerControl(optimizer="bobyqa",
-                                               optCtrl=list(maxfun=2e5)))
-summary(pred.abund.glmer)
-overdisp_fun(pred.abund.glmer) # no overdispersion
-plot(pred.abund.glmer) 
-
-deltaR2(pred.abund.glmer, update(pred.abund.glmer, .~. -Wind.Exposure))
-sem.model.fits(pred.abund.glmer)[ ,"Marginal"] - sum(test$var_percent[1:4])
-test <- var.calc(pred.abund.glmer)
-  
-plotFEsim(FEsim(pred.abund.glmer))
-plotREsim(REsim(pred.abund.glmer))
-
-
-# Likelihood ratio tests
-w.pred.3 <- drop1(pred.abund.glmer, test = "Chisq") %>% tidy() # marginal effect, but note that full model had difficulty converging
-w.pred.2 <- drop1(update(pred.abund.glmer, .~. -Wind.Exposure:Genotype:Year), test = "Chisq") %>% tidy() # still convergence issues
-w.pred.1 <- drop1(update(pred.abund.glmer, .~. -Wind.Exposure*Genotype*Year + Wind.Exposure + Genotype + Year), test = "Chisq") %>% tidy() # runs without any convergence issues.
-
-pred.abund.anova <- bind_rows(w.pred.1, w.pred.2, w.pred.3) %>%
-  filter(term != "<none>") %>%
-  mutate(Response = "predator abundance",
-         Response.type = "community",
-         Specific.type = "arthropods",
-         Test.type = "Chi-square",
-         Experiment = "wind",
-         Model.type = "GLMM",
-         Error.dist = "poisson",
-         Response.trans = "none") %>%
-  select(Experiment, Response.type, Specific.type, Response,
-         Factor = term, num_DF = df, #den_DF = DenDF, 
-         Statistic = LRT, P_value = Pr.Chi., Model.type, 
-         Test.type, Error.dist, Response.trans) %>%
-  mutate(Statistic = round(Statistic,2),
-         #den_DF = round(den_DF,1),
-         P_value = round(P_value,3))
-
-## Calculate R2 for significant predictors
-pred.abund.main <- update(pred.abund.glmer, .~. -Wind.Exposure*Year + Wind.Exposure + Year)
-
-sem.model.fits(list(pred.abund.glmer, pred.abund.main))
-
-# Genotype is not significant, but has a higher R2 value than wind exposure...
-pred.abund.R2 <- 
-  data.frame(Factor = c("Wind.Exposure","Genotype","Year"),
-             Response = "predator abundance",
-             Response.type = "community",
-             Specific.type = "arthropods",
-             Experiment = "wind",
-             delta_R2 = round(c(deltaR2(pred.abund.main, update(pred.abund.main, .~. -Wind.Exposure)),
-                                deltaR2(pred.abund.main, update(pred.abund.main, .~. -Genotype)),
-                                deltaR2(pred.abund.main, update(pred.abund.main, .~. -Year))),2))
-
-# tests
-pred.1 <- glmer(pred.abund ~ Wind.Exposure*Year +
-                            (1|Genotype) +
+pred.abund.glmer <- glmer(pred.abund ~ Wind.Exposure*Year + Genotype +
                             (1|Block) + 
                             (1|Block:Wind.Exposure) +
                             #(1|X) +
@@ -360,27 +280,32 @@ pred.1 <- glmer(pred.abund ~ Wind.Exposure*Year +
                           family = "poisson",
                           control=glmerControl(optimizer="bobyqa",
                                                optCtrl=list(maxfun=2e5)))
-summary(pred.1) 
-sem.model.fits(pred.1)
-var.rand <- 0.48183+0.09968
-overdisp_fun(pred.1) # no evidence of overdispersion
-sem.model.fits(pred.1) # about 4% for wind, but now, Genotype is showing up as no effect.
+summary(pred.abund.glmer)
+overdisp_fun(pred.abund.glmer) # no overdispersion
+plot(pred.abund.glmer) 
 
-plot(pred.abund ~ Genotype, wind.arth.df)
+# Wald Chi-square tests
+pred.abund.anova <- anova.table(pred.abund.glmer, test = "Chisq", experiment = "wind")
 
+## Calculate R2 for significant predictors
+pred.abund.up <- update(pred.abund.glmer, .~. -Wind.Exposure:Year -Genotype -(1|Block)) # dropped block because 0% of variance explained
+
+pred.abund.R2 <- var.table(pred.abund.up, experiment = "wind")
 
 ## Wind: Caloptilia analysis ----
+hist(wind.arth.df$Gracilliaridae_miner)
+with(wind.arth.df, table(Gracilliaridae_miner, Year))
 
 # GLMM
-LTF.abund.glmer <- glmer(Gracilliaridae_miner ~ Wind.Exposure*Year +
-                            (1|Genotype) + # data don't support more complex interactions with Genotype.
+LTF.abund.glmer <- glmer(Gracilliaridae_miner ~ Wind.Exposure*Year + 
+                           Genotype + # only model without convergence
                             (1|Block) + 
                             (1|Block:Wind.Exposure) +
                             #(1|X) +
                             (1|plant_code),
                           data = wind.arth.df,
                           contrasts = list(Wind.Exposure = "contr.sum",
-                                           #Genotype = "contr.sum",
+                                           Genotype = "contr.sum",
                                            Year = "contr.sum"),
                           family = "poisson",
                           control=glmerControl(optimizer="bobyqa",
@@ -389,24 +314,24 @@ summary(LTF.abund.glmer)
 overdisp_fun(LTF.abund.glmer) # no overdispersion
 plot(LTF.abund.glmer) 
 
-var.calc(LTF.abund.glmer)
-anova(LTF.abund.glmer, update(LTF.abund.glmer, .~. -(Wind.Exposure*Year|Genotype) + (Wind.Exposure + Year|Genotype)), test = "Chisq")
-anova(update(LTF.abund.glmer, .~. -(Wind.Exposure*Year|Genotype) + (Wind.Exposure + Year|Genotype)), update(LTF.abund.glmer, .~. -(Wind.Exposure*Year|Genotype) + (1|Genotype)), test = "Chisq")
-anova(update(LTF.abund.glmer, .~. -(Wind.Exposure*Year|Genotype) + (1|Genotype)), update(LTF.abund.glmer, .~. -(Wind.Exposure*Year|Genotype)), test = "Chisq")
+## Wald Chi-square test
+LTF.abund.anova <- anova.table(LTF.abund.glmer, test = "Chisq", experiment = "wind")
 
-plotREsim(REsim(LTF.abund.glmer))
+## calculate variance components
+LTF.abund.up <- update(LTF.abund.glmer, .~. -Wind.Exposure:Year
+                       -Genotype + (1|Genotype))
+LTF.abund.R2 <- var.table(LTF.abund.up, experiment = "wind")
 
 ## Wind: Cecidomyiidae galler analysis ----
-with(filter(wind.arth.df, Year == "2013"), interaction.plot(Wind.Exposure, Genotype, Cecidomyiidae_gall))
+with(wind.arth.df, table(Cecidomyiidae_gall, Year))
 
 # GLMM
-gall.abund.glmer <- glmer(Cecidomyiidae_gall ~ Wind.Exposure +
-                           (1|Genotype) + # data don't support more complex interactions with Genotype.
+gall.abund.glmer <- glmer(Cecidomyiidae_gall ~ Wind.Exposure+Genotype + Year +
                            (1|Block) + 
-                           (1|Block:Wind.Exposure), #+
+                           (1|Block:Wind.Exposure) +
                            #(1|X) +
-                           #(1|plant_code),
-                         data = filter(wind.arth.df, Year == "2013"),
+                           (1|plant_code),
+                         data = wind.arth.df,
                          contrasts = list(Wind.Exposure = "contr.sum",
                                           Genotype = "contr.sum",
                                           Year = "contr.sum"),
@@ -417,206 +342,83 @@ summary(gall.abund.glmer)
 overdisp_fun(gall.abund.glmer) # no overdispersion
 plot(gall.abund.glmer) 
 
-plotREsim(REsim(gall.abund.glmer))
+gall.abund.anova <- anova.table(gall.abund.glmer, test = "Chisq", experiment = "wind")
 
-anova(gall.abund.glmer, update(gall.abund.glmer, .~. -(1|Genotype)))
-var.calc(gall.abund.glmer)
+gall.abund.up <- update(gall.abund.glmer, .~. -Genotype + (1|Genotype) -(1|Block))
 
-## 2012 ----
-summary(w.arth.12.full$total.abund)
-summary(w.arth.12.full$total.rich)
-sum(colSums(w.arth.12.full[ ,wind.arth.names]))
-round(colSums(w.arth.12.full[ ,wind.arth.names])/sum(colSums(w.arth.12.full[ ,wind.arth.names]))*100,0)
+gall.abund.R2 <- var.table(gall.abund.up, experiment = "wind")
 
-# total abundance
-plot(total.rich ~ total.abund, w.arth.12.full)
-hist(w.arth.12.full$total.abund)
-hist(w.arth.12.full$total.rich)
-summary(w.arth.12.full$total.rich)
-summary(w.arth.12.full$total.abund)
-colSums(wind.arth.df[ ,wind.arth.names])/sum(colSums(wind.arth.df[ ,wind.arth.names]))
+## Wind: Spider analysis ----
+spider.abund.glmer <- glmer(Spider ~ Wind.Exposure*Year + Genotype +
+                            (1|Block) + 
+                            (1|Block:Wind.Exposure) +
+                            #(1|X) +
+                            (1|plant_code),
+                          data = wind.arth.df,
+                          contrasts = list(Wind.Exposure = "contr.sum",
+                                           Genotype = "contr.sum",
+                                           Year = "contr.sum"),
+                          family = "poisson",
+                          control=glmerControl(optimizer="bobyqa",
+                                               optCtrl=list(maxfun=2e5)))
+summary(spider.abund.glmer)
+overdisp_fun(spider.abund.glmer) # no overdispersion
+plot(spider.abund.glmer) 
 
+spider.abund.anova <- anova.table(spider.abund.glmer, test = "Chisq", experiment = "wind")
 
-## arthropod probability 
-hist(wind.arth.df$total.abund)
-with(wind.arth.df, interaction.plot(Wind.Exposure, Genotype, total.abund))
-library(piecewiseSEM)
+spider.abund.up <- update(spider.abund.glmer, .~. -Wind.Exposure:Year -Genotype -(1|Block))
 
-### Test random vs. fixed effect specification
-w.total.12 <- glmer(total.abund ~ Wind.Exposure*Genotype +
-                      (1|Year) +
-                      (1|plant_code) +
-                      #(1|X) +
-                     (1|Block/Wind.Exposure), 
-                   wind.arth.df, family = poisson(link = log), contrasts = list(Wind.Exposure = "contr.sum", Genotype = "contr.sum"),
-                   control=glmerControl(optimizer="bobyqa",
-                                        optCtrl=list(maxfun=2e5)))
-w.total.12.main <- update(w.total.12, .~. -Wind.Exposure:Genotype)
-w.total.12.geno <- update(w.total.12.main, .~. -Wind.Exposure)
-w.total.12.wind <- update(w.total.12.main, .~. -Genotype)
+spider.abund.R2 <- var.table(spider.abund.up, experiment = "wind")
 
-# fixed
-mods <- list(w.total.12, w.total.12.main, w.total.12.geno, w.total.12.wind)
-sem.model.fits(mods)
+## Wind: Aphididae analysis ----
+with(wind.arth.df, table(Aphididae, Year)) # no aphids in 2013, therefore, I only analyze 2012
 
-# random
-rw.total.12 <- glmer(total.abund ~ (1|Wind.Exposure) + (1|Genotype) +
-                      (1|Year) +
-                      (1|plant_code) +
-                      #(1|X) +
-                      (1|Block/Wind.Exposure), 
-                    wind.arth.df, family = poisson(link = log), contrasts = list(Wind.Exposure = "contr.sum", Genotype = "contr.sum"),
-                    control=glmerControl(optimizer="bobyqa",
-                                         optCtrl=list(maxfun=2e5)))
-#rw.total.12.main <- update(w.total.12, .~. -(Wind.Exposure|Genotype))
-rw.total.12.geno <- update(rw.total.12, .~. -(1|Wind.Exposure))
-rw.total.12.wind <- update(rw.total.12, .~. -(1|Genotype))
+aphid.abund.glmer <- glmer(Aphididae ~ Wind.Exposure + Genotype +
+                              (1|Block) + 
+                              (1|Block:Wind.Exposure) +
+                              #(1|X) +
+                              (1|plant_code),
+                            data = filter(wind.arth.df, Year == "2012"),
+                            contrasts = list(Wind.Exposure = "contr.sum",
+                                             Genotype = "contr.sum",
+                                             Year = "contr.sum"),
+                            family = "poisson",
+                            control=glmerControl(optimizer="bobyqa",
+                                                 optCtrl=list(maxfun=2e5)))
+summary(aphid.abund.glmer)
+overdisp_fun(aphid.abund.glmer) # no overdispersion
+plot(aphid.abund.glmer) 
 
-# Generate null model (intercept and random effects only, no fixed effects)
-null.model = update(rw.total.12, formula = paste(". ~ ", get.random.formula(rw.total.12, "~1", modelList = NULL)))
+anova.table(aphid.abund.glmer, test = "Chisq", experiment = "wind") # nothing significant
 
-# Get the fixed effects of the null model
-null.fixef = as.numeric(fixef(null.model))
+## Wind: Tortricid leaf tier analysis
+with(wind.arth.df, table(Tortricidiae_leaftier, Year)) # no leaftiers in 2013, therefore, I only analyze 2012
 
-varDist = log(1 + 1/exp(null.fixef))
-obs = names(unlist(lapply(ranef(rw.total.12), nrow))[unlist(lapply(ranef(rw.total.12), nrow)) == nrow(rw.total.12@pp$X)]) ##????
-varDisp =  sum(
-  
-  sapply(VarCorr(rw.total.12)[obs], function(Sigma) {
-    
-    X = model.matrix(rw.total.12)  
-    
-    Z = X[, rownames(Sigma)]
-    
-    sum(diag(Z %*% Sigma %*% t(Z)))/nrow(X)
-    
-  } )
+leaftier.abund.glmer <- glmer(Tortricidiae_leaftier ~ Wind.Exposure*Year + Wind.Exposure*Genotype + 
+                             (1|Block) + 
+                             (1|Block:Wind.Exposure) +
+                             #(1|X) +
+                             (1|plant_code),
+                           data = wind.arth.df,
+                           contrasts = list(Wind.Exposure = "contr.sum",
+                                            Genotype = "contr.sum",
+                                            Year = "contr.sum"),
+                           family = "poisson",
+                           control=glmerControl(optimizer="bobyqa",
+                                                optCtrl=list(maxfun=2e5)))
+summary(leaftier.abund.glmer)
+overdisp_fun(leaftier.abund.glmer) # no overdispersion
+plot(leaftier.abund.glmer) 
 
-summary(rw.total.12)
-0.13491/(1.09009+0.08281+0.06778+0.13491+0.02928+0.05382+varDist) # genotype at 9%
-0.05382/(1.09009+0.08281+0.06778+0.13491+0.02928+0.05382+varDist) # wind at 3%
-r.mods <- list(rw.total.12, #w.total.12.main, 
-               rw.total.12.geno, rw.total.12.wind)
-sem.model.fits(r.mods)
+leaftier.anova <- anova.table(leaftier.abund.glmer, test = "Chisq", experiment = "wind") # nothing significant
 
+leaftier.up <- update(leaftier.abund.glmer, .~. -Wind.Exposure:Year -Wind.Exposure:Genotype -Wind.Exposure -Genotype +(1|Genotype))
 
-#sem.model.fits()
-anova(w.total.12,
-      update(w.total.12, .~. -Wind.Exposure:Genotype))#,
-main <- update(w.total.12, .~. -Wind.Exposure:Genotype)
-anova(main,
-      update(main, .~. -Wind.Exposure))
-anova(main,
-      update(main, .~. -Genotype))
-sem.model.fits(list(w.total.12, 
-                    update(w.total.12, .~. -Wind.Exposure*Genotype + Wind.Exposure),
-                    update(w.total.12, .~. -Wind.Exposure*Genotype + Genotype)))#, update(w.total.12, .~.-(1|Genotype) + (1|Wind.Exposure) + Genotype)))
-sem.model.fits(list(w.total.12, update(w.total.12, .~. -(1|Genotype)+Genotype)))
-overdisp_fun(w.total.12)
-summary(w.total.12)
-exp(0.327)
-exp(-0.25256)
-exp(-0.25256) # exposed plants receive 22% less arthropods per year
-exp(0.19992)
-exp(0.3463)
-exp(0.5121) # unexposed plants receive 1.7x more arthropods per year than unexposed plants
-predict(w.total.12, newdata = newdata)
-newdata <- with(wind.arth.df, expand.grid(Wind.Exposure=unique(Wind.Exposure), Year=unique(Year)))
-0.04716/(0.04716+0.05898+0.01119+0.07207+0.66929+0.25) # 4.2% of the variance
-visreg(w.total.12)
-plot(w.total.12)
-exp(0.2428)
+plotREsim(REsim(leaftier.up))  
+leaftier.R2 <- var.table(leaftier.up, experiment = "wind")
 
-anova(w.total.12, update(w.total.12, .~. -(1|Genotype)))
-anova(w.total.12, update(w.total.12, .~. -(1|Genotype)))
-
-# test G and GxE
-anova(w.total.12,
-      update(w.total.12, .~. -(Wind.Exposure|Genotype) + (1|Genotype)), # possible G effect
-      update(w.total.12, .~. -(Wind.Exposure|Genotype)))
-
-# test wind effect
-anova(w.total.12, update(w.total.12, .~. -Wind.Exposure))
-
-## Herbivore probability
-with(w.arth.12.full, sum((herb.abund > 0))/length(herb.abund)) # ~49% of plants with a herbivore
-w.herb.12 <- glmer((herb.abund > 0) ~ Wind.Exposure + (Wind.Exposure|Genotype) +
-                     (1|Block/Wind.Exposure), 
-                   w.arth.12.full, 
-                   family = "binomial")
-summary(w.herb.12)
-visreg(w.herb.12)
-
-# test G and GxE
-anova(w.herb.12,
-      update(w.herb.12, .~. -(Wind.Exposure|Genotype) + (1|Genotype)), # possible G effect
-      update(w.herb.12, .~. -(Wind.Exposure|Genotype)))
-
-# test wind effect
-anova(w.herb.12, update(w.herb.12, .~. -Wind.Exposure))
-
-# random model
-w.herb.12.rand <- glmer((herb.abund > 0) ~ (1|Wind.Exposure) + (1|Genotype) + (1|Block/Wind.Exposure), 
-                   w.arth.12.full, 
-                   family = "binomial")
-anova(w.herb.12.rand, update(w.herb.12.rand, .~. -(1|Wind.Exposure))) # interesting, now wind exposure doesn't apparently have a detectable effect...
-anova(w.herb.12.rand, update(w.herb.12.rand, .~. -(1|Genotype)))
-summary(w.herb.12.rand)
-0.24/(0.1479+0.24+0.3976+(pi^2)/3) # 6% for genotype
-0.1479/(0.1479+0.24+0.3976+(pi^2)/3) # 4% for wind exposure
-
-## aphid probability
-with(w.arth.12.full, interaction.plot(Wind.Exposure, Genotype, Aphididae))
-with(w.arth.12.full, sum((Gracilliaridae_miner > 0))/length(Gracilliaridae_miner)) # ~21% of plants with a herbivore
-hist(w.arth.12.full$Gracilliaridae_miner)
-w.miner.12 <- lmer(log(Aphididae+1) ~ Wind.Exposure + (Wind.Exposure|Genotype) +
-                     (1|Block/Wind.Exposure), 
-                   w.arth.12.full)
-summary(w.miner.12)
-visreg(w.miner.12)
-
-# test G and GxE
-anova(w.miner.12,
-      update(w.miner.12, .~. -(Wind.Exposure|Genotype) + (1|Genotype)), # possible G effect
-      update(w.miner.12, .~. -(Wind.Exposure|Genotype)))
-
-# test wind effect
-anova(w.miner.12, update(w.miner.12, .~. -Wind.Exposure))
-
-# random model
-w.miner.12.rand <- glmer((Gracilliaridae_miner>0) ~ (1|Wind.Exposure) + (1|Genotype) + (1|Block/Wind.Exposure), 
-                        w.arth.12.full, 
-                        family = "binomial")
-anova(w.miner.12.rand, update(w.miner.12.rand, .~. -(1|Wind.Exposure))) # interesting, now wind exposure doesn't apparently have a detectable effect...
-anova(w.miner.12.rand, update(w.miner.12.rand, .~. -(1|Genotype)))
-summary(w.miner.12.rand)
-0.5547/(0+0+0.5547+0.2356+(pi^2)/3) # 14% for genotype
-0.2356/(0+0+0.5547+0.2356+(pi^2)/3) # 6% for wind exposure
-
-#w.herbabund.12 <- lmer(log(herb.abund) ~ Wind.Exposure + (1|Genotype) + 
- #                        (1|Block/Wind.Exposure), 
-  #                     filter(w.arth.12.full, herb.abund > 0))
-#summary(w.herbabund.12)
-#plot(w.herbabund.12)
-
-# predator probability. Insufficient cases to likely even test for an effect.
-with(w.arth.12.full, sum((pred.abund > 0))/length(pred.abund)) # only ~10% of plants had a predator
-w.pred.12 <- glmer((pred.abund > 0) ~ Wind.Exposure + (Wind.Exposure|Genotype) +
-                     (1|Block/Wind.Exposure), 
-                   w.arth.12.full, 
-                   family = "binomial")
-summary(w.pred.12)
-visreg(w.pred.12)
-
-# test G and GxE
-anova(w.pred.12,
-      update(w.pred.12, .~. -(Wind.Exposure|Genotype) + (1|Genotype)), # possible G effect
-      update(w.pred.12, .~. -(Wind.Exposure|Genotype)))
-
-# test wind effect
-anova(w.pred.12, update(w.pred.12, .~. -Wind.Exposure))
-
-
+## Wind: community analysis ----
 # dissimilarity matrix, full dataset
 w.dis.12 <- vegdist(w.arth.12.pos[ ,wind.arth.names],
                     method = "horn")
@@ -852,7 +654,191 @@ anova(betadisper(d = w.dis.13.sub,
       strata = w.effect.13$Block)
 
 ## Ant-aphid community analyses ----
-# only 2012
+colSums(aa.arth.df[ ,aa.arth.names])
+round(colSums(aa.arth.df[ ,aa.arth.names])/sum(colSums(aa.arth.df[ ,aa.arth.names]))*100,0)
+
+# look at response from spiders, leafhoper, leaftier, LTF, ant_black, Aphids_nonAphis and aphid growth rates.
+
+## ant-aphid: arthropod abundance analysis ----
+
+# GLMM
+aa.arth.abund.glmer <- glmer(total.abund ~ scale(Ant.mound.dist)*Aphid.treatment*Genotype +
+                            (1|plant_code) +
+                            (1|Block/fact.Ant.mound.dist),
+                          data = aa.arth.df,
+                          contrasts = list(Aphid.treatment = "contr.sum",
+                                           Genotype = "contr.sum"),
+                          family = "poisson",
+                          control=glmerControl(optimizer="bobyqa",
+                                               optCtrl=list(maxfun=2e5)))
+print(summary(aa.arth.abund.glmer), correlation = TRUE)
+overdisp_fun(aa.arth.abund.glmer) # accounted for overdispersion by modelling individual-level random effect.
+plot(aa.arth.abund.glmer) 
+
+aa.arth.abund.anova <- anova.table(aa.arth.abund.glmer, test = "Chisq", experiment = "ant-aphid")
+
+aa.arth.abund.up <- update(aa.arth.abund.glmer, .~. -scale(Ant.mound.dist)*Aphid.treatment*Genotype + scale(Ant.mound.dist)*Aphid.treatment + (Aphid.treatment|Genotype) - (1|plant_code))
+
+plotFEsim(FEsim(aa.arth.abund.up))
+with(aa.arth.df, interaction.plot(Ant.mound.dist, Aphid.treatment, total.abund))
+with(aa.arth.df, interaction.plot(Aphid.treatment, Genotype, total.abund))
+plotREsim(REsim(aa.arth.abund.up))
+
+aa.arth.abund.R2 <- var.table(aa.arth.abund.up, experiment = "ant-aphid")
+
+## ant-aphid: arthropod richness analysis ----
+plot(total.rich ~ total.abund, aa.arth.df)
+
+# GLMM
+aa.arth.rich.glmer <- glmer(total.rich ~ scale(Ant.mound.dist)*Aphid.treatment*Genotype +
+                           #(1|plant_code) +
+                           (1|Block/fact.Ant.mound.dist),
+                         data = aa.arth.df,
+                         contrasts = list(Aphid.treatment = "contr.sum",
+                                          Genotype = "contr.sum"),
+                         family = "poisson",
+                         control=glmerControl(optimizer="bobyqa",
+                                              optCtrl=list(maxfun=2e5)))
+print(summary(aa.arth.rich.glmer), correlation = TRUE)
+overdisp_fun(aa.arth.rich.glmer) # no overdispersion
+plot(aa.arth.rich.glmer) 
+
+aa.arth.rich.anova <- anova.table(aa.arth.rich.glmer, test = "Chisq", experiment = "ant-aphid")
+
+aa.arth.rich.up <- update(aa.arth.rich.glmer, .~. -scale(Ant.mound.dist)*Aphid.treatment*Genotype + (1|Genotype))
+
+plotREsim(REsim(aa.arth.rich.up))
+
+aa.arth.rich.R2 <- var.table(aa.arth.rich.up, experiment = "ant-aphid")
+
+## ant-aphid: rarefied arthropod richness analysis ----
+aa.arth.df$total.rarerich <- rarefy(aa.arth.df[ ,aa.arth.names], 2) - 1
+
+hist(filter(aa.arth.df, total.abund > 2)$total.rarerich)
+
+# GLMM. Note that logit-transformation (common for proportion data) did not qualitatively affect the outcome or the residuals
+aa.arth.rarerich.glmer <- lmer(total.rarerich ~ scale(Ant.mound.dist)*Aphid.treatment*Genotype +
+                              #(1|plant_code) +
+                              (1|Block/fact.Ant.mound.dist),
+                            data = filter(aa.arth.df, total.abund > 2),
+                            contrasts = list(Aphid.treatment = "contr.sum",
+                                             Genotype = "contr.sum"))
+print(summary(aa.arth.rarerich.glmer), correlation = TRUE)
+plot(aa.arth.rarerich.glmer) 
+
+aa.arth.rarerich.anova <- anova.table(aa.arth.rarerich.glmer, test = "F", experiment = "ant-aphid")
+
+aa.arth.rarerich.up <- update(aa.arth.rarerich.glmer, .~. -scale(Ant.mound.dist)*Aphid.treatment*Genotype)
+
+aa.arth.rarerich.R2 <- var.table(aa.arth.rarerich.up, experiment = "ant-aphid")
+
+## ant-aphid: herbivore abundance analysis ----
+hist(aa.arth.df$herb.abund.nonAphis)
+
+# GLMM
+aa.herb.nonAphis.glmer <- glmer(herb.abund.nonAphis ~ scale(Ant.mound.dist)*Aphid.treatment*Genotype +
+                              (1|plant_code) +
+                              (1|Block/fact.Ant.mound.dist),
+                            data = aa.arth.df,
+                            contrasts = list(Aphid.treatment = "contr.sum",
+                                             Genotype = "contr.sum"),
+                            family = "poisson",
+                            control=glmerControl(optimizer="bobyqa",
+                                                 optCtrl=list(maxfun=2e5)))
+print(summary(aa.herb.nonAphis.glmer), correlation = TRUE)
+overdisp_fun(aa.herb.nonAphis.glmer) # no overdispersion
+plot(aa.herb.nonAphis.glmer) 
+
+aa.herb.nonAphis.anova <- anova.table(aa.herb.nonAphis.glmer, test = "Chisq", experiment = "ant-aphid")
+
+aa.herb.nonAphis.up <- update(aa.herb.nonAphis.glmer, .~. -scale(Ant.mound.dist)*Aphid.treatment*Genotype + scale(Ant.mound.dist)*Aphid.treatment + (Aphid.treatment|Genotype) -(1|plant_code))
+
+plotREsim(REsim(aa.herb.nonAphis.up))
+with(aa.arth.df, interaction.plot(Aphid.treatment, Genotype, herb.abund.nonAphis))
+with(aa.arth.df, interaction.plot(Ant.mound.dist, Aphid.treatment, herb.abund.nonAphis))
+
+aa.herb.nonAphis.R2 <- var.table(aa.herb.nonAphis.up, experiment = "ant-aphid")
+
+## ant-aphid: predator abundance analysis ----
+
+# GLMM
+aa.pred.nonFobs.glmer <- glmer(pred.abund.nonFobs ~ scale(Ant.mound.dist)*Aphid.treatment*Genotype +
+                                  #(1|plant_code) +
+                                  (1|Block/fact.Ant.mound.dist),
+                                data = aa.arth.df,
+                                contrasts = list(Aphid.treatment = "contr.sum",
+                                                 Genotype = "contr.sum"),
+                                family = "poisson",
+                                control=glmerControl(optimizer="bobyqa",
+                                                     optCtrl=list(maxfun=2e5)))
+print(summary(aa.pred.nonFobs.glmer), correlation = TRUE)
+overdisp_fun(aa.pred.nonFobs.glmer) # no overdispersion
+plot(aa.pred.nonFobs.glmer) 
+
+aa.pred.nonFobs.anova <- anova.table(aa.pred.nonFobs.glmer, test = "Chisq", experiment = "ant-aphid")
+
+aa.pred.nonFobs.up <- update(aa.pred.nonFobs.glmer, .~. -scale(Ant.mound.dist)*Aphid.treatment*Genotype + Aphid.treatment + (1|Genotype))
+
+plotFEsim(FEsim(aa.pred.nonFobs.up))
+plotREsim(REsim(aa.pred.nonFobs.up))
+with(aa.arth.df, plot(pred.abund.nonFobs ~ Aphid.treatment + Genotype))
+with(aa.arth.df, interaction.plot(Ant.mound.dist, Aphid.treatment, pred.abund.nonFobs))
+
+aa.pred.nonFobs.R2 <- var.table(aa.pred.nonFobs.up, experiment = "ant-aphid")
+
+## ant-aphid: Formica obscuripes abundance analysis ----
+
+# GLMM
+aa.Fobs.abund.glmer <- glmer(ant_F_obscuripes ~ scale(Ant.mound.dist) + Aphid.treatment + (1|Genotype) +
+                                 (1|plant_code) +
+                                 (1|Block/fact.Ant.mound.dist),
+                               data = aa.arth.df,
+                               contrasts = list(Aphid.treatment = "contr.sum",
+                                                Genotype = "contr.sum"),
+                               family = "poisson",
+                               control=glmerControl(optimizer="bobyqa",
+                                                    optCtrl=list(maxfun=2e5)))
+print(summary(aa.Fobs.abund.glmer), correlation = TRUE)
+overdisp_fun(aa.Fobs.abund.glmer) # no overdispersion
+plot(aa.Fobs.abund.glmer) 
+
+aa.Fobs.abund.anova <- anova.table(aa.Fobs.abund.glmer, test = "Chisq", experiment = "ant-aphid")
+
+anova(aa.Fobs.abund.glmer, update(aa.Fobs.abund.glmer, .~. -(1|Genotype))) # no genotype effect
+
+aa.Fobs.abund.up <- update(aa.Fobs.abund.glmer, .~. -scale(Ant.mound.dist)*Aphid.treatment*Genotype + Aphid.treatment -(1|Genotype) -(1|Block/fact.Ant.mound.dist) + (1|Block:fact.Ant.mound.dist) -(1|plant_code)) 
+
+plotFEsim(FEsim(aa.Fobs.abund.up))
+plotREsim(REsim(aa.Fobs.abund.up))
+
+with(aa.arth.df, plot(ant_F_obscuripes ~ Aphid.treatment))
+
+aa.Fobs.abund.R2 <- var.table(aa.Fobs.abund.up, experiment = "ant-aphid")
+
+## ant-aphid: Aphis growth rates analysis ----
+
+# calculate average aphid growth rate for each plant.
+aa.aphid.GR.sum <- aa.aphid.GR %>%
+  group_by(Block, Genotype, Ant.mound.dist, Aphid.treatment, plant_code) %>%
+  dplyr::summarise(mean.Aphid.GR = mean(Aphis.growth.rate, na.rm = TRUE)) %>%
+  mutate(fact.Ant.mound.dist = as.factor(Ant.mound.dist))
+hist(aa.aphid.GR.sum$mean.Aphid.GR) # note though that growth rates are virtually all negative.
+
+aphid.GR.lmer <- lmer(mean.Aphid.GR ~ scale(Ant.mound.dist)*Genotype + (1|Block/fact.Ant.mound.dist),
+                      aa.aphid.GR.sum,
+                      contrasts = list(Genotype = "contr.sum"))
+summary(aphid.GR.lmer)
+plot(aphid.GR.lmer)
+
+aphid.GR.anova <- anova.table(aphid.GR.lmer, test = "F", type = 3, experiment = "ant-aphid") # effect of genotype on aphid growth rate.
+
+aphid.GR.up <- update(aphid.GR.lmer, .~. -scale(Ant.mound.dist)*Genotype + (1|Genotype))
+
+aphid.GR.R2 <- var.table(aphid.GR.up, experiment = "ant-aphid")
+
+
+
+# only 2012 ----
 summary(aa.arth.df$total.abund)
 summary(aa.arth.df$total.rich)
 round(colSums(aa.arth.df[ ,aa.arth.names])/sum(colSums(aa.arth.df[ ,aa.arth.names]))*100,0)
@@ -945,6 +931,8 @@ summary(glmer((pred.abund.all > 0) ~ (1|Aphid.treatment) + (1|Ant.mound.dist) + 
 #anova(aa.pred.abund, ddf = "Kenward-Roger")
 #visreg(aa.pred.prob, xvar = "Ant.mound.dist")
 #0.01407/(0.2206+0.01407)
+
+## Ant-aphid: community analysis
 
 # dissimilarity matrix, full dataset
 aa.dis.12 <- vegdist(aa.arth.12.pos[ ,aa.arth.names],
@@ -1305,61 +1293,5 @@ plot(betadisper(vegdist(wind.comm.2013),
 plot(betadisper(vegdist(wind.comm.2013), 
                  group = wind.arth.2013$Genotype,
                  bias.adjust = TRUE)) # doesn't violates assumption of adonis...
-
-
-## ant-aphid growth rates ----
-# no relationship with distance to ant mound
-ggplot(aa.aphid.GR, aes(x = Genotype, y = Aphis.growth.rate, color = Genotype)) +
-  geom_boxplot() +
-  geom_point(aes(fill = Genotype), position = position_jitterdodge(jitter.width = 2)) + 
-  #stat_smooth(se = FALSE) +
-  facet_wrap(~Date_rel, nrow = 2)
-
-# residuals look a bit binomial in their distribution. I think this is because the different durations put different lower limits to the decline in population growth rate. Now, I'm thinking the best thing to do would be to just used Aphid densities over time. It is a lot more of an intuitive response variable, and I could account for zeros with a poisson or maybe zero-inflated poisson.
-aphid.GR.lmer <- lmer(Aphis.growth.rate ~ Ant.mound.dist + Genotype*Date_rel + (1|Block/Ant.mound.dist) + (1|plant_code),
-                      aa.aphid.GR)
-summary(aphid.GR.lmer)
-#confint(profile(aphid.GR.lmer))
-plot(aphid.GR.lmer) # things that need to be accounted for.
-anova(aphid.GR.lmer, ddf = "Kenward-Roger")
-
-
-#mutate(non.leaftier.herb.abund = LTF_Caloptilia + tentmine_Phyllonorycter + gall_R_rigidae + gall_R_salicisbrassicoides + gall_Pontania + gall_Aculus + leafhopper_C_reductus + leafhopper_green + leafhopper_unk + sawfly_larva + caterpillar_looper + caterpillar_LB + caterpillar_unk + red_scale + psyllid + grasshopper,
-#      total.herb.abund = non.leaftier.herb.abund + leaftier_Tortricid,
-#     total.omniv.abund = stinkbug + ant_F_obscuripes,
-#    total.pred.abund = spider_Theridion + spider_BY + spider_NW + spider_Tetragnathid + spider_CS + spider_Larionoides)
-
-#herbs <- colnames(wind.2013.vis.df.max)[5:21]
-#omnivs <- colnames(wind.2013.vis.df.max)[22:23]
-#preds <- colnames(wind.2013.vis.df.max)[24:29]
-
-#wind.2013.max.gg <- wind.2013.vis.df.max %>%
-# filter(Dead < 1) %>%
-#gather(Species, Abundance, LTF_Caloptilia:total.pred.abund)
-
-#library(ggplot2)
-#ggplot(filter(wind.2013.max.gg, Species %in% c("leaftier_Tortricid", "non.leaftier.herb.abund", "total.pred.abund")),
-#      aes(x = Genotype, y = Abundance, color = Wind.Exposure)) +
-#geom_boxplot() + 
-#facet_wrap(~Species, nrow = 3)
-
-# graph doesn't look too convincing. Aphid population growth is virtually always negative...
-ggplot(filter(aa.2012.vis.aphidgrowth, Aphid.Treatment == "aphid"),
-       aes(x = Genotype, y = Aphid.growth.rate, color = Genotype)) +
-  geom_boxplot() +
-  facet_wrap(~relative.Date, ncol = 2)
-
-ggplot(filter(aa.2012.vis.alive, Aphid.Treatment == "aphid"),
-       aes(x = total.aphid.abund, y = Red.Ants)) +
-  geom_point() +
-  stat_smooth(method = "loess")
-
-library(lme4)
-aphid.lmer <- glmer(Red.Ants.pres ~ total.aphid.abund + (1|Genotype) + (1|relative.Date) + (1|Block/Distance.to.Ant.Mound), aa.2012.vis.alive, family = "binomial")
-summary(aphid.lmer)
-confint(profile(aphid.lmer))
-anova(aphid.lmer)
-plot(aphid.lmer)
-plot(total.aphid.abund ~ relative.Date, aa.2012.vis.alive)
 
 
