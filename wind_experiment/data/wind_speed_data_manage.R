@@ -3,7 +3,10 @@
 
 library(dplyr)
 library(tidyr)
-library(lmerTest)
+#library(lmerTest)
+library(car)
+library(effects)
+
 ## upload data
 speed <- read.csv('~/Documents/Lanphere_Experiments/wind_experiment/data/wind_speed_data_2013.csv') %>%
   tbl_df() %>%
@@ -28,10 +31,14 @@ summary(speed1.lmer)
 anova(speed1.lmer)
 car::Anova(speed1.lmer, test.statistic = "F")
 
+Effect("treatment", speed1.lmer)
+
 plot(max.speed ~ treatment, speed2)
 speed2.lmer <- lmer(max.speed ~ treatment + (1|block), speed2)
 summary(speed2.lmer)
 car::Anova(speed2.lmer, test.statistic = "F")
+
+Effect("treatment", speed2.lmer)
 
 # marginal effect. paired t-test gives the exact same results. May just through this one out, especially since it was done by a different person (Brendan).
 plot(max.speed ~ treatment, speed3)
