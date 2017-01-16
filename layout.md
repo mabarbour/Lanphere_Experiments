@@ -10,7 +10,6 @@ longtable_crrrrr_toprule_Exper.html
 figures/fig_2/fig_2.png
 figures/image03/image03.png
 textbfFigure_1_Effec.html
-figures/image07/image07.png
 textbfFigure_2_Effec.html
 figures/image04/image04.png
 textbfFigure_2_Stati.html
