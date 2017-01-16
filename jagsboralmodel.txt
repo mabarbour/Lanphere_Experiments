@@ -1,0 +1,77 @@
+model {
+
+	 ## Data Level ## 
+	 for(i in 1:n) {
+
+		 eta[i,1] <- inprod(X.params[1,],X[i,])
+		 u[i,1] ~ dgamma(1/all.params[1,2], 1/all.params[1,2])
+		 y[i,1] ~ dpois(exp(all.params[1,1] + eta[i,1])*(u[i,1])) ## Parameterizing the NB as a multiplicative random effect models, with size
+
+		 eta[i,2] <- inprod(X.params[2,],X[i,])
+		 u[i,2] ~ dgamma(1/all.params[2,2], 1/all.params[2,2])
+		 y[i,2] ~ dpois(exp(all.params[2,1] + eta[i,2])*(u[i,2])) ## Parameterizing the NB as a multiplicative random effect models, with size
+
+		 eta[i,3] <- inprod(X.params[3,],X[i,])
+		 u[i,3] ~ dgamma(1/all.params[3,2], 1/all.params[3,2])
+		 y[i,3] ~ dpois(exp(all.params[3,1] + eta[i,3])*(u[i,3])) ## Parameterizing the NB as a multiplicative random effect models, with size
+
+		 eta[i,4] <- inprod(X.params[4,],X[i,])
+		 u[i,4] ~ dgamma(1/all.params[4,2], 1/all.params[4,2])
+		 y[i,4] ~ dpois(exp(all.params[4,1] + eta[i,4])*(u[i,4])) ## Parameterizing the NB as a multiplicative random effect models, with size
+
+		 eta[i,5] <- inprod(X.params[5,],X[i,])
+		 u[i,5] ~ dgamma(1/all.params[5,2], 1/all.params[5,2])
+		 y[i,5] ~ dpois(exp(all.params[5,1] + eta[i,5])*(u[i,5])) ## Parameterizing the NB as a multiplicative random effect models, with size
+
+		 eta[i,6] <- inprod(X.params[6,],X[i,])
+		 u[i,6] ~ dgamma(1/all.params[6,2], 1/all.params[6,2])
+		 y[i,6] ~ dpois(exp(all.params[6,1] + eta[i,6])*(u[i,6])) ## Parameterizing the NB as a multiplicative random effect models, with size
+
+		 eta[i,7] <- inprod(X.params[7,],X[i,])
+		 u[i,7] ~ dgamma(1/all.params[7,2], 1/all.params[7,2])
+		 y[i,7] ~ dpois(exp(all.params[7,1] + eta[i,7])*(u[i,7])) ## Parameterizing the NB as a multiplicative random effect models, with size
+
+		 eta[i,8] <- inprod(X.params[8,],X[i,])
+		 u[i,8] ~ dgamma(1/all.params[8,2], 1/all.params[8,2])
+		 y[i,8] ~ dpois(exp(all.params[8,1] + eta[i,8])*(u[i,8])) ## Parameterizing the NB as a multiplicative random effect models, with size
+
+		 eta[i,9] <- inprod(X.params[9,],X[i,])
+		 u[i,9] ~ dgamma(1/all.params[9,2], 1/all.params[9,2])
+		 y[i,9] ~ dpois(exp(all.params[9,1] + eta[i,9])*(u[i,9])) ## Parameterizing the NB as a multiplicative random effect models, with size
+
+		 eta[i,10] <- inprod(X.params[10,],X[i,])
+		 u[i,10] ~ dgamma(1/all.params[10,2], 1/all.params[10,2])
+		 y[i,10] ~ dpois(exp(all.params[10,1] + eta[i,10])*(u[i,10])) ## Parameterizing the NB as a multiplicative random effect models, with size
+
+		 eta[i,11] <- inprod(X.params[11,],X[i,])
+		 u[i,11] ~ dgamma(1/all.params[11,2], 1/all.params[11,2])
+		 y[i,11] ~ dpois(exp(all.params[11,1] + eta[i,11])*(u[i,11])) ## Parameterizing the NB as a multiplicative random effect models, with size
+
+		 eta[i,12] <- inprod(X.params[12,],X[i,])
+		 u[i,12] ~ dgamma(1/all.params[12,2], 1/all.params[12,2])
+		 y[i,12] ~ dpois(exp(all.params[12,1] + eta[i,12])*(u[i,12])) ## Parameterizing the NB as a multiplicative random effect models, with size
+
+		 eta[i,13] <- inprod(X.params[13,],X[i,])
+		 u[i,13] ~ dgamma(1/all.params[13,2], 1/all.params[13,2])
+		 y[i,13] ~ dpois(exp(all.params[13,1] + eta[i,13])*(u[i,13])) ## Parameterizing the NB as a multiplicative random effect models, with size
+
+		 eta[i,14] <- inprod(X.params[14,],X[i,])
+		 u[i,14] ~ dgamma(1/all.params[14,2], 1/all.params[14,2])
+		 y[i,14] ~ dpois(exp(all.params[14,1] + eta[i,14])*(u[i,14])) ## Parameterizing the NB as a multiplicative random effect models, with size
+
+		 } 
+
+
+	 ## Process Level ##
+	 for(j in 1:p) { all.params[j,1] ~ dnorm(0,0.01) } ## Separate species intercepts
+	 for(j in 1:p) { all.params[j,2] ~ dunif(0,50) } ## Dispersion parameters
+
+
+	 for(j in 1:p) { X.params[j,1] ~ dnorm(0,0.01) } 
+
+	 for(j in 1:p) { X.params[j,2] ~ dnorm(0,0.01) } 
+
+	 for(j in 1:p) { X.params[j,3] ~ dnorm(0,0.01) } 
+
+
+	 }

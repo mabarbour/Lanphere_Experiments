@@ -1,0 +1,148 @@
+
+
+Genotype-by-environment effects on willow arthropod community
+-------------------------------------------------------------
+
+Matthew Barbour, Greg Crutsinger, etc.
+
+
+Abstract
+--------
+
+Introduction
+------------
+
+Methods
+-------
+### Study Site
+
+Study Site
+
+We conducted this research at Lanphere Dunes (40°53'29.85"N, 124° 8'49.06"W), a pristine coastal dune ecosystem managed by US Fish and Wildlife service in Humboldt County, California.  The willow, *Salix hookeriana*, naturally occurs in dune swales.  The dominant vegetation in the swales consistst of *S. hookeriana* and beach pine (NEED SPECIES NAME).
+
+### Experimental Design
+*Propogation of willow cuttings*
+Prior to bud burst in February 2012, we took cuttings from one replicate of each of the 10 genotypes used in this experiment that were taken from another common garden where we have replicates of 26 genetically distinct willow clones.  
+We chose these 10 genotypes because they vary significantly in carbon-nitrogen ratios, LIST OTHER TRAITS
+
+On February 21, 2012 (double check date) we sacrificed 1-2 replicates from 10 of 27 genotypes that varied significantly in leaf carbon:nitrogen ratios (NEED STATS), a putative trait that influences aphid performance.   COMMON GARDEN DETAILS.  We took cuttings from shoots grown in the previous year and soaked cuttings in water overnight.  On February 22, 2012 we planted cuttings in a mixture of 80% perlite, 20% peat moss and ___ dolomite lime.  We grew cuttings under ambient weather conditions outside the greenhouse at Humboldt State University.  (do I need to mention that they were exposed to herbivory?)
+
+From May 20-22, 2012 we planted willow cuttings in the swales at the Lanphere Dunes Unit within Humboldt Bay National Wildlife Refuge in California (GPS).  We removed all arthropods on the willows at the time of planting.  On May 22, we collected aphids (GET SPECIES or GENUS name) and placed 5 adult apterate aphids on willow cuttings in the aphid treatment.  We bagged aphids onto the apical shoots of cuttings using organza bags to promote aphid establishment in spite of oncoming inclement weather (wind and rain).  We also placed organza bags on all control plants as well.  On May 27, we checked aphid treatments to ensure there were 5 adult aphids and removed bags from all cuttings.  If necessary, we added aphids to these treatments until there were 5 adults and we removed any aphid nymphs that were produced since initial establishment.  On May 27, we double-checked willows to ensure that all arthropods (spiders and leaf rollers; except for a couple of stem galls) were removed.  
+
+*Wind Experiment Setup*
+We planted willow cuttings in a completely randomized block experimental design.  We established two sites at each of 10 different willow patches (10 blocks).  Sites were either exposed or unexposed to the wind (fixed effects) and we planted one replicate of each of 10 genotypes (random effects) in each site (20 treatments * 10 blocks = 200 total cuttings).  We planted exposed and unexposed sites within each block the same distance from the willow patch to control for insect accessability; however, exposed sites faced prevailing winds during the growing season.  These wind exposed sites were (GIVE DETAILS ON WIND EXPOSURE).
+
+*Ant Experiment Setup*
+TO DO
+We planted cuttings around 5 different ant mounds (experimental blocks).  We planted 20 cuttings (aphid and control treatment of each of 10 genotypes) at each distance of 1.5, 6.5 and 12.5 meters from the edge of the ant mound, for a total of 60 cuttings per ant mound.  At each distance, we staggered cuttings at a distance of 25 cm around each distance measurement and ensured that all cuttings were spaced 50 cm apart from each other.  Up until May 27, we supplemented planted cuttings with water to promote the survival of cuttings. 
+To assess the independent effects of willow genotype on aphid performance, we conducted a separate experiment (IN SOLARIUM OR GROWTH CHAMBERS) where we placed 2 adult apterate aphids on the apical shoots of willow cuttings on ____.  2 weeks later, we surveyed cuttings for aphid abundance and used Agrawal 2004 to calculate aphid population growth.  We used the mean aphid population growth for each genotype as a continuous explanatory variable of genotype’s effect on ant-aphid interactions.
+
+TO DO
+To assess the effects of willow genotype and distance from ant mound on ant-aphid interactions, we surveyed all cuttings June 10, 24, and July 8 and 22 for aphid and ant abundance.  
+
+TO DO
+To assess the effects of willow genotype and ant-aphid interactions on ecological networks, we surveyed all cuttings on June 24 and July 22 for the abundance and diversity of arthropods.  For web-building spiders, we collected their webs and identified the abundance and diversity of their prey items.  For herbivore larva, we collected them, brought them into the lab, and fed them leaves until they pupated.  We reared pupa until either the original herbivore or an adult parasitoid emerged.
+
+TO DO
+To assess the effects of ant-aphid interactions on ecological networks, we also surveyed willow patches that occurred in proximity to thatch-ant mounds.  We found __ ant mounds and recorded its distance from the closest willow patch.  We recorded whether or not ant-aphid was occurring, and if so, which ant and aphid species were involved (think about recording specific details of ant and aphid abundances…).  
+
+TO DO
+To assess the effects of willow genotype and ant-aphid interactions on willow performance, we surveyed all cuttings on July 22 for percent leaf area damaged on the 5 most recent leaves of the most apical growing shoot.  We scored leaves (0-10 damage score).  In addition, we removed all growth from the current year, dried and weighed it to the nearest gram to assess total biomass production from that year.
+
+TO DO
+To assess the putative mechanisms by which willow genotype and ant-aphid interactions influence ecological networks, we quantified several traits for each willow cutting, including: specific leaf area (SLA), leaf area, water content, leaf toughness, trichome density, and above ground biomass (CURRENT YEAR SHOOT PRODUCTION OR DRY AND WEIGHT ENTIRE CUTTING?).  (GIVE DETAILS IN APPENDIX FOR QUANTIFYING EACH PLANT TRAIT).  NEED TO DETERMINE HOW COST-EFFECTIVE IT WOULD BE TO CALCULATE C:N RATIOS OR DEFENSIVE CHEMISTRY FOR ALL PLANTS.  
+
+*Measuring Plant Traits*
+We measured 6 different plant traits at the time herbivores were collected, including: specific leaf area (SLA), leaf size (LS), browned portion of leaf (likely in response to desiccation), plant height, total shoot length, and number of leaves.
+
+*Soil Measurements*
+At the end of the growing season (September 17 – 28) in 2012, we measured X aspects of the soil, including: X nutrients, total organic matter content, moisture, temperature, and electrical conductivity.
+
+To measure nutrient availability in the soil, we used Plant Root Simulator (PRS) Probes (Western Ag Innovations, Saskatchewan, Canada).  We installed PRS probes at 3 randomly selected locations within each site for 11 days.
+
+To measure total organic matter content (TOM), we used a trowel to collect soil at a depth up to 15 cm adjacent to the randomly positioned PRS probes on Sep 18, 2012.  Soils were transported back to the lab in plastic bags, sieved into fragments less than 2 mm, randomly subsampled using a soil splitter, and dried at an average temperature of 105 degrees Celsius for X days.  We then weighed a subsample of the oven dried soil into an oven dried crucible and placed the crucible and soil into a furnace to be combusted at XX degrees Celsius for X days.  We then weighed the combusted samples, placed them in a desiccator for 20 minutes, and reweighed them.  To calculate total organic matter we used the equation: TOM = (Oven Dry Weight - Combusted Weight)/Oven Dry Weight.
+
+We used an EM50 Digital/Analog Data Logger (Decagon Devices, Washington, USA) to measure soil moisture, temperature, and electrical conductivity at a soil depth of about 5 cm.  We measured soil moisture at 3 random locations within each site on three different days while PRS probes were in the ground.  All readings occurred between GIVE HOURS.
+
+*Measuring Herbivore Community*
+
+
+Results
+-------
+
+Discussion
+----------
+
+Acknowledgements
+----------------
+
+References
+----------
+
+
+Previous writing
+----------------
+
+### Wind section
+Goal: To examine how a major abiotic force (wind) interacts with the genotype of a foundation tree species (dune willow) to influence insect food webs and willow fitness.
+
+Overaching Question: How does wind exposure alter the effects of willow genotype on insect communities and willow performance?  
+
+Sub-questions:
+1)  How does willow genotype interact with wind exposure to influence willow growth?
+2)	How does willow genotype interact with wind exposure to influence ecological networks?
+a.	Investigate putative plant traits that may influence insect food webs.
+i.	Biomass (quantity)
+ii.	C:N ratio (quality)
+iii.	Other plant traits
+3)	How does wind exposure influence willow biomass and insect food webs?
+a.	Investigate patches exposed to and free of wind exposure (look at effects of intra-patch heterogeneity, on ecological network)
+
+Materials & Methods
+
+
+Experiment 1: Genotype-Wind Effects on Insect Community
+Completely Randomized Block Experimental Design 
+-	2 treatments
+o	Exposed (adjacent to willow patch)
+o	Unexposed (behind willow patch relative to prevailing winds)
+-	10 genotypes
+o	Genotypes vary significantly in how they allocate carbon and nitrogen to their leaves.  
+o	I will also measure more plant traits that likely exhibit heritable genetic variation.
+-	10 blocks
+o	10 different willow patches. 
+-	Experimental unit: 1 willow cutting planted directly into the ground per treatment per genotype per block.
+-	Summary of material
+o	200 cuttings (10 blocks * 2 treatments * 10 genotypes)
+-	After 2-3 months:
+o	Survey insects for their abundance and diversity.  
+o	Survey sedentary insects (galls, leaf miners, leaf folders, etc.) and rear them for their parasitoids.
+
+
+### Ant-Aphid Section
+Goal: To examine how a major biotic interaction (ants tending aphids) interacts with the genotype of a foundation tree species (dune willow) to influence insect food webs and plant fitness.
+
+Overarching Question: How does the presence of aphids and distance from thatch-ant mounds alter the effects of willow genotype on insect communities and willow performance?
+
+
+Field Experiment:  Genotype by Ant-Aphid Interactions effect on insect communities
+Completely Randomized Block Experimental Design 
+-	6 treatments
+o	Distance from ant mound: 1, 6, and 12 meters
+o	Aphids presence: no addition or add 5 wingless individuals
+•	Check that no new aphids have colonized “no addition” plants approximately once a week.
+-	10 genotypes (60 cm cuttings)
+o	Genotypes vary significantly in C:N ratios which may influence aphid performance.
+o	More plant traits will be measured that likely exhibit heritable genetic variation. 
+-	5 blocks
+o	5 different ant mounds.  
+-	Experimental unit: 1 willow cutting planted into the ground
+-	Summary of material needed
+o	300 cuttings (5 blocks * 6 treatments * 10 genotypes)
+o	750 aphids (5 blocks * 3 treatments * 5 aphids per cutting * 10 genotypes)
+-	Bag all cuttings to prevent insect colonization.  Allow aphids to establish for 24-48 hrs then unbag all plants.
+-	Survey cuttings approximately once a week to assess ant activity, aphid population growth and aphid parasitism.
+-	After 2-3 months, survey cuttings for insect abundance and diversity.  Sample galls and leaf miners and rear them for their parasitoids.
+-	Before ending experiment, place one western tent caterpillar larva on each cutting as a bioassay of the effects of ant-aphid interactions on herbivory and survival of non-aphid insects (monitor herbivory and survival every 12-24 hrs).
+ 
+
