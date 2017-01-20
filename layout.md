@@ -1,7 +1,6 @@
 abstract.html
 _First_macro_on.html
 textbfAbstract__begi.html
-ffee.tex
 7480.html
 emphStatistical_anal.html
 textbfAuthors_Contri.html
