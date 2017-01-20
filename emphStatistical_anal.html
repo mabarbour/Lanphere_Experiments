@@ -1,9 +1,4 @@
-
-
-<div class="ltx_p">Statistical analyses</div>
-
-
-<div class="ltx_p">willow genotype, the environment, and their interaction, influenced
+<div class="ltx_p">Statistical analyses</div><div class="ltx_p">willow genotype, the environment, and their interaction, influenced
 richness, abundance, and rarefied richness of aboveground arthropods as
 well as rarefied richness of root fungi and bacteria, we used separate
 generalized linear mixed-effect models (GLMMs) (Bolker et al.
@@ -27,10 +22,7 @@ with Kenward-Roger approximated degrees of freedom. For count responses
 distributions in our models and tested the significance of fixed effects
 using likelihood-ratio tests. If necessary, we accounted for
 overdispersion in these Poisson models by specifying an individual-level
-random effect.</div>
-
-
-<div class="ltx_p">To examine whether community composition depended on willow genotype,
+random effect.</div><div class="ltx_p">To examine whether community composition depended on willow genotype,
 the environment, or their interaction, we applied a Hellinger
 transformation to our community data (square root of proportional
 abundance of species found on each willow; Legendre &amp; Gallagher (2001)
@@ -53,10 +45,7 @@ a covariate and ran the same permutation test as previously described.
 This ensured that our significance tests of treatments that varied at
 the plot-level were based on the appropriate residual degrees of freedom
 (wind exposure residual df = 9; distance from ant mound residual
-df = 4).</div>
-
-
-<div class="ltx_p">To compare the relative importance of willow genotype vs. different
+df = 4).</div><div class="ltx_p">To compare the relative importance of willow genotype vs. different
 environmental factors, we fit reduced GLMMs with significant factors as
 random effects. We then used the variance components estimated for these
 random effects to calculate the percentage of variance (hereafter
@@ -70,10 +59,7 @@ redundancy statistic for each significant factor, which has been shown
 to be unbiased estimator of explained variance (Peres-Neto et al. 2006).
 This adjusted redundancy statistic is an analogue of adjusted
 R 2 but for multivariate responses and we refer
-to it hereafter as R2adj.</div>
-
-
-Plant
+to it hereafter as R2adj.</div><div>Plant
 traits — To analyze how willow genotype, the environment, and their
 interaction, influenced willow phenotypes, we used separate GLMMs with
 the same structure described in the “Community responses” section. For
@@ -102,19 +88,10 @@ environmental variation affects community responses, we used piecewise
 structural equation models (SEMs) (Lefcheck 2015). We only modeled
 potential mechanisms and community responses that were statistically
 significant in our prior analyses. For example, if we did not observe a
-G\label{heritable-trait-variation-vs.-phenotypic-plasticity-vs.-direct-environmental-effects-to-identify-potential-mechanisms-by-which-willow-genetic-and-environmental-variation-affects-community-responses-we-used-piecewise-structural-equation-models-sems-lefcheck-2015.-we-only-modeled-potential-mechanisms-and-community-responses-that-were-statistically-significant-in-our-prior-analyses.-for-example-if-we-did-not-observe-a-g}
-
-
-<span class="ltx_Math">\begin{equation}
+G\label{heritable-trait-variation-vs.-phenotypic-plasticity-vs.-direct-environmental-effects-to-identify-potential-mechanisms-by-which-willow-genetic-and-environmental-variation-affects-community-responses-we-used-piecewise-structural-equation-models-sems-lefcheck-2015.-we-only-modeled-potential-mechanisms-and-community-responses-that-were-statistically-significant-in-our-prior-analyses.-for-example-if-we-did-not-observe-a-g}<span class="math ltx_Math v1">\begin{equation}
 \times\nonumber \\
- \end{equation}</span>
-
-
-<div class="ltx_p">E effect on a community response variable, then we did not model this
-interactive effect in the piecewise SEM.</div>
-
-
-<div class="ltx_p">An advantage of piecewise SEMs is that they are flexible, allowing users
+ \end{equation}</span></div><div class="ltx_p">E effect on a community response variable, then we did not model this
+interactive effect in the piecewise SEM.</div><div class="ltx_p">An advantage of piecewise SEMs is that they are flexible, allowing users
 to account for correlated structure (i.e. random effects) in their
 experimental design. However, as with any technique that relies on
 multiple regression, structural equation models can give misleading
@@ -128,10 +105,7 @@ At times, we lacked data for all traits on each plant or all soil
 properties measured in each plot. Therefore, we used a regularized
 iterative PCA algorithm to impute missing values (Josse et al.
 2012). For each PCA, we retained principal components with eigenvalues
-greater than 1.</div>
-
-
-<div class="ltx_p">To calculate standardized coefficients in our piecewise SEM, we scaled
+greater than 1.</div><div class="ltx_p">To calculate standardized coefficients in our piecewise SEM, we scaled
 all predictor and response variables to mean = 0 and SD = 1 prior to
 analyzing them with GLMMs (error distribution = Gaussian). For willow
 genotype, we specified the average effect for the 10 genotypes as the
@@ -148,23 +122,11 @@ structural equation model, we used a test of directed separation
 (Shipley 2000). This test identifies missing paths in the model,
 calculates the P-value for each missing pathway, and then
 calculates a test statistic, Fisher’s C, using the following
-equation: C = -2</div>
-
-
-<span class="ltx_Math">\begin{equation}
+equation: C = -2</div><div><span class="math ltx_Math v1">\begin{equation}
 ln(P_{i})\nonumber \\
- \end{equation}</span>
-
-
-<div class="ltx_p">, where</div>
-
-
-<span class="ltx_Math">\begin{equation}
+ \end{equation}</span></div><div class="ltx_p">, where</div><div><span class="math ltx_Math v1">\begin{equation}
 P_{i}\nonumber \\
- \end{equation}</span>
-
-
-<div class="ltx_p">is the P-value of the ith missing pathway and k is
+ \end{equation}</span></div><div class="ltx_p">is the P-value of the ith missing pathway and k is
 the total number of missing pathways. Fisher’s C can then be
 compared to a chi-square distribution with 2k degrees of freedom.
 If there are many missing pathways with low P-values, this will
@@ -173,22 +135,10 @@ Therefore, a P-value &lt; 0.05 indicates a poor fit for
 the structural equation model, whereas a P-value &gt;
 0.05 indicates a good fit. Note that if we have included the key plant
 traits as well as biotic and abiotic factors, then there should be no
-missing paths between willow genotype and our environmental treatments.</div>
-
-
-<div class="ltx_p">All analyses were conducted in R version 3.2.4 (R Core Team 2016).</div>
-
-
-
-
-
-<h3 class="ltx_title_subsubsection">Results</h3>\label{results}
-
-
-<div class="ltx_title_paragraph">What is the relative importance of
+missing paths between willow genotype and our environmental treatments.</div><div class="ltx_p">All analyses were conducted in R version 3.2.4 (R Core Team 2016).</div><h3 class="ltx_title_subsubsection">Results</h3><div>\label{results}</div><div class="ltx_title_paragraph">What is the relative importance of
 willow genotype vs. the biotic and abiotic environment in structuring
 aboveground
-communities?</div>\label{what-is-the-relative-importance-of-willow-genotype-vs.-the-biotic-and-abiotic-environment-in-structuring-aboveground-communities-1}
+communities?</div><div>\label{what-is-the-relative-importance-of-willow-genotype-vs.-the-biotic-and-abiotic-environment-in-structuring-aboveground-communities-1}
 
 
 Ant-aphid
@@ -217,15 +167,9 @@ responses, arthropod community composition was influenced by an
 interaction between willow genotype and the aphid treatment (Fig. 2A;
 R 2adj= 6%,
 F9,157 = 1.45, P = 0.022). This
-G\label{ant-aphid-experiment-willow-genotype-tended-to-be-more-important-than-the-biotic-environment-in-structuring-the-arthropod-community-table-s1-in-supporting-information.-we-found-that-arthropod-richness-varied-from-1.2-to-3.2-species-among-genotypes-ux1d70e2-11-ux3c79-41.35-p-0.001-while-arthropod-abundance-varied-4-fold-among-the-different-clones-fig.-1a-ux1d70e2-7-ux3c79-34.86-p-0.001.-the-effect-of-willow-genotype-on-arthropod-richness-was-explained-by-correlated-responses-in-arthropod-abundance-as-there-was-no-difference-in-rarefied-richness-among-genotypes-f9138.8-0.83-p-0.586.-aphid-treatment-was-the-only-factor-that-affected-rarefied-richness-ux1d70e2-4-f1139.2-5.34-p-0.022-resulting-in-a-16-decrease-in-rarefied-richness-when-aphids-were-added-to-willows-fig.-1c-however-this-effect-of-aphid-treatment-did-not-translate-into-an-effect-on-total-richness-ux3c71-0.45-p-0.504.-willows-in-the-aphid-treatment-also-had-2-fold-more-arthropods-but-only-at-the-furthest-distance-from-ant-mounds-fig.-1bt-ux1d70e2-9-ux3c71-8.12-p-0.004.-proximity-to-ant-mounds-did-not-influence-any-other-aspect-of-the-arthropod-community-table-s1.-in-contrast-to-richness-and-abundance-responses-arthropod-community-composition-was-influenced-by-an-interaction-between-willow-genotype-and-the-aphid-treatment-fig.-2a-r2adj-6-f9157-1.45-p-0.022.-this-g}
-
-
-<span class="ltx_Math">\begin{equation}
+G\label{ant-aphid-experiment-willow-genotype-tended-to-be-more-important-than-the-biotic-environment-in-structuring-the-arthropod-community-table-s1-in-supporting-information.-we-found-that-arthropod-richness-varied-from-1.2-to-3.2-species-among-genotypes-ux1d70e2-11-ux3c79-41.35-p-0.001-while-arthropod-abundance-varied-4-fold-among-the-different-clones-fig.-1a-ux1d70e2-7-ux3c79-34.86-p-0.001.-the-effect-of-willow-genotype-on-arthropod-richness-was-explained-by-correlated-responses-in-arthropod-abundance-as-there-was-no-difference-in-rarefied-richness-among-genotypes-f9138.8-0.83-p-0.586.-aphid-treatment-was-the-only-factor-that-affected-rarefied-richness-ux1d70e2-4-f1139.2-5.34-p-0.022-resulting-in-a-16-decrease-in-rarefied-richness-when-aphids-were-added-to-willows-fig.-1c-however-this-effect-of-aphid-treatment-did-not-translate-into-an-effect-on-total-richness-ux3c71-0.45-p-0.504.-willows-in-the-aphid-treatment-also-had-2-fold-more-arthropods-but-only-at-the-furthest-distance-from-ant-mounds-fig.-1bt-ux1d70e2-9-ux3c71-8.12-p-0.004.-proximity-to-ant-mounds-did-not-influence-any-other-aspect-of-the-arthropod-community-table-s1.-in-contrast-to-richness-and-abundance-responses-arthropod-community-composition-was-influenced-by-an-interaction-between-willow-genotype-and-the-aphid-treatment-fig.-2a-r2adj-6-f9157-1.45-p-0.022.-this-g} <span class="math ltx_Math v1">\begin{equation}
 \times\nonumber \\
- \end{equation}</span>
-
-
-<div class="ltx_p">Eaphid effect was primarily due to the differential
+ \end{equation}</span></div><div class="ltx_p">Eaphid effect was primarily due to the differential
 response of other aphids to a single willow genotype (Fig. 2A solid
 line; Table S2). If we remove this genotype from the analysis, we find
 independent effects on community composition, with the effect of willow
@@ -233,11 +177,7 @@ genotype (R2adj = 3%,
 F8,156 = 1.66, P = 0.007) being relatively more
 important than the addition of aphids
 (R2adj = 1%,
-F1,156 = 2.93, P = 0.017).</div>
-
-
-
-\label{section-2}
+F1,156 = 2.93, P = 0.017).</div><div>\label{section-2}
 
 
 
@@ -281,17 +221,9 @@ F9,68 = 1.17, P =
 
 
 
- \label{section-3}
-
-
-
-
-<div class="ltx_title_paragraph">Do willow genetic and environmental
+ \label{section-3}</div><div class="ltx_title_paragraph">Do willow genetic and environmental
 variation have different effects on above and belowground
-communities?</div>\label{do-willow-genetic-and-environmental-variation-have-different-effects-on-above-and-belowground-communities-1}
-
-
-<div class="ltx_p">Willow genotype and wind exposure had distinct effects on
+communities?</div><div>\label{do-willow-genetic-and-environmental-variation-have-different-effects-on-above-and-belowground-communities-1}</div><div class="ltx_p">Willow genotype and wind exposure had distinct effects on
 root-associated fungal and bacterial communities compared to foliar
 arthropods (Table S3). Neither wind exposure (F1,8.8 =
 0.90, P = 0.369) nor willow genotype (F9,95.0 = 1.21, P
@@ -302,10 +234,7 @@ genotypes (Fig. 2C; 𝜎2 = 1%, F9,117 =
 (F1,9 = 1.19, P = 0.162). Genotypic differences in
 fungal community composition were due to variation in the relative
 abundance of at least eight different OTUs, most of which were
-saprotrophs (Table S4) and not arbuscular or ectomycorrhiza.</div>
-
-
-<div class="ltx_p">In contrast to the fungal community, wind exposure influenced the
+saprotrophs (Table S4) and not arbuscular or ectomycorrhiza.</div><div class="ltx_p">In contrast to the fungal community, wind exposure influenced the
 bacterial community (Table S3), but in the opposite direction of foliar
 arthropods. For example, the rarefied richness of bacterial OTUs was 6%
 higher on the roots of wind-exposed vs. unexposed plants (Fig. 1F;
@@ -316,14 +245,10 @@ R 2adj = 3%,
 F1,9 = 1.38, P = 0.092), there was no detectable effect
 of willow genotype on any aspect of the bacterial community (rarefied
 richness: F9,100.3 = 1.63, P = 0.117; community
-composition: F9,120 = 0.93, P = 0.536).</div>
-
-
-
-<div class="ltx_title_paragraph">What is the relative importance of
+composition: F9,120 = 0.93, P = 0.536).</div><div class="ltx_title_paragraph">What is the relative importance of
 heritable trait variation, phenotypic plasticity, and direct
 environmental effects in structuring
-communities?</div>\label{what-is-the-relative-importance-of-heritable-trait-variation-phenotypic-plasticity-and-direct-environmental-effects-in-structuring-communities-1}
+communities?</div><div>\label{what-is-the-relative-importance-of-heritable-trait-variation-phenotypic-plasticity-and-direct-environmental-effects-in-structuring-communities-1}
 
 
 Ant-aphid
@@ -337,23 +262,14 @@ ranging from 0.05 to 7 among the most disparate willow genotypes in the
 aphid treatment (χ9 = 20.83, P = 0.013). This strong
 effect of willow genotype on A. farinosa in the aphid treatment
 resulted in a
-G\label{ant-aphid-experiment-we-hypothesized-that-the-effect-of-willow-genetic-variation-and-the-biotic-environment-on-arthropod-communities-would-be-mediated-in-part-by-variation-in-the-abundance-of-a.-farinosa-and-f.-obscuripes.-while-distance-from-ant-mounds-had-little-effect-on-a.-farinosa-ux3c71-0.55-p-0.460-willow-genotype-had-a-strong-effect-with-the-average-number-of-aphids-ranging-from-0.05-to-7-among-the-most-disparate-willow-genotypes-in-the-aphid-treatment-ux3c79-20.83-p-0.013.-this-strong-effect-of-willow-genotype-on-a.-farinosa-in-the-aphid-treatment-resulted-in-a-g}
-
-
-<span class="ltx_Math">\begin{equation}
+G\label{ant-aphid-experiment-we-hypothesized-that-the-effect-of-willow-genetic-variation-and-the-biotic-environment-on-arthropod-communities-would-be-mediated-in-part-by-variation-in-the-abundance-of-a.-farinosa-and-f.-obscuripes.-while-distance-from-ant-mounds-had-little-effect-on-a.-farinosa-ux3c71-0.55-p-0.460-willow-genotype-had-a-strong-effect-with-the-average-number-of-aphids-ranging-from-0.05-to-7-among-the-most-disparate-willow-genotypes-in-the-aphid-treatment-ux3c79-20.83-p-0.013.-this-strong-effect-of-willow-genotype-on-a.-farinosa-in-the-aphid-treatment-resulted-in-a-g} <span class="math ltx_Math v1">\begin{equation}
 \times\nonumber \\
- \end{equation}</span>
-
-
-<div class="ltx_p">Eaphid effect on the abundance of F. obscuripes
+ \end{equation}</span></div><div class="ltx_p">Eaphid effect on the abundance of F. obscuripes
 (χ2 = 6.26, P = 0.044), with ant abundance varying from
 0 to ~0.5 individuals (on average) among clones in the
 aphid treatment, whereas they were virtually absent in the absence of
 aphids. Proximity to ant mounds had no effect on the abundance of
-F. obscuripes (χ1 = 1.68, P = 0.195).</div>
-
-
-<div class="ltx_p">In addition to ant-aphid interactions, we hypothesized that the effect
+F. obscuripes (χ1 = 1.68, P = 0.195).</div><div class="ltx_p">In addition to ant-aphid interactions, we hypothesized that the effect
 of willow genetic variation and the biotic environment on arthropod
 communities would be mediated by plant traits. We observed both direct
 and interactive effects of willow genotype and the biotic environment on
@@ -363,33 +279,18 @@ varied approximately 2-fold among the most disparate willow genotypes
 shoot count χ9 = 65.84, P &lt; 0.001; shoot
 length F9,204.2 = 7.27, P &lt; 0.001). Willows
 did appear to produce 28% more shoots in the absence of aphids, but
-only at the furthest distance from ant mounds (Eaphid</div>
-
-
-<span class="ltx_Math">\begin{equation}
+only at the furthest distance from ant mounds (Eaphid</div><div><span class="math ltx_Math v1">\begin{equation}
 \times\nonumber \\
- \end{equation}</span>
-
-
-<div class="ltx_p">Eant χ1 = 4.20, P = 0.040). While there
+ \end{equation}</span></div><div class="ltx_p">Eant χ1 = 4.20, P = 0.040). While there
 was little apparent effect of willow genotype and the biotic environment
 on leaf water content (Table S1), we found that the addition of aphids
 modified the effect of certain willow genotypes on leaf trichome density
-(G</div>
-
-
-<span class="ltx_Math">\begin{equation}
+(G</div><div><span class="math ltx_Math v1">\begin{equation}
 \times\nonumber \\
- \end{equation}</span>
-
-
-<div class="ltx_p">Eaphid χ8 = 23.17, P = 0.003).
+ \end{equation}</span></div><div class="ltx_p">Eaphid χ8 = 23.17, P = 0.003).
 Specifically, two clones (S and T) produced ~4-fold more
 trichomes when aphids were absent, whereas genotype L produced 3-fold
-more trichomes when aphids were present (Table S1).</div>
-
-
-<div class="ltx_p">Using structural equation models (for richness, abundance, and rarefied
+more trichomes when aphids were present (Table S1).</div><div class="ltx_p">Using structural equation models (for richness, abundance, and rarefied
 richness) and redundancy analysis (for community composition), we found
 that heritable trait variation and direct effects of aphid additions
 were the primary determinants of the arthropod community rather than
@@ -411,10 +312,7 @@ we found that the abundance of A. farinosa was the only factor
 (of the mechanisms we modeled) influencing the arthropod community
 (F1,183 = 2.86, P = 0.025). Specifically, higher
 abundance of A. farinosa resulted in an increase in the
-proportional abundance of other ant species in the community (Fig. 2D).</div>
-
-
-<div class="ltx_p">Despite our detailed analysis of potential mechanisms, our structural
+proportional abundance of other ant species in the community (Fig. 2D).</div><div class="ltx_p">Despite our detailed analysis of potential mechanisms, our structural
 equation models revealed multiple missing paths (dotted lines, Fig.
 2A,B,C), resulting in rather poor fits for most models (richness:
 C2 = 24.84, P &lt; 0.001; abundance:
@@ -424,35 +322,19 @@ the traits we measured, willow genotype still had a strong effect on
 arthropod richness (Fig. 5A) and A. farinosa abundance (Fig. 5B),
 indicating that we failed to identify key pathways (likely unmeasured
 traits) by which genetic variation influenced these responses.
-Similarly, we failed to fully identify the Eaphid</div>
-
-
-<span class="ltx_Math">\begin{equation}
+Similarly, we failed to fully identify the Eaphid</div><div><span class="math ltx_Math v1">\begin{equation}
 \times\nonumber \\
- \end{equation}</span>
-
-
-<div class="ltx_p">Eant effect on arthropod abundance (Fig. 5B) as well as
+ \end{equation}</span></div><div class="ltx_p">Eant effect on arthropod abundance (Fig. 5B) as well as
 how the addition of aphids negatively affected rarefied richness (Fig.
 5C). For our redundancy analysis of community composition, we found that
 A. farinosa abundance explained the effect of the aphid treatment
 (F1,173 = 0.90, P = 0.447), but we still failed to
 detect the effect of both willow genotype (F9,173 =
-1.53, P = 0.014) and the G</div>
-
-
-<span class="ltx_Math">\begin{equation}
+1.53, P = 0.014) and the G</div><div><span class="math ltx_Math v1">\begin{equation}
 \times\nonumber \\
- \end{equation}</span>
-
-
-<div class="ltx_p">Eaphid effect (F9,164 = 1.71, P =
+ \end{equation}</span></div><div class="ltx_p">Eaphid effect (F9,164 = 1.71, P =
 0.004), suggesting that we failed to measure important constitutive and
-inducible plant traits.</div>
-
-
-
-Wind
+inducible plant traits.</div><div>Wind
 experiment — One of the mechanisms by which wind exposure could
 influence willow-associated communities is through accumulated effects
 on soil properties; however, we observed only modest effects of wind
@@ -462,10 +344,7 @@ wind-exposed plots was marginally drier (F1,9.0 = 3.52,
 5.08, 0.051) than in unexposed plots, but there was no clear difference
 in either percent organic matter (F1,8.4 = 0.68, 0.434)
 or nutrient composition (F1,9.0 = 1.31, 0.282).
-\label{wind-experiment-one-of-the-mechanisms-by-which-wind-exposure-could-influence-willow-associated-communities-is-through-accumulated-effects-on-soil-properties-however-we-observed-only-modest-effects-of-wind-exposure-on-soil-properties-table-s2.-specifically-soil-in-wind-exposed-plots-was-marginally-drier-f19.0-3.52-0.093-with-higher-amounts-of-total-nitrogen-f19.0-5.08-0.051-than-in-unexposed-plots-but-there-was-no-clear-difference-in-either-percent-organic-matter-f18.4-0.68-0.434-or-nutrient-composition-f19.0-1.31-0.282.}
-
-
-<div class="ltx_p">As with the ant-aphid experiment, we hypothesized that the effects of
+\label{wind-experiment-one-of-the-mechanisms-by-which-wind-exposure-could-influence-willow-associated-communities-is-through-accumulated-effects-on-soil-properties-however-we-observed-only-modest-effects-of-wind-exposure-on-soil-properties-table-s2.-specifically-soil-in-wind-exposed-plots-was-marginally-drier-f19.0-3.52-0.093-with-higher-amounts-of-total-nitrogen-f19.0-5.08-0.051-than-in-unexposed-plots-but-there-was-no-clear-difference-in-either-percent-organic-matter-f18.4-0.68-0.434-or-nutrient-composition-f19.0-1.31-0.282.}</div><div class="ltx_p">As with the ant-aphid experiment, we hypothesized that the effects of
 wind exposure and willow genotype on associated communities would be
 mediated by plant traits. Interestingly, we found that plant-growth and
 leaf quality traits responded differently to wind exposure and willow
@@ -483,15 +362,9 @@ in willows that varied over 2-fold in height (F9,145.3 =
 47.42, P &lt; 0.001), and shoot length (F9,144.2
 = 4.97, P &lt; 0.001) among the most disparate genotypes. While
 the effect of willow genotype on the number of shoots changed by the end
-of the experiment (χ9 = 18.26, P = 0.032), this G</div>
-
-
-<span class="ltx_Math">\begin{equation}
+of the experiment (χ9 = 18.26, P = 0.032), this G</div><div><span class="math ltx_Math v1">\begin{equation}
 \times\nonumber \\
- \end{equation}</span>
-
-
-<div class="ltx_p">Eyear effect was relatively small
+ \end{equation}</span></div><div class="ltx_p">Eyear effect was relatively small
 (R2 = 0.05) compared to the effect of genotype
 alone (R2 = 0.13). In contrast to plant-growth
 traits, willow genotype was the primary factor in determining leaf
@@ -506,10 +379,7 @@ sampling year (F9,141.6 = 2.80, P = 0.005; 2012,
 R2 = 0.11; 2013, R2 =
 0.16). Unlike aboveground plant traits, root C:N did not appear to be
 influenced by either wind exposure (F1,8.7 = 0.31, P =
-0.590) or willow genotype (F9,107.0 = 0.85, P = 0.569).</div>
-
-
-<div class="ltx_p">Similar to the ant-aphid experiment, we found that heritable trait
+0.590) or willow genotype (F9,107.0 = 0.85, P = 0.569).</div><div class="ltx_p">Similar to the ant-aphid experiment, we found that heritable trait
 variation and direct effects of wind exposure were the primary factors
 influencing the arthropod community rather than phenotypic plasticity
 (Table 1). Both trait PC1 and PC2 mediated the indirect effects of
@@ -545,10 +415,7 @@ composition were primarily mediated by plant trait PC1
 (F1,76 = 12.05, P = 0.001). Positive values of trait PC1
 (i.e. larger plants) had greater proportional abundance of gall midges,
 leaf-mining moths, and spiders, whereas leaf-tiering moths were
-insensitive to plant size (Fig. 7B).</div>
-
-
-<div class="ltx_p">As with the aboveground community, we found that heritable trait
+insensitive to plant size (Fig. 7B).</div><div class="ltx_p">As with the aboveground community, we found that heritable trait
 variation and direct environmental effects were the primary determinants
 of rhizosphere communities, although we did a poorer job of identifying
 the specific mechanisms. For example, we previously showed that fungal
@@ -575,30 +442,15 @@ indicating that bacterial richness was greater in environments with more
 of these micronutrients. Although we detected clear effects of soil
 properties and root C:N on rarefied richness of root-associated
 communities, none of these soil and plant characteristics were strong
-predictors of rhizosphere community composition (Table S7).</div>
-
-
-<div class="ltx_p">In contrast to the ant-aphid experiment, our structural equation models
+predictors of rhizosphere community composition (Table S7).</div><div class="ltx_p">In contrast to the ant-aphid experiment, our structural equation models
 provided good fits to our data (i.e., P &gt; 0.05), indicating
 that we identified the key processes affecting the richness (Fig. 7A;
 C10 = 2.94, P = 0.983), abundance (C10 =
 6.73, P = 0.751), and rarefied richness (C32 = 21.63, P
-= 0.985) of willow-associated communities.</div>
-
-
-
-
-
-<h3 class="ltx_title_subsubsection">Discussion</h3>\label{discussion}
-
-
-<div class="ltx_title_paragraph">What is the relative importance of
+= 0.985) of willow-associated communities.</div><h3 class="ltx_title_subsubsection">Discussion</h3><div>\label{discussion}</div><div class="ltx_title_paragraph">What is the relative importance of
 willow genotype vs. the biotic and abiotic environment in structuring
 aboveground
-communities?</div>\label{what-is-the-relative-importance-of-willow-genotype-vs.-the-biotic-and-abiotic-environment-in-structuring-aboveground-communities-2}
-
-
-<div class="ltx_p">The relative importance of host-plant genetic effects on associated
+communities?</div><div>\label{what-is-the-relative-importance-of-willow-genotype-vs.-the-biotic-and-abiotic-environment-in-structuring-aboveground-communities-2}</div><div class="ltx_p">The relative importance of host-plant genetic effects on associated
 arthropod, bacterial, and fungal communities depended on the type of
 environmental gradient. In the ant-aphid experiment, willow genetic
 variation tended to have a stronger effect on arthropod community
@@ -613,16 +465,9 @@ composition, willow genotype still had predictable effects on individual
 arthropod guilds. Taken together, our study suggests that host-plant
 genetic variation, aphid presence, and the amount of wind exposure can
 be equally important in structuring foliar arthropod communities in
-coastal dunes ecosystems.</div>
-
-
-
-<div class="ltx_title_paragraph">Do willow genetic and environmental
+coastal dunes ecosystems.</div><div class="ltx_title_paragraph">Do willow genetic and environmental
 variation have different effects on above and belowground
-communities?</div>\label{do-willow-genetic-and-environmental-variation-have-different-effects-on-above-and-belowground-communities-2}
-
-
-<div class="ltx_p">Although diverse assemblages of above and belowground taxa colonize host
+communities?</div><div>\label{do-willow-genetic-and-environmental-variation-have-different-effects-on-above-and-belowground-communities-2}</div><div class="ltx_p">Although diverse assemblages of above and belowground taxa colonize host
 plants, there are no genotype-by-environment studies, to our knowledge,
 that have simultaneously measured the responses of above and belowground
 assemblages. We found that foliar arthropods responded differently than
@@ -641,13 +486,9 @@ research turns its attention belowground to understand the plant traits
 influencing these diverse assemblages. This will have the added benefit
 of understanding associations between above and belowground traits which
 will be important for predicting when we would expect linkages between
-above and belowground communities.</div>
-
-
-
-<div class="ltx_title_paragraph">What are the potential mechanisms by
+above and belowground communities.</div><div class="ltx_title_paragraph">What are the potential mechanisms by
 which willow genetic and environmental variation affects community
-responses?</div>\label{what-are-the-potential-mechanisms-by-which-willow-genetic-and-environmental-variation-affects-community-responses}
+responses?</div><div>\label{what-are-the-potential-mechanisms-by-which-willow-genetic-and-environmental-variation-affects-community-responses}
 
 
 Ant-aphid
@@ -663,10 +504,7 @@ oestlundi on evening primrose (Oenothera biennis); however, leaf
 water content and trichome density were not associated with A.
 farinosa abundance in our study, suggesting the traits mediating
 plant-aphid interactions are species specific (Züst &amp; Agrawal
-2016).\label{ant-aphid-experiment-our-study-supports-an-emerging-generalization-that-host-plant-genetic-variation-has-strong-bottom-up-effects-on-ant-aphid-interactions-johnson-2008-mooney-agrawal-2008-abdalaroberts-et-al.-2012.-as-with-other-studies-we-found-that-ant-abundances-were-strongly-mediated-by-the-effects-of-host-plant-genetic-variation-on-aphid-densities-johnson-2008-mooney-agrawal-2008.-johnson-2008-found-that-heritable-variation-in-leaf-water-content-and-trichome-density-were-important-determinants-of-the-densities-of-aphis-oestlundi-on-evening-primrose-oenothera-biennis-however-leaf-water-content-and-trichome-density-were-not-associated-with-a.-farinosa-abundance-in-our-study-suggesting-the-traits-mediating-plant-aphid-interactions-are-species-specific-zuxfcst-agrawal-2016.}
-
-
-<div class="ltx_p">In contrast to previous work (Johnson 2008; Mooney &amp; Agrawal 2008), we
+2016).\label{ant-aphid-experiment-our-study-supports-an-emerging-generalization-that-host-plant-genetic-variation-has-strong-bottom-up-effects-on-ant-aphid-interactions-johnson-2008-mooney-agrawal-2008-abdalaroberts-et-al.-2012.-as-with-other-studies-we-found-that-ant-abundances-were-strongly-mediated-by-the-effects-of-host-plant-genetic-variation-on-aphid-densities-johnson-2008-mooney-agrawal-2008.-johnson-2008-found-that-heritable-variation-in-leaf-water-content-and-trichome-density-were-important-determinants-of-the-densities-of-aphis-oestlundi-on-evening-primrose-oenothera-biennis-however-leaf-water-content-and-trichome-density-were-not-associated-with-a.-farinosa-abundance-in-our-study-suggesting-the-traits-mediating-plant-aphid-interactions-are-species-specific-zuxfcst-agrawal-2016.}</div><div class="ltx_p">In contrast to previous work (Johnson 2008; Mooney &amp; Agrawal 2008), we
 found that the effects of host-plant genotype on the richness and
 abundance of other arthropods were mediated, in part, by genotypic
 differences in plant size rather than ant abundance. One possible reason
@@ -679,11 +517,7 @@ genotype average = 7 individuals). While we failed to fully identify the
 mechanisms (likely unmeasured plant traits) explaining arthropod
 community responses in this experiment, our results do suggest that
 host-plant evolution could have strong effects on arthropod community
-structure, despite variability in this biotic factor.</div>
-
-
-
-Wind
+structure, despite variability in this biotic factor.</div><div>Wind
 experiment — Our study supports the notion that wind is a key
 environmental factor in structuring communities associated with host
 plants in coastal dune ecosystems (Miller and Weis 1999; Crutsinger et
@@ -696,10 +530,7 @@ species and individuals on prostrate vs. erect morphs of coyote bush
 (Baccharis piluaris), due to their low-lying growth form which
 enabled them to be more productive than erect morphs at their windy
 coastal dunes site.
-\label{wind-experiment-our-study-supports-the-notion-that-wind-is-a-key-environmental-factor-in-structuring-communities-associated-with-host-plants-in-coastal-dune-ecosystems-miller-and-weis-1999-crutsinger-et-al.-2010-2014.-we-found-that-the-negative-effects-of-wind-exposure-on-arthropod-richness-and-abundance-resulted-from-a-combination-of-direct-effects-on-colonization-as-well-as-indirect-effects-mediated-by-wind-pruning-and-to-a-lesser-extent-reductions-in-leaf-quality.-similarly-crutsinger-et-al.-2014-found-that-there-were-more-arthropod-species-and-individuals-on-prostrate-vs.-erect-morphs-of-coyote-bush-baccharis-piluaris-due-to-their-low-lying-growth-form-which-enabled-them-to-be-more-productive-than-erect-morphs-at-their-windy-coastal-dunes-site.}
-
-
-<div class="ltx_p">Few studies have examined community-level responses to natural
+\label{wind-experiment-our-study-supports-the-notion-that-wind-is-a-key-environmental-factor-in-structuring-communities-associated-with-host-plants-in-coastal-dune-ecosystems-miller-and-weis-1999-crutsinger-et-al.-2010-2014.-we-found-that-the-negative-effects-of-wind-exposure-on-arthropod-richness-and-abundance-resulted-from-a-combination-of-direct-effects-on-colonization-as-well-as-indirect-effects-mediated-by-wind-pruning-and-to-a-lesser-extent-reductions-in-leaf-quality.-similarly-crutsinger-et-al.-2014-found-that-there-were-more-arthropod-species-and-individuals-on-prostrate-vs.-erect-morphs-of-coyote-bush-baccharis-piluaris-due-to-their-low-lying-growth-form-which-enabled-them-to-be-more-productive-than-erect-morphs-at-their-windy-coastal-dunes-site.}</div><div class="ltx_p">Few studies have examined community-level responses to natural
 variability in the abiotic environment and host-plant genetic variation,
 making it difficult to draw other useful comparisons. The majority of
 genotype-by-abiotic environment studies to date have used fertilizers to
@@ -719,15 +550,7 @@ progress on understanding the relative importance of willow genotype vs.
 environment for associated communities, future experimental work should
 focus on manipulating natural variation in specific abiotic factors, or,
 at the very least, measuring variability in abiotic factors to begin to
-identify putative causal factors.</div>
-
-
-
-
-<div class="ltx_title_paragraph">Conclusions</div>\label{conclusions}
-
-
-<div class="ltx_p">Overall, our study reinforces the importance of host-plant genetic
+identify putative causal factors.</div><div class="ltx_title_paragraph">Conclusions</div><div>\label{conclusions}</div><div class="ltx_p">Overall, our study reinforces the importance of host-plant genetic
 variation in shaping associated communities and extends this finding to
 natural biotic and abiotic gradients in coastal dune ecosystems. Our
 findings also suggest that predicting community responses to genetic and
@@ -744,7 +567,3 @@ well as how host-plant traits mediate interactions between above and
 belowground communities. In doing so, we will be able to work toward a
 more synthetic understanding of the evolutionary ecology of host plants
 and their diverse associated communities.</div>
-
-
-
-
