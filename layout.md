@@ -1,6 +1,5 @@
 abstract.html
 _First_macro_on.html
-bad3.html
 textbfAbstract__begi.html
 7480.html
 emphStatistical_anal.html
