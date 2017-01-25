@@ -1,0 +1,20 @@
+% Please add the following required packages to your document preamble:
+% \usepackage{booktabs}
+% \usepackage{multirow}
+\begin{table}[]
+\centering
+\caption{\textbf{Table 1}: Net effect sizes of heritable trait variation, phenotypic plasticity, and direct environmental effects on community structure. Values represent the sum of effect sizes calculated across different pathways of the structural equation models (Fig. 2 and 3). Note that effects sizes include significant missing pathways (e.g. dotted lines in Fig. 2).}
+\label{my-label}
+\begin{tabular}{@{}lllll@{}}
+\toprule
+Experiment                      & Response                    & Heritable Trait variation & Trait plasticity & Direct Environmental effects \\ \midrule
+\multirow{3}{*}{Ant-Aphid 2012} & Arthropod Richness          & 0.57                      & n.m.             & n.m.                         \\
+                                & Arthropod Abundance         & 0.11                      & n.m.             & 0.25                         \\
+                                & Arthropod Rarefied Richness & n.m.                      & n.m.             & -0.2                         \\
+\multirow{5}{*}{Wind 2013}      & Arthropod Richness          & 0.19                      & -0.13            & -0.22                        \\
+                                & Arthropod Abundance         & 0.16                      & -0.11            & -0.08                        \\
+                                & Arthropod Rarefied Richness & 0.19                      & 0.12             & -0.26                        \\
+                                & Fungal Rarefied Richness    & 0.05                      & n.m.             & 0.07                         \\
+                                & Bacterial Rarefied Richness & n.m.                      & n.m.             & 0.05                         \\ \cmidrule(l){2-5} 
+\end{tabular}
+\end{table}
