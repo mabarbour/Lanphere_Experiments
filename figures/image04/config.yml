@@ -1,9 +1,8 @@
 ---
+version: 1
 multicolumn: false
 export-width: 0.7\columnwidth
-web-width: 500px
+web-width: 800
 align: center
 float: h!
-export-filename: 
-version: 1
 path: figures/image04/config.yml
