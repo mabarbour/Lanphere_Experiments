@@ -23,6 +23,8 @@ figures/image04/image04.png
 textbfFigure_2_Stati.html
 figures/image05/image05.png
 textbfFigure_3_Stati.html
+f69a.tex
+1640a.html
 longtable_crrrrrrrr_toprule_te.html
 Notes_textsuperscrip.html
 longtable_crrrrrrrr_toprule_te.html
