@@ -1,5 +1,5 @@
-**User Story**
+**User**:
 
-**Acceptance Criteria**
+**Well-defined Taks**:
 
-**Definition of Done**
+**Outcome**:
