@@ -21,6 +21,7 @@
 \usepackage{rotating}
 \usepackage{hyperref}
 \usepackage{setspace} % remove this if submitting to Am. Nat., because the line spacing for figure and tables should be double spaced.
+\renewcommand{\arraystretch}{1.3} % likely need to remove if submitting to Am. Nat.
 
 
 %%%%%%%%%%%%%%%%%%%%%
@@ -1130,13 +1131,13 @@ Research in Science and a NSERC Discovery grant.
 
 %[Figure A2 goes here.]
 
-\begin{sidewaystable}%[h]
+\begin{sidewaystable}
 \centering
 \caption{Summary of statistical models that analyze the
 effects of willow genotype, aphid treatment, and distance from ant
 mounds on the arthropod community, ant-aphid interactions, and plant
 traits.}
-\label{TableA1}
+\label{aaCommTrait}
 \begin{tabular}{@{}llllllll@{}}
 \toprule
 Responses                & Genotype (G)   & E\textsubscript{aphid}        &  E\textsubscript{ant}        & G $\times$ E\textsubscript{aphid}      & G$\times$E\textsubscript{ant}        & E\textsubscript{aphid} $\times$ E\textsubscript{ant}   & G$\times$ E\textsubscript{aphid} $\times$ E\textsubscript{ant} \\ \midrule
@@ -1146,18 +1147,18 @@ Total abundance\textsuperscript{a}         & \textbf{34.86}\textsubscript{(9)}  
 Rarefied richness\textsuperscript{b}       & 0.83\textsubscript{(9,138.8)}  & \textbf{5.34}\textsubscript{(1,139.2)} & 0.46\textsubscript{(1,8.2)} & 1.81\textsubscript{(9,139.7)} & 0.94\textsubscript{(9,139.7)} & 0.41\textsubscript{(1,140.6)} & 0.70\textsubscript{(9,139.4)} \\
 Community composition\textsuperscript{c}   & 1.52\textsubscript{(9,176)}    & 2.04\textsubscript{(1,176)}   & 1.01\textsubscript{(1,9)}   & \textbf{1.45}\textsubscript{(9,157)}   & 0.97\textsubscript{(9,157)}   & 0.69\textsubscript{(1,157)}   & 0.93\textsubscript{(9,148)}   \\
 \textbf{Ant-aphid interactions}   &                &               &             &               &               &               &               \\
-\textit{A. farinosa} abund.\textsuperscript{a}       & \textbf{20.83}\textsubscript{(9)}       & -             & 0.55\textsubscript{(1)}     & -             & 10.25\textsubscript{(9)}      & -             & -             \\
-\textit{F. obscuripes} abund.\textsuperscript{a}     & 2.42\textsubscript{(1*)}       & 9.77\textsubscript{(1)}       & 1.68\textsubscript{(1)}     & \textbf{6.26}\textsubscript{(2*)}      & -             & -             & -             \\
+\textit{A. farinosa} abund.\textsuperscript{a}       & \textbf{20.83}\textsubscript{(9)}       & ---             & 0.55\textsubscript{(1)}     & ---             & 10.25\textsubscript{(9)}      & ---             & ---             \\
+\textit{F. obscuripes} abund.\textsuperscript{a}     & 2.42\textsubscript{(1*)}       & 9.77\textsubscript{(1)}       & 1.68\textsubscript{(1)}     & \textbf{6.26}\textsubscript{(2*)}      & ---             & ---             & ---             \\
 \textbf{Plant traits}             &                &               &             &               &               &               &               \\
 Height\textsuperscript{b}                  & \textbf{15.83}\textsubscript{(9,204.2)} & 0.63\textsubscript{(1,204.3)} & 0.31\textsubscript{(1,9.1)} & 0.93\textsubscript{(9,204.5)} & 0.98\textsubscript{(9,204.4)} & 0.07\textsubscript{(1,204.3)} & 1.62\textsubscript{(9,204.7)} \\
 Shoot count\textsuperscript{b}             & \textbf{65.84}\textsubscript{(9)}       & 2.76\textsubscript{(1)}       & 0.21\textsubscript{(1)}     & 12.11\textsubscript{(9)}      & 8.80\textsubscript{(9)}       & \textbf{4.20}\textsubscript{(1)}       & 9.21\textsubscript{(9)}       \\
 Shoot length\textsuperscript{b}            & \textbf{7.27}\textsubscript{(9,204.2)}  & 2.39\textsubscript{(1,204.2)} & 0.10\textsubscript{(1,9.1)} & 1.05\textsubscript{(9,204.5)} & 0.70\textsubscript{(9,204.3)} & 1.24\textsubscript{(1,204.3)} & 0.56\textsubscript{(9,204.6)} \\
-Leaf trichome density\textsuperscript{a}   & 38.17\textsubscript{(9)}       & 0.44\textsubscript{(1)}       & 0.81\textsubscript{(1)}     & \textbf{23.17}\textsubscript{(8)}      & 8.41\textsubscript{(9)}       & 0.84\textsubscript{(1)}       & -             \\
+Leaf trichome density\textsuperscript{a}   & 38.17\textsubscript{(9)}       & 0.44\textsubscript{(1)}       & 0.81\textsubscript{(1)}     & \textbf{23.17}\textsubscript{(8)}      & 8.41\textsubscript{(9)}       & 0.84\textsubscript{(1)}       & ---             \\
 log(Leaf water content)\textsuperscript{b} & 1.33\textsubscript{(9,69.6)}   & 0.01\textsubscript{(1,69.4)}  & 1.02\textsubscript{(1,7.1)} & 0.48\textsubscript{(8,70.4)}  & 0.79\textsubscript{(9,69.5)}  & 0.36\textsubscript{(1,70.6)}  & 1.02\textsubscript{(7,72.0)}  \\ \bottomrule
 \end{tabular}
 \bigskip{}
 \\
-{\footnotesize Note: We report the test statistic and include the degrees of freedom for each test in parentheses. Font type denotes statistical significance (\textbf{bold} P $<$ 0.05, \textit{italic} P $<$ 0.10, normal P $>$ 0.10). \textsuperscript{a}Likelihood-ratio test and degrees of freedom calculated using a generalized linear mixed-effect model (error distribution = Poisson, link function = log); \textsuperscript{b}$F$-test and Kenward-Roger approximated degrees of freedom calculated using a linear mixed-effect model; \textsuperscript{c}$F$-test calculated using redundancy analysis on Hellinger-transformed community data; *indicates that predictor was modeled as a random effect and its significance was determined using a likelihood ratio test.}
+{\footnotesize Note: We report the test statistic and include the degrees of freedom for each test in parentheses. Pathways that were not modelled are denoted by '---'. Font type denotes statistical significance (\textbf{bold} P $<$ 0.05, \textit{italic} P $<$ 0.10, normal P $>$ 0.10). \textsuperscript{a}Likelihood-ratio test and degrees of freedom calculated using a generalized linear mixed-effect model (error distribution = Poisson, link function = log); \textsuperscript{b}$F$-test and Kenward-Roger approximated degrees of freedom calculated using a linear mixed-effect model; \textsuperscript{c}$F$-test calculated using redundancy analysis on Hellinger-transformed community data; *indicates that predictor was modeled as a random effect and its significance was determined using a likelihood ratio test.}
 \end{sidewaystable}
 
 
@@ -1165,23 +1166,23 @@ log(Leaf water content)\textsuperscript{b} & 1.33\textsubscript{(9,69.6)}   & 0.
 \centering
 \caption{Summary of abundance responses of key arthropod
 guilds in the ant-aphid experiment.}
-\label{my-label}
-\begin{tabular}{llllllll}
+\label{aaGuild}
+\begin{tabular}{@{}llllllll@{}}
 \toprule
 Arthropod abundances               & Genotype (G)\textsubscript{(9)} & E\textsubscript{aphid(1)} & E\textsubscript{ant(1)} & G$\times$E\textsubscript{aphid(9)} & G$\times$E\textsubscript{ant(9)} & E\textsubscript{aphid}$\times$E\textsubscript{ant(1)} & G$\times$E\textsubscript{aphid}$\times$E\textsubscript{ant(9)} \\
 \midrule
-Leaf-mining moth (Gracilliaridae)   & 26.78           & 0.32      & 2.35    & 13.56       & 20.31     & 4.32           & -                \\
-non-A. farinosa aphids (Aphididae)  & 24.43           & 0.01      & 0.04    & 23.16       & 6.99      & 3.63           & 8.16             \\
-Leafhopper (Cicadellidae)           & 21.92           & 0.84      & 0.01    & 7.29        & 11.54     & 1.67           & -                \\
-Spiders (Araneae)                   & 16.24           & 0.01      & 0.1     & 15.39       & 11.34     & 0.01           & -                \\
-non-\textit{F. obscuripes} ants (Formicidae) & 22.43           & 17.7      & 1.52    & 5.21        & 7.07      & 0.73           & -                \\
-Leaf-tiering moth(Tortricidae)     & 23.79           & 0.81      & 9.79    & -           & -         & 3.77           &    - \\
+Leaf-mining moth (Gracilliaridae)   & \textbf{26.78}           & 0.32      & 2.35    & 13.56       & \textbf{20.31}     & \textbf{4.32}           & ---                \\
+non-\textit{A. farinosa} aphids (Aphididae)  & \textbf{24.43}           & 0.01      & 0.04    & \textbf{23.16}       & 6.99      & \textit{3.63}           & 8.16             \\
+Leafhopper (Cicadellidae)           & \textbf{21.92}           & 0.84      & 0.01    & 7.29        & 11.54     & 1.67           & ---                \\
+Spiders (Araneae)                   & \textit{16.24}           & 0.01      & 0.10     & \textit{15.39}       & 11.34     & 0.01           & ---                \\
+non-\textit{F. obscuripes} ants (Formicidae) & \textbf{22.43}           & \textbf{17.70}      & 1.52    & 5.21        & 7.07      & 0.73           & ---                \\
+Leaf-tiering moth(Tortricidae)     & \textbf{23.79}           & 0.81      & \textbf{9.79}    & ---           & ---         & \textit{3.77}           &    --- \\
 \bottomrule
 \end{tabular}
 \bigskip{}
 \\
 {\footnotesize Note: We analyzed all of these responses
-using generalized linear mixed-effect models (error distribution = Poisson, link function = log). We report the likelihood-ratio test statistic and include the degrees of freedom for each test as a subscript next to each predictor. Font type denotes statistical significance (\textbf{bold} P $<$ 0.05, \textit{italic} P $<$ 0.10 , normal P $>$ 0.10).}
+using generalized linear mixed-effect models (error distribution = Poisson, link function = log). We report the likelihood-ratio test statistic and include the degrees of freedom for each test as a subscript next to each predictor. Pathways that were not modelled are denoted by '---'. Font type denotes statistical significance (\textbf{bold} P $<$ 0.05, \textit{italic} P $<$ 0.10 , normal P $>$ 0.10).}
 \end{sidewaystable}
 
 
@@ -1190,33 +1191,33 @@ using generalized linear mixed-effect models (error distribution = Poisson, link
 \centering
 \caption{Summary of statistical models that analyze the
 effects of willow genotype and wind exposure on associated communities.}
-\label{my-label}
-\begin{tabular}{llllllll}
+\label{wComm}
+\begin{tabular}{@{}llllllll@{}}
 \toprule
-Responses  & Genotype (G)  & E\textsubscript{wind}  & E\textsubscript{year}   & G$\times$E\texsubscript{wind}       & G$\times$E\textsubscript{year}       & E\textsubscript{wind}$\times$E\textsubscript{year}    & G$\times$E\textsubscript{wind}$\times$E\textsubscript{year} \\
+Responses  & Genotype (G)  & E\textsubscript{wind}  & E\textsubscript{year}   & G$\times$E\textsubscript{wind}       & G$\times$E\textsubscript{year}       & E\textsubscript{wind}$\times$E\textsubscript{year}    & G$\times$E\textsubscript{wind}$\times$E\textsubscript{year} \\
 \midrule
 \textbf{Foliar arthropods}          &               &              &                 &               &               &                &               \\
 Richness\textsuperscript{a}                  & \textbf{28.01}\textsubscript{(9)}      & \textbf{10.33}\textsubscript{(1)}     & \textbf{13.55}\textsubscript{(1)}        & 3.74\textsubscript{(9)}       & 9.85\textsubscript{(9)}       & 0.92\textsubscript{(1)}        & 7.04\textsubscript{(9)}       \\
 Abundance\textsuperscript{a}                 & \textbf{25.25}\textsubscript{(9)}      & \textbf{5.48}\textsubscript{(1)}      & \textbf{6.72}\textsubscript{(1)}         & 7.33\textsubscript{(9)}       & 8.22\textsubscript{(9)}       & 1.65\textsubscript{(1)}        & 11.85\textsubscript{(9)}      \\
-Rarefied richness\textsuperscript{b}         & 1.96\textsubscript{(9,71.1)}  & \textbf{22.82}\textsubscript{(1,7.8)} & 1.13\textsubscript{(1,82.7)}    & 0.66\textsubscript{(9,80.9)}  & -             & 0.67\textsubscript{(1,81.9)}   & -             \\
-Community composition\textsubscript{2012}  & 0.96\textsubscript{(9,51)}    & 1.26\textsubscript{(1,7)}    &       -          & 0.91\textsubscript{(9,42)}    &   -            &       -         &       -        \\
-Community composition\textsubscript{2013}  & 1.17\textsubscript{(9,68)}    & \textbf{5.70}\textsubscript{(1,9)}    &     -            & 0.69\textsubscript{(6,62)}    &      -         &       -         &               \\
+Rarefied richness\textsuperscript{b}         & 1.96\textsubscript{(9,71.1)}  & \textbf{22.82}\textsubscript{(1,7.8)} & 1.13\textsubscript{(1,82.7)}    & 0.66\textsubscript{(9,80.9)}  & ---             & 0.67\textsubscript{(1,81.9)}   & ---             \\
+Community composition\textsubscript{2012}  & 0.96\textsubscript{(9,51)}    & 1.26\textsubscript{(1,7)}    &       ---          & 0.91\textsubscript{(9,42)}    &   ---            &       ---         &       ---        \\
+Community composition\textsubscript{2013}  & 1.17\textsubscript{(9,68)}    & \textbf{5.70}\textsubscript{(1,9)}    &     ---            & 0.69\textsubscript{(6,62)}    &      ---         &       ---         &               \\
 \textbf{Root-associated Mycorrhiza} &               &              &                 &               &               &                &               \\
 %Richness\textsubscript{2013}\textsuperscript{b}              & 1.28\textsubscript{(9,95.0)}  & 1.01\textsubscript{(1,8.8)}  & -               & 1.23\textsubscript{(9,95.8)}  & -             & -              & -             \\
 %Abundance\textsubscript{2013}\textsuperscript{b}             & 0.80\textsubscript{(9,95.5)}  & 0.36\textsubscript{(1,8.7)}  & -               & 1.03\textsubscript{(9,96.4)}  & -             & -              & -             \\
-Rarefied richness\textsubscript{2013}\textsuperscript{b}     & 0.87\textsubscript{(9,95.1)}  & 0.88\textsubscript{(1,8.8)}  & -               & 0.93\textsubscript{(9,95.9)}  & -             & -              & -             \\
-Community composition\textsubscript{2013}  & \textbf{1.01}\textsubscript{(9,117)}   & 1.18\textsubscript{(1,9)}    & -               & 0.87\textsubscript{(9,108)}   & -             & -              & -             \\
-\textbf{Root-associated Bacteria}   &               &              &                 &               & -             & -              & -             \\
+Rarefied richness\textsubscript{2013}\textsuperscript{b}     & 0.87\textsubscript{(9,95.1)}  & 0.88\textsubscript{(1,8.8)}  & ---               & 0.93\textsubscript{(9,95.9)}  & ---             & ---              & ---             \\
+Community composition\textsubscript{2013}  & \textbf{1.01}\textsubscript{(9,117)}   & 1.18\textsubscript{(1,9)}    & ---               & 0.87\textsubscript{(9,108)}   & ---             & ---              & ---             \\
+\textbf{Root-associated Bacteria}   &               &              &                 &               & ---             & ---              & ---             \\
 %Richness\textsubscript{2013}\textsuperscript{b}              & 1.35\textsubscript{(9,100.8)} & 4.53\textsubscript{(1,7.9)}  & -               & 0.87\textsubscript{(9,101.5)} & -             & -              & -             \\
 %Abundance\textsubscript{2013}\textsuperscript{b}             & 1.39\textsubscript{(9,102.3)} & 2.00\textsubscript{(1,8.0)}  & -               & 0.64\textsubscript{(9,103.2)} & -             & -              & -             \\
-Rarefied richness\textsubscript{2013}\textsuperscript{b}     & 1.48\textsubscript{(9,99.9)}  & \textbf{6.03}\textsubscript{(1,7.8)} & -               & 1.35\textsubscript{(9,100.5)} & -             & -              & -             \\
-Community composition\textsubscript{2013}  & 0.93\textsubscript{(9,120)}   & \textit{1.38}\textsubscript{(1,9)}    & -               & 0.87\textsubscript{(9,111)}   & -             & -              & -  \\
+Rarefied richness\textsubscript{2013}\textsuperscript{b}     & 1.48\textsubscript{(9,99.9)}  & \textbf{6.03}\textsubscript{(1,7.8)} & ---               & 1.35\textsubscript{(9,100.5)} & ---             & ---              & ---             \\
+Community composition\textsubscript{2013}  & 0.93\textsubscript{(9,120)}   & \textit{1.38}\textsubscript{(1,9)}    & ---               & 0.87\textsubscript{(9,111)}   & ---             & ---              & ---  \\
 \bottomrule
 \end{tabular}
 \bigskip{}
 \\
 {\footnotesize Note: We report the test statistic and include the degrees of freedom
-for each test in parentheses. Font type denotes statistical significance
+for each test in parentheses. Pathways that were not modelled are denoted by '---'. Font type denotes statistical significance
 (\textbf{bold} P $<$ 0.05, \textit{italic} P $<$ 0.10, normal P
 $>$ 0.10). \textsuperscript{a}Likelihood-ratio test and degrees of freedom calculated using a
 generalized linear mixed-effect model (error distribution = Poisson,
@@ -1234,25 +1235,25 @@ significance was determined using a likelihood ratio test.}
 \caption{Summary of statistical models that analyze the
 effects of willow genotype and wind exposure on
 soil characteristics and plant traits.}
-\label{my-label}
-\begin{tabular}{llllllll}
+\label{wSoilPlant}
+\begin{tabular}{@{}llllllll@{}}
 \toprule
 Responses                  & Genotype (G)  & E\textsubscript{wind}        & E\textsubscript{year}           & G$\times$E\textsubscript{wind}       & G$\times$E\textsubscript{year}       & E\textsubscript{wind}$\times$E\textsubscript{year}    & G$\times$E\textsubscript{wind}$\times$E\textsubscript{year} \\
 \midrule
 \textbf{Soil characteristics}       &               &              &                 &               &               &                &               \\
-Total N\textsuperscript{b}                   & -             & \textit{5.08}\textsubscript{(1,9)}    & -               & -             & -             & -              & -             \\
-Soil moisture\textsuperscript{b}             & -             & \textit{3.52}\textsubscript{(1,9)}    & -               & -             & -             & -              & -             \\
-Percent organic matter\textsuperscript{b}    & -             & 0.68\textsubscript{(1,8.4)}  & -               & -             & -             & -              & -             \\
-Nutrient PC1\textsuperscript{b}              & -             & 1.31\textsubscript{(1,9)}    & -               & -             & -             & -              & -             \\
+Total N\textsuperscript{b}                   & ---             & \textit{5.08}\textsubscript{(1,9)}    & ---               & ---             & ---             & ---              & ---             \\
+Soil moisture\textsuperscript{b}             & ---             & \textit{3.52}\textsubscript{(1,9)}    & ---               & ---             & ---             & ---              & ---             \\
+Percent organic matter\textsuperscript{b}    & ---             & 0.68\textsubscript{(1,8.4)}  & ---               & ---             & ---             & ---              & ---             \\
+Nutrient PC1\textsuperscript{b}              & ---             & 1.31\textsubscript{(1,9)}    & ---               & ---             & ---             & ---              & ---             \\
 \textbf{Plant traits}               &               &              &                 &               &               &                &               \\
 Height\textsuperscript{b}                    & \textbf{9.13}\textsubscript{(9,145.3)} & \textbf{29.10}\textsubscript{(1,9.0)} & 210.09\textsubscript{(1,156.3)} & 0.71\textsubscript{(9,147.9)} & 0.80\textsubscript{(9,157.8)} & \textbf{16.69}\textsubscript{(1,158.4)} & 1.84\textsubscript{(9,160.9)} \\
 Shoot count\textsuperscript{a}               & \textbf{47.42}\textsubscript{(9)}      & \textbf{9.91}\textsubscript{(1)}      & 5.68\textsubscript{(1)}         & 10.70\textsubscript{(9)}      & \textbf{18.26}\textsubscript{(9)}      & \textbf{12.53}\textsubscript{(1)}       & 5.76\textsubscript{(9)}       \\
 Shoot length\textsuperscript{b}              & \textbf{4.97}\textsubscript{(9,144.2)} & \textbf{10.44}\textsubscript{(1,9.0)} & 75.36\textsubscript{(1,158.5)}  & 0.84\textsubscript{(9,146.9)} & 1.61\textsubscript{(9,160.1)} & 0.05\textsubscript{(1,160.7)}  & 0.70\textsubscript{(9,163.2)} \\
 Leaf water content\textsuperscript{b}        & 4.90\textsubscript{(9,129.0)} & 0.97\textsubscript{(1,8.7)}  & 2.93\textsubscript{(1,139.7)}   & 0.47\textsubscript{(9,132.0)} & \textbf{2.80}\textsubscript{(9,141.6)} & 2.03\textsubscript{(1,141.5)}  & 1.56\textsubscript{(9,144.1)} \\
-Leaf trichome density\textsubscript{2012}\textsuperscript{b} & \textbf{67.31}\textsubscript{(9)}      & 0.02\textsubscript{(1)}      & -               & 10.45\textsubscript{(9)}      & -             & -              & -             \\
-SLA\textsubscript{2013}\textsuperscript{b}                   & \textbf{4.21}\textsubscript{(9,122.5)} & 0.34\textsubscript{(1,8.9)}  & -               & 1.19\textsubscript{(9,123.4)} & -             & -              & -             \\
-Leaf C:N\textsubscript{2013}\textsuperscript{b}              & \textbf{4.88}\textsubscript{(9,70.48)} & 1.54\textsubscript{(1,7.8)}  & -               & 1.31\textsubscript{(9,71.6)}  & -             & -              & -             \\
-Root C:N\textsubscript{2013}\textsuperscript{b}              & 0.85\textsubscript{(9,107.0)} & 0.31\textsubscript{(1,8.7)}  & -               & 0.33\textsubscript{(9,107.5)} & -             & -              & -    \\
+Leaf trichome density\textsubscript{2012}\textsuperscript{b} & \textbf{67.31}\textsubscript{(9)}      & 0.02\textsubscript{(1)}      & ---               & 10.45\textsubscript{(9)}      & ---             & ---              & ---             \\
+SLA\textsubscript{2013}\textsuperscript{b}                   & \textbf{4.21}\textsubscript{(9,122.5)} & 0.34\textsubscript{(1,8.9)}  & ---               & 1.19\textsubscript{(9,123.4)} & ---             & ---              & ---             \\
+Leaf C:N\textsubscript{2013}\textsuperscript{b}              & \textbf{4.88}\textsubscript{(9,70.48)} & 1.54\textsubscript{(1,7.8)}  & ---               & 1.31\textsubscript{(9,71.6)}  & ---             & ---              & ---             \\
+Root C:N\textsubscript{2013}\textsuperscript{b}              & 0.85\textsubscript{(9,107.0)} & 0.31\textsubscript{(1,8.7)}  & ---               & 0.33\textsubscript{(9,107.5)} & ---             & ---              & ---    \\
 \bottomrule
 \end{tabular}
 \bigskip{}
@@ -1266,40 +1267,38 @@ Root C:N\textsubscript{2013}\textsuperscript{b}              & 0.85\textsubscrip
 \centering
 \caption{Summary of abundance responses of key arthropod
 guilds in the wind experiment.}
-\label{TableS2}
+\label{wGuild}
 \begin{tabular}{@{}llllllll@{}}
 \toprule
 Arthropod abundances & Genotype (G)\textsubscript{(9)} &
 E\textsubscript{wind(1)} & G$\times$E\textsubscript{wind(9)} & E\textsubscript{year(1)} & G$\times$E\textsubscript{year(9)} & E\textsubscript{wind}$\times$E\textsubscript{year(1)} & G$\times$E\textsubscript{wind}$\times$E\textsubscript{year(9)}\tabularnewline
 \midrule
 %\endhead
-Leaf-mining moths (Gracilliaridae) & \textbf{17.15} & \textbf{9.42} & -
-& \textbf{4.26} & - & 0.09 & -\tabularnewline
-Gall midges (Cecidomyiidae) & \textbf{19.26} & \textbf{17.59} & - &
-\textbf{38.07} & - & - & -\tabularnewline
+Leaf-mining moths (Gracilliaridae) & \textbf{17.15} & \textbf{9.42} & ---
+& \textbf{4.26} & --- & 0.09 & ---\tabularnewline
+Gall midges (Cecidomyiidae) & \textbf{19.26} & \textbf{17.59} & --- &
+\textbf{38.07} & --- & --- & ---\tabularnewline
 Leaf-tiering moths (Tortricidae) & \textbf{24.78} & 1.34 & 11.50 &
-\textbf{117.19} & - & 2.65 & -\tabularnewline
-Aphids\textsubscript{2012} (Aphididae) & 4.31 & 0.32 & - & - & - & - & -\tabularnewline
-Spiders (Araneae) & 8.27 & \textbf{6.04} & - & \textbf{6.54} & - & 0.20
-& -\tabularnewline
+\textbf{117.19} & --- & 2.65 & ---\tabularnewline
+Aphids\textsubscript{2012} (Aphididae) & 4.31 & 0.32 & --- & --- & --- & --- & ---\tabularnewline
+Spiders (Araneae) & 8.27 & \textbf{6.04} & --- & \textbf{6.54} & --- & 0.20
+& ---\tabularnewline
 \bottomrule
-%\end{longtable}
 \end{tabular}
-\bigskip{}
+\bigskip{} 
 \\
 {\footnotesize Note: We analyzed all of these responses
-using generalized linear mixed-effect models (error distribution = Poisson, link function = log). We report the likelihood-ratio test statistic and include the degrees of freedom for each test as a subscript next to each predictor. Font type denotes statistical significance (\textbf{bold} P $<$ 0.05, \textit{italic} P $<$ 0.10 , normal P $>$ 0.10).}
+using generalized linear mixed-effect models (error distribution = Poisson, link function = log). We report the likelihood-ratio test statistic and include the degrees of freedom for each test as a subscript next to each predictor. Pathways that were not modelled are denoted by '---'. Font type denotes statistical significance (\textbf{bold} P $<$ 0.05, \textit{italic} P $<$ 0.10 , normal P $>$ 0.10).}
 \end{sidewaystable}
  
 
-\begin{table}[] %[h]
+\begin{table}[]
 \centering
 \caption{Summary of loadings and variance explained by first
 two components from separate principal components analysis (PCA) of
 aboveground plant traits.}
-\label{TableS3}
+\label{traitPCA}
 \begin{tabular}{@{}lll@{}}
-% \begin{longtable}[]{@{}lll@{}}
 \toprule
 Individual traits & Trait PC1 & Trait
 PC2\tabularnewline
@@ -1330,7 +1329,6 @@ Specific Leaf Area (SLA) & -0.46 & -0.42\tabularnewline
 Leaf C:N & -0.04 & 0.59\tabularnewline
 Variance explained & 45\% & 26\%\tabularnewline
 \bottomrule
-% \end{longtable}
 \end{tabular}
 \bigskip{}
 \\
@@ -1343,7 +1341,7 @@ prior to PCA to give them equal weight in the analysis.}
 \caption{Summary of loadings and variance explained by first
 two components from principal components analysis (PCA) of soil
 properties.}
-\label{TableS4}
+\label{soilPCA}
 \begin{tabular}{@{}lll@{}}
 \toprule
 Soil properties & Soil PC1 & Soil
@@ -1375,24 +1373,23 @@ Variance explained & 38\% & 14\%\tabularnewline
 prior to PCA to give them equal weight in the analysis.}
 \end{table}
 
-\begin{table} %[h]
+\begin{table}
 \centering
-\caption{{Redundancy analyses of foliar arthropods and
-root-associated fungi and bacteria.}}
-\label{TableS5}
+\caption{Redundancy analyses of foliar arthropods and
+root-associated fungi and bacteria in wind experiment (2013).}
+\label{wRedund}
 \begin{tabular}{@{}lllllll@{}}
-% \begin{longtable}[]{@{}lllllll@{}}
 \toprule
 Community composition & E\textsubscript{wind} & Trait PC1 &
 Trait PC2 & Root C:N & Soil PC1 &
 Soil PC2\tabularnewline
 \midrule
 % \endhead
-Arthropods & 0.83\textsubscript{(1,9)} & \textbf{12.05}\textsubscript{(1,76)} & 0.65\textsubscript{(1,76)} & - & - &
--\tabularnewline
-Mycorrhiza & - & - & - & 1.17\textsubscript{(1,115)} & 1.89\textsubscript{(1,8)} &
+Arthropods & 0.83\textsubscript{(1,9)} & \textbf{12.05}\textsubscript{(1,76)} & 0.65\textsubscript{(1,76)} & --- & --- &
+---\tabularnewline
+Mycorrhiza & --- & --- & --- & 1.17\textsubscript{(1,115)} & 1.89\textsubscript{(1,8)} &
 0.85\textsubscript{(1,8)}\tabularnewline
-Bacteria & - & - & - & 1.31\textsubscript{(1,116)} & 1.90\textsubscript{(1,8)} &
+Bacteria & --- & --- & --- & 1.31\textsubscript{(1,116)} & 1.90\textsubscript{(1,8)} &
 0.81\textsubscript{(1,8)}\tabularnewline
 \bottomrule
 % \end{longtable}
@@ -1400,7 +1397,7 @@ Bacteria & - & - & - & 1.31\textsubscript{(1,116)} & 1.90\textsubscript{(1,8)} &
 \bigskip{}
 \\
 {\footnotesize Note: We report F-statistics and degrees
-of freedom in parenthesis. Font type denotes statistical significance
+of freedom in parenthesis. Effects that were not modelled are denoted by '---'. Font type denotes statistical significance
 (\textbf{bold} P \textless{} 0.05, italic P \textless{} 0.10, normal P
 \textgreater{} 0.10).}
 \end{table}
@@ -1499,29 +1496,30 @@ of freedom in parenthesis. Font type denotes statistical significance
 \renewcommand{\thetable}{\arabic{table}}
 \setcounter{table}{0}
 
-% Please add the following required packages to your document preamble:
-% \usepackage{booktabs}
-% \usepackage{multirow}
+
 \begin{sidewaystable}
-%\begin{table}[h]
-\caption{{Net effect sizes of heritable trait variation, phenotypic plasticity, and direct environmental effects on community structure. }}
-\label{Table1}
+\caption{Net effect sizes of genetic variation, phenotypic plasticity, and direct environmental effects on community structure.}
+\label{effectsSEM}
 \centering
-\begin{tabular}{@{}lllll@{}}
+\begin{tabular}{@{}llll@{}}
 \toprule
-Experiment                      & Response                    & Heritable Trait variation & Trait plasticity & Direct Environmental effects \\ \midrule
-\multirow{3}{*}{Ant-Aphid 2012} & Arthropod Richness          & 0.57                      & n.m.             & n.m.                         \\
-                                & Arthropod Abundance         & 0.11                      & n.m.             & 0.25                         \\
-                                & Arthropod Rarefied Richness & n.m.                      & n.m.             & -0.2                         \\
-\multirow{5}{*}{Wind 2013}      & Arthropod Richness          & 0.19                      & -0.13            & -0.22                        \\
-                                & Arthropod Abundance         & 0.16                      & -0.11            & -0.08                        \\
-                                & Arthropod Rarefied Richness & 0.19                      & 0.12             & -0.26                        \\
-                                & Fungal Rarefied Richness    & 0.05                      & n.m.             & 0.07                         \\
-                                & Bacterial Rarefied Richness & n.m.                      & n.m.             & 0.05                         \\ \cmidrule(l){2-5} 
+Response & Genetic Variation & Phenotypic plasticity & Direct Environmental effects \\ 
+\midrule
+\textbf{Ant-Aphid 2012} & & & \\
+Arthropod Richness  & 0.57 & --- & --- \\
+Arthropod Abundance & 0.11 & --- & 0.25 \\
+Arthropod Rarefied Richness & ---  & --- & -0.2 \\
+\textbf{Wind 2013} & & & \\
+ Arthropod Richness & 0.19 & -0.13 & -0.22 \\
+Arthropod Abundance & 0.16 & -0.11 & -0.08 \\
+Arthropod Rarefied Richness & 0.19 & 0.12 & -0.26 \\
+Fungal Rarefied Richness & 0.05 & --- & 0.07 \\
+Bacterial Rarefied Richness & --- & --- & 0.05 \\
+\bottomrule
 \end{tabular}
 \bigskip{}
 \\
-{\footnotesize Note: Values represent the sum of effect sizes calculated across different pathways of the structural equation models (Fig. 2 and 3). Note that effects sizes include significant missing pathways (e.g. dotted lines in Fig. 2).}
+{\footnotesize Note: Values represent the sum of effect sizes calculated across different pathways of the structural equation models (Fig. \ref{aaSEM} and \ref{wSEM}). Pathways that were not modelled are denoted by '---'. Note that effects sizes include significant missing pathways (e.g. dotted lines in Fig. \ref{aaSEM}).}
 \end{sidewaystable}
 %\end{table}
 
@@ -1564,15 +1562,15 @@ Experiment                      & Response                    & Heritable Trait 
 
 \begin{figure}[h!]
 \centering
-\includegraphics[scale = 0.08]{image03.png}
+\includegraphics[scale = 0.16]{image03.png}
 \caption{Effects of genetic variation within the willow
-\emph{Salix hookeriana} as well as biotic (aphid additions and proximity
+\textit{Salix hookeriana} as well as biotic (aphid additions and proximity
 to ant mounds) and abiotic (wind exposure) factors on the structure of
 above and belowground communities. Willow genotype had strong effects on
 arthropod abundance in both the ant-aphid (A) and wind exposure (B)
 experiments. In the ant-aphid experiment (A), arthropod abundance was
-influenced by the addition of the aphid \emph{Aphis farinosa}, but only
-at the furthest distance from mounds of the ant \emph{Formica
+influenced by the addition of the aphid \textit{Aphis farinosa}, but only
+at the furthest distance from mounds of the ant \textit{Formica
 obscuripes}. In the wind experiment (B), wind exposure reduced arthropod
 abundance. In contrast to arthropod abundance, willow genotype had weak
 effects on arthropod rarefied richness in both the ant-aphid (C) and
@@ -1585,13 +1583,13 @@ rarefied richness of rhizosphere fungi (E) and bacteria (F). While wind
 exposure had a weak effect on fungal rarefied richness (E), we found
 that wind exposed willows hosted a more diverse community of rhizosphere
 bacteria (F). Points and error bars correspond to the response
-variable's mean $\pm$ 95\% confidence interval. We calculated mean and confidence intervals based on the full models (Tables S1,S3) using the emph{effects} package in R.}
+variable's mean $\pm$ 95\% confidence interval. We calculated mean and confidence intervals based on the full models (Tables \ref{aaCommTrait},\ref{wComm}) using the \textit{effects} package in R.}
 \label{Fig:GxEuni}
 \end{figure}
 
 \begin{figure}[h!]
 \centering
-\includegraphics[scale = 0.4]{fig_2.png}
+\includegraphics[scale = 0.65]{fig_2.png}
 \caption{Effects of genetic variation within the willow
 \emph{\textit{Salix hookeriana}} as well as biotic (aphid additions) and
 abiotic (wind exposure) factors on the composition of above and
@@ -1600,13 +1598,13 @@ of the aphid \emph{Aphis farinosa} (grey diamonds) modified the
 effect of willow genotype on the composition of the arthropod community.
 This interaction between willow genotype and aphid treatment was solely
 due to the differential effect of genotype J (solid line) on the
-abundance of non-emph{A. farinosa} aphids in the aphid treatment (Table S2).
+abundance of non-\emph{A. farinosa} aphids in the aphid treatment (Table \ref{aaGuild}).
 For arthropods in the wind experiment (B), we found that wind exposure
 had a strong effect on community composition in 2013 (but not 2012,
-Table S3), with no clear effect of willow genotype. Belowground, we
+Table \ref{wComm}), with no clear effect of willow genotype. Belowground, we
 found that willow genotype influenced the composition of rhizosphere
-fungi, while the composition of rhizosphere bacteria was only influenced
-by wind exposure. Black text and grey ellipses correspond to the
+fungi (C), while the composition of rhizosphere bacteria was only influenced
+by wind exposure (D). Black text and grey ellipses correspond to the
 community centroid $\pm$ 95\% confidence interval. Grey numbers denote
 blocks and each unique number is the community centroid for the plot
 within each block. Grey circles mark the location of individual willow
@@ -1618,48 +1616,42 @@ redundancy analysis on Hellinger-transformed community data.}
 
 \begin{figure}[h!]
 \centering
-\includegraphics[scale = 0.4]{image04.png}
+\includegraphics[scale = 0.45]{image04.png}
 \caption{Statistical models of the processes mediating
 arthropod community assembly in the ant-aphid experiment. Piecewise
 structural equation models of arthropod richness (A), abundance (B), and
 rarefied richness (C). Colored and white boxes represent exogenous and
 endogenous variables, respectively. Solid, single-headed arrows
 correspond to modeled pathways between predictor and response variables,
-and may be either positive (black) or negative (red). Grey,
-double-headed arrows denote variables with no direct relationship and
-that we assumed to be driven by the same underlying factor. For clarity,
-we only plotted paths with standardized coefficients \textgreater{}
-0.10. Numbers next to all arrows represent the standardized path
-coefficient, which also corresponds to the thickness of arrows. (B)
-Redundancy analysis illustrating the effect of plant traits (Trait PC1
-square root of proportional abundances of species found on each willow).
+and may be either positive (black) or negative (red). For clarity,
+we only plotted paths with standardized coefficients $>$
+0.10, but marginally significant effects (0.05 $<$ P $<$ 0.10) are transparent. Numbers next to all arrows represent the standardized path
+coefficient, which also corresponds to the thickness of arrows. (D)
+Redundancy analysis illustrating the effect of plant traits (Trait PC1, PC2) and \textit{A. farinosa} abundance on the arthropod community (Hellinger-transformed = square root of proportional abundances of species found on each willow).
 Black and blue arrows correspond to plant traits and species,
 respectively, while grey dots represent the position of individual
 willow communities.}
-\label{Fig:SEMaa}
+\label{aaSEM}
 \end{figure}
 
 \begin{figure}[h!]
 \centering
-\includegraphics[scale = 0.4]{image05.png}
+\includegraphics[scale = 0.45]{image05.png}
 \caption{Statistical models of the processes mediating
 community assembly in the wind experiment for 2013. (A) Piecewise
 structural equation model of the rarefied richness of foliar arthropods
 as well as root fungi and bacteria. Colored and white boxes represent
 exogenous and endogenous variables, respectively. Solid, single-headed
 arrows correspond to modeled pathways between predictor and response
-variables, and may be either positive (black) or negative (red). Grey,
-double-headed arrows denote variables with no direct relationship and
-that we assumed to be driven by the same underlying factor. For clarity,
-we only plotted paths with standardized coefficients \textgreater{}
-0.10. Numbers next to all arrows represent the standardized path
-coefficient, which also corresponds to the thickness of arrows. (D)
-Redundancy analysis illustrating the effect of plant traits (Trait PC1
-square root of proportional abundances of species found on each willow).
+variables, and may be either positive (black) or negative (red). For clarity,
+we only plotted paths with standardized coefficients $>$
+0.10, but marginally significant effects (0.05 $<$ P $<$ 0.10) are transparent. Numbers next to all arrows represent the standardized path
+coefficient, which also corresponds to the thickness of arrows. (B)
+Redundancy analysis illustrating the effect of plant traits (Trait PC1, PC2) on the arthropod community (Hellinger-transformed = square root of proportional abundances of species found on each willow).
 Black and blue arrows correspond to plant traits and species,
 respectively, while grey
 dots represent the position of individual willow communities.}
-\label{Fig:SEMwind}
+\label{wSEM}
 \end{figure}
 
 %\subsection*{Online figure legends}
