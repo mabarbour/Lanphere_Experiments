@@ -304,10 +304,10 @@ anova(w.b.soil.rda, by = "margin",  permutations = how(block = w.b.plots.centr.h
 adonis(b.hell.mech.rootCNsub ~ soil.PC1 + soil.PC2 + root_CN, data = bacteria.df.mech.rootCNsub, method = "euclidean", permutations = how(block = bacteria.df.mech.rootCNsub$Block, nperm = 999)) # effect of root C:N is marginal (explains 1% of variance)
 
 ## Ant-aphid: SEM data management ----
-aa.arth.df <- read.csv('~/Documents/Lanphere_Experiments/final_data/ant_aphid_arthropod_df.csv') %>% tbl_df() %>% mutate(Block = as.factor(Block), fact.Ant.mound.dist = as.factor(Ant.mound.dist)) %>% select(-X)
+aa.arth.df <- read.csv('~/Lanphere_Experiments/final_data/ant_aphid_arthropod_df.csv') %>% tbl_df() %>% mutate(Block = as.factor(Block), fact.Ant.mound.dist = as.factor(Ant.mound.dist)) %>% select(-X)
 aa.arth.names <- colnames(select(aa.arth.df, Gracilliaridae_miner:Spider))
 
-aa.trait.df <- read.csv('~/Documents/Lanphere_Experiments/final_data/ant_aphid_trait_df.csv') %>% tbl_df() %>% #mutate(fact.Ant.Mound.Dist = as.factor(Ant.mound.dist), Plot_code = paste(Block, Ant.mound.dist, sep = "_"), Block = as.factor(Block)) %>% 
+aa.trait.df <- read.csv('~/Lanphere_Experiments/final_data/ant_aphid_trait_df.csv') %>% tbl_df() %>% #mutate(fact.Ant.Mound.Dist = as.factor(Ant.mound.dist), Plot_code = paste(Block, Ant.mound.dist, sep = "_"), Block = as.factor(Block)) %>% 
   filter(Year == "2012") %>% select(plant_ID, trait.PC1, trait.PC2)
 
 aa.mech.df <- left_join(aa.arth.df, aa.trait.df)
@@ -328,16 +328,16 @@ sem.model.fits(aa.arth.rich.2012) # marginal R2 = 0.14
 fixef(aa.arth.rich.2012)
 fixef(aa.arth.rich.2012)*p.scale
 
-aa.arth.rich.2012.Gmiss <- lmerTest::lmer(total.rich ~ trait.PC1 + trait.PC2 + Genotype + (1|Block) + (1|Block:fact.Ant.mound.dist), aa.SEM.df, contrasts = list(Genotype = "contr.Sum"))
+aa.arth.rich.2012.Gmiss <- lmerTest::lmer(total.rich ~ trait.PC1 + trait.PC2 + Genotype + (1|Block) + (1|Block:fact.Ant.mound.dist), aa.SEM.df, contrasts = list(Genotype = "contr.sum"))
 sd(fixef(aa.arth.rich.2012.Gmiss)[-(1:3)]) # missing Genotype SD = 0.38
 sd(fixef(aa.arth.rich.2012.Gmiss)[-(1:3)])*p.scale # plot scale = 5.6
 
-aa.traitPC1.2012 <- lmerTest::lmer(trait.PC1 ~ Genotype + (1|Block) + (1|Block:fact.Ant.mound.dist), aa.SEM.df, contrasts = list(Genotype = "contr.Sum"))
+aa.traitPC1.2012 <- lmerTest::lmer(trait.PC1 ~ Genotype + (1|Block) + (1|Block:fact.Ant.mound.dist), aa.SEM.df, contrasts = list(Genotype = "contr.sum"))
 sd(fixef(aa.traitPC1.2012)[-1]) # Genotype SD = 0.39
 sd(fixef(aa.traitPC1.2012)[-1])*p.scale # plot scale = 9.8
 sem.model.fits(aa.traitPC1.2012) # marginal R2 = 0.12
 
-aa.traitPC2.2012 <- lmerTest::lmer(trait.PC2 ~ Genotype + (1|Block) + (1|Block:fact.Ant.mound.dist), aa.SEM.df, contrasts = list(Genotype = "contr.Sum"))
+aa.traitPC2.2012 <- lmerTest::lmer(trait.PC2 ~ Genotype + (1|Block) + (1|Block:fact.Ant.mound.dist), aa.SEM.df, contrasts = list(Genotype = "contr.sum"))
 sd(fixef(aa.traitPC2.2012)[-1]) # Genotype SD = 0.47
 sd(fixef(aa.traitPC2.2012)[-1])*p.scale # plot scale = 11.6
 sem.model.fits(aa.traitPC2.2012) # marginal R2 = 0.23
@@ -381,7 +381,7 @@ sem.model.fits(aa.arth.abund.2012) # marginal R2 = 0.06
 aa.aphis.2012.treats <- lmerTest::lmer(aphid_Aphis ~ num.Aphid*Ant.mound.dist + trait.PC1 + trait.PC2 + (1|Block) + (1|Block:fact.Ant.mound.dist), aa.SEM.df) # added Ant.mound.dist because this was one of the interactive effects driving total abundance
 sem.model.fits(aa.aphis.2012.treats) # marginal R2 = 0.19
 
-aa.aphis.2012.treats.Gmiss <- lmerTest::lmer(aphid_Aphis ~ num.Aphid*Ant.mound.dist + trait.PC1 + trait.PC2 + Genotype + (1|Block) + (1|Block:fact.Ant.mound.dist), aa.SEM.df, contrasts = list(Genotype = "contr.Sum"))
+aa.aphis.2012.treats.Gmiss <- lmerTest::lmer(aphid_Aphis ~ num.Aphid*Ant.mound.dist + trait.PC1 + trait.PC2 + Genotype + (1|Block) + (1|Block:fact.Ant.mound.dist), aa.SEM.df, contrasts = list(Genotype = "contr.sum"))
 sd(fixef(aa.aphis.2012.treats.Gmiss)[-(c(1:5,15))]) # Genotype SD = 0.28
 sd(fixef(aa.aphis.2012.treats.Gmiss)[-(c(1:5,15))])*p.scale # plot scale = 4.3
 
@@ -398,7 +398,7 @@ aa.arth.abund.2012.add <- lmerTest::lmer(total.abund ~ ant_F_obscuripes + aphid_
 summary(aa.arth.abund.2012.add) # p-values of 0.000944 after accounting for significance of main effects
 0.188881*p.scale # 2.83 plot scale
 
-aa.traitPC1.2012.add <- lmerTest::lmer(trait.PC1 ~ Genotype + num.Aphid*Ant.mound.dist + (1|Block) + (1|Block:fact.Ant.mound.dist), aa.SEM.df, contrasts = list(Genotype = "contr.Sum"))
+aa.traitPC1.2012.add <- lmerTest::lmer(trait.PC1 ~ Genotype + num.Aphid*Ant.mound.dist + (1|Block) + (1|Block:fact.Ant.mound.dist), aa.SEM.df, contrasts = list(Genotype = "contr.sum"))
 summary(aa.traitPC1.2012.add) # 0.854631, interactive effect is not significant after accounting for main effects (maintaining marginality)
 
 aa.traitPC2.2012.add <- lmerTest::lmer(trait.PC2 ~ Genotype + num.Aphid*Ant.mound.dist + (1|Block) + (1|Block:fact.Ant.mound.dist), aa.SEM.df, contrasts = list(Genotype = "contr.sum"))
