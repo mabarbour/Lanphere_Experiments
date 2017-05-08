@@ -1,9 +1,9 @@
 ## Analysis of root-associated communities
 
 ## load required libraries ----
-source('~/Documents/miscellaneous_R/model_diagnostic_functions.R')
-source('~/Documents/miscellaneous_R/veganCovEllipse.R')
-source('~/Documents/miscellaneous_R/beta.div.R')
+source('~/miscellaneous_R/model_diagnostic_functions.R')
+source('~/miscellaneous_R/veganCovEllipse.R')
+library(adespatial) #source('~/miscellaneous_R/beta.div.R')
 library(merTools) # must load before dplyr since this package requires 'MASS' which requires 'plyr'
 library(dplyr)
 library(tidyr)
@@ -28,17 +28,17 @@ fungal.df$fungal.sub.abund <- rowSums(round(fungal.df[ ,f.sub.OTUs]),0)
 #fungal.df$fungal.sub.rarerich <- rarefy(round(fungal.df[ ,f.sub.OTUs],0), min(fungal.df$fungal.sub.abund))
 
 # arbuscular mycorrhizal OTUs
-abm <- read.csv("~/Documents/Lanphere_Experiments/fungi_FUNGUILD_AMF.csv", check.names = FALSE, stringsAsFactors = FALSE)
+abm <- read.csv("~/Lanphere_Experiments/fungi_FUNGUILD_AMF.csv", check.names = FALSE, stringsAsFactors = FALSE)
 colnames(abm)[c(1,137:141)] <- c("OTU_ID","taxon","taxon_level","trophic_mode","guild","confidence_ranking")
 abm.char <- select(abm, OTU_ID, taxonomy:confidence_ranking)
 
 # ectomycorrhizal OTUs
-ecm <- read.csv("~/Documents/Lanphere_Experiments/fungi_FUNGUILD_ECM.csv", check.names = FALSE, stringsAsFactors = FALSE)
+ecm <- read.csv("~/Lanphere_Experiments/fungi_FUNGUILD_ECM.csv", check.names = FALSE, stringsAsFactors = FALSE)
 colnames(ecm)[c(1,137:142)] <- c("OTU_ID","taxon","taxon_level","trophic_mode","guild","confidence_ranking","growth_morphology")
 ecm.char <- select(ecm, OTU_ID, taxonomy:growth_morphology)
 
 # pathogen OTUs
-path <- read.csv("~/Documents/Lanphere_Experiments/fungi_FUNGUILD_pathogens.csv", check.names = FALSE, stringsAsFactors = FALSE)
+path <- read.csv("~/Lanphere_Experiments/fungi_FUNGUILD_pathogens.csv", check.names = FALSE, stringsAsFactors = FALSE)
 colnames(path)[c(1,137:143)] <- c("OTU_ID","taxon","taxon_level","trophic_mode","guild","confidence_ranking","growth_morphology","trait")
 path.char <- select(path, OTU_ID, taxonomy:trait)
 
@@ -211,7 +211,7 @@ colSums(fungal.df[ ,names(which(f.beta$SCBD > 0.004))])
 taxa.sub <- which(as.character(f.taxa$OTU_ID) %in% c("OTU_54","OTU_68","OTU_134","OTU_66","OTU_119","OTU_262","OTU_1606","OTU_113"))#names(which(f.beta$SCBD > 0.004)) == TRUE)
 
 table(f.taxa$Guild)
-as.data.frame(f.taxa[taxa.sub, ])
+as.data.frame(f.taxa[taxa.sub, ]) %>% select(OTU_ID, Species)
 write.csv(as.data.frame(f.taxa[taxa.sub, ]), "key_fungal_taxa.csv")
 
 hist(fungal.df$OTU_54)
@@ -224,11 +224,12 @@ sort(colSums(fungal.df[ ,f.sub.OTUs]))
 # def. sig: 54,
 # sig: 313, 146, 135, 104 (but errors)
 # not sig: 171, 199, 115, 82
-OTU.lmer <- glmer(round(OTU_113,0) ~ offset(log(fungal.sub.abund)) + Wind.Exposure  + Genotype + (1|X) + (1|Block) + (1|Block:Wind.Exposure), data = fungal.df, family = "poisson", contrasts = list(Wind.Exposure = "contr.sum", Genotype = "contr.sum"), control=glmerControl(optimizer="bobyqa", optCtrl=list(maxfun=2e5)))
+OTU.lmer <- glmer(round(OTU_113,0) ~ offset(log(fungal.sub.abund)) + Wind.Exposure*Genotype + (1|X) + (1|Block) + (1|Block:Wind.Exposure), data = fungal.df, family = "poisson", contrasts = list(Wind.Exposure = "contr.sum", Genotype = "contr.sum"), control=glmerControl(optimizer="bobyqa", optCtrl=list(maxfun=2e5)))
 overdisp_fun(OTU.lmer)
 plot(OTU.lmer)
 summary(OTU.lmer)
 drop1(OTU.lmer, test = "Chisq")
+drop1(update(OTU.lmer, .~. -Wind.Exposure:Genotype), test = "Chisq")
 # def. sig: 54, 68, 
 #anova.table(OTU.lmer, type = 2, experiment = "wind")
 
@@ -257,7 +258,7 @@ library(lme4)
 hist(fungal.df$OTU_199)
 fungal.df$X <- as.factor(fungal.df$X)
 plot(OTU_54 ~ Genotype, fungal.df)
-OTU.glmer <- glmer(round(OTU_5,0) ~ Wind.Exposure + Genotype + 
+OTU.glmer <- glmer(round(OTU_134,0) ~ Wind.Exposure + Genotype + 
                         (1|X) +
                         (1|Block) + (1|Block:Wind.Exposure),
                       data = fungal.df,
