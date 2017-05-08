@@ -244,7 +244,7 @@ w.arth.hell.rda.wind <- rda(w.arth.hell.plots.df[ ,1:10] ~ Condition(Block) + Wi
 anova(w.arth.hell.rda.wind, by = "margin",permuations = how(block = w.arth.hell.plots.df$Block, nperm = 999))  # suggest that wind exposure did not have a direct effect on community composition (after accounting for indirect effects on plant traits).
 
 ## Wind: fungal community assembly ----
-fungal.df.mech <- left_join(fungal.df, select(filter(w.trait.df, Year == "2013"), plant_ID, root_CN)) %>% left_join(., select(w.soil, Plot_code, soil.PC1, soil.PC2)) 
+fungal.df.mech <- left_join(fungal.df, select(filter(w.trait.df, Year == "2013"), plant_ID, root_CN)) %>% left_join(., select(w.soil, Plot_code, soil.PC1, soil.PC2)) %>% left_join(select(filter(w.trait.df, Year == "2013"), plant_ID, trait.PC1, trait.PC2))
 
 fungal.df.mech.rootCNsub <- filter(fungal.df.mech, root_CN > 0)
 
@@ -272,6 +272,9 @@ adonis(w.f.plots.hell$centroids ~ Block + soil.PC1 + soil.PC2, data = w.f.plots.
 adonis(f.hell.mech.rootCNsub ~ soil.PC1 + soil.PC2 + root_CN, data = fungal.df.mech.rootCNsub, permutations = how(block = fungal.df.mech.rootCNsub$Block, nperm = 999), method = "euclidean") # important to have root_CN in last position to make sure the test preserves marginality. Note that the tests for soil.PC1 and soil.PC2 are bogous because they aren't based on the appropriate degrees of freedom. Effect of root C:N is marginal.
 
 adonis(f.hell.mech.rootCNsub ~ soil.PC1 + soil.PC2 + root_CN + Genotype, data = fungal.df.mech.rootCNsub, permutations = how(block = fungal.df.mech.rootCNsub$Block, nperm = 999), method = "euclidean") # test whether Genotype still has an effect after accounting for these factors.nGenotype effect is significant after accounting for all of the factors, suggesting we don't know what is mediating the assembly of the fungal community.
+
+# do not appear to be any correlated effects of aboveground plant traits, such as trait.PC1 and trait.PC2 which we know is strongly controlled by plant genotype.
+adonis(f.hell.mech.rootCNsub ~ soil.PC1 + soil.PC2 + root_CN + trait.PC1 + trait.PC2, data = fungal.df.mech.rootCNsub, permutations = how(block = fungal.df.mech.rootCNsub$Block, nperm = 999), method = "euclidean") 
 
 #anova(w.f.mech.rootCN.rda, by = "term", permutations = how(block = fungal.df.mech.rootCNsub$Block, nperm = 999)) # 
 
