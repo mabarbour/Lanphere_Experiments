@@ -1,9 +1,11 @@
 ## load required libraries ----
-library(ggvegan)
+#library(devtools)
+#install_github("gavinsimpson/ggvegan")
+library(ggvegan) # requires devtools and install_github()
 library(cowplot)
-source('~/Documents/miscellaneous_R/autoplot.custom.R')
-library(devtools)
-install_github("jslefche/piecewiseSEM")
+#source('~/Documents/miscellaneous_R/autoplot.custom.R')
+#library(devtools)
+#install_github("jslefche/piecewiseSEM")
 library(piecewiseSEM) # dev version as of Nov. 10
 #library(missMDA) # for imputing missing values in PCA
 library(dplyr)
@@ -14,6 +16,11 @@ library(lmerTest)
 library(vegan) # community composition analysis
 library(effects)
 library(car)
+library(RCurl) # get code directly from github
+
+## source and parse github code
+script <- getURL("https://raw.githubusercontent.com/mabarbour/miscellaneous_R/master/autoplot.custom.R", ssl.verifypeer = FALSE)
+eval(parse(text = script))
 
 
 ## Wind SEM data management ----
@@ -46,14 +53,14 @@ bacteria.df <- read.csv("bacteria.df.csv") %>% tbl_df() %>% mutate(Block = as.fa
 b.OTUs <- colnames(select(bacteria.df, -(X:bacteria.rarerich)))
 
 ## load arthropod community data ----
-wind.arth.df <- read.csv('~/Documents/Lanphere_Experiments/final_data/wind_arthropod_df.csv') %>%
+wind.arth.df <- read.csv('~/Lanphere_Experiments/final_data/wind_arthropod_df.csv') %>%
   tbl_df() %>% #rename(plant_ID = plant_code) %>%
   mutate(Block = as.factor(Block), Year = as.factor(Year), Plot_code = paste(Block, Wind.Exposure, sep = "."))
 
 w.arth.names <- colnames(select(wind.arth.df, Gracilliaridae_miner:Spider))
 
 ## load plant trait data ----
-w.trait.df <- read.csv('~/Documents/Lanphere_Experiments/final_data/wind_trait_df.csv') %>% tbl_df() %>% mutate(Block = as.factor(Block), Year = as.factor(Year), Plot_code = paste(Block, Wind.Exposure, sep = "."))
+w.trait.df <- read.csv('~/Lanphere_Experiments/final_data/wind_trait_df.csv') %>% tbl_df() %>% mutate(Block = as.factor(Block), Year = as.factor(Year), Plot_code = paste(Block, Wind.Exposure, sep = "."))
 glimpse(w.trait.df)
 
 ## combine datasets into data frame ----
@@ -151,17 +158,18 @@ fixef(bact.rarerich.2013)
 sem.model.fits(bact.rarerich.2013)
 
 # for an unknown reason, I receive an error when I try to include all of the models together. I'm going to work around this by manually calculating Fisher's C, df, and P-value.
-mods.rarerich <- list(traitPC1.2013, traitPC2.2013, soilPC1.2013, soilPC2.2013, rootCN.2013, fung.rarerich.2013, bact.rarerich.2013) #, rootCN.2013,
-mods.rarerich2 <- list(traitPC1.2013, traitPC2.2013, soilPC1.2013, soilPC2.2013, arth.rarerich.2013) #, rootCN.2013,
+mods.rarerich <- list(traitPC1.2013, traitPC2.2013, soilPC1.2013, soilPC2.2013, rootCN.2013, fung.rarerich.2013, bact.rarerich.2013)#, arth.rarerich.2013)
+mods.rarerich2 <- list(traitPC1.2013, traitPC2.2013, soilPC1.2013, soilPC2.2013, arth.rarerich.2013) 
 
-sem.fit(mods.rarerich, data = w.SEM.2013, corr.errors = c("fungal.rarerich~~bacteria.rarerich","trait.PC1~~trait.PC2","soil.PC1~~soil.PC2")) # adequate fit to the data: Fisher.C = 22.26, df = 38, P = 0.98; AIC = 174.26, AICc = 6026.26, K = 76, n = 79
-#sem.fit(mods.rarerich2, data = w.SEM.2013, corr.errors = c("trait.PC1~~trait.PC2","soil.PC1~~soil.PC2"))
+sem.fit(mods.rarerich, data = w.SEM.2013, corr.errors = c("fungal.rarerich~~bacteria.rarerich", "trait.PC1~~trait.PC2","soil.PC1~~soil.PC2")) # adequate fit to the data: Fisher.C = 22.26, df = 38, P = 0.98; AIC = 174.26, AICc = 6026.26, K = 76, n = 79
+sem.fit(mods.rarerich2, data = w.SEM.2013, corr.errors = c("trait.PC1~~trait.PC2","soil.PC1~~soil.PC2"))
 
 rarerich.sem <- sem.missing.paths(mods.rarerich, w.SEM.2013, corr.errors = c("fungal.rarerich~~bacteria.rarerich","trait.PC1~~trait.PC2","soil.PC1~~soil.PC2"), conditional = TRUE) %>% 
   rbind.data.frame(., sem.missing.paths(mods.rarerich2, data = w.SEM.2013, corr.errors = c("trait.PC1~~trait.PC2","soil.PC1~~soil.PC2"), conditional = TRUE)[-c(1,2), ]) # remove overlapping missing paths
 
-rarerich.sem.C <- -2*sum(log(rarerich.sem$p.value)) # Fisher.C = 21.17
-1 - pchisq(rarerich.sem.C, 2 * length(rarerich.sem$p.value)) # df = 32, P = 0.928
+rarerich.sem.C <- -2*sum(log(rarerich.sem$p.value)) # Fisher.C = 22.32
+rarerich.df <- 2 * length(rarerich.sem$p.value)*2 # df = 32
+1 - pchisq(rarerich.sem.C, rarerich.df) # P = 0.899
 
 #mods.rarerich.coefs <- sem.coefs(mods.rarerich2, data = w.SEM.2013, corr.errors = c("fungal.rarerich~~bacteria.rarerich","trait.PC1~~trait.PC2","soil.PC1~~soil.PC2"), standardize = "none")
 #mods.rarerich.coefs <- mutate(mods.rarerich.coefs, plot.scale = estimate*25)
