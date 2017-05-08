@@ -16,11 +16,16 @@ library(effects) # calculating mean and confidence intervals of treatment and ge
 library(psych) # for correlation tests
 #library(car) # for Anova function
 #library(broom) # for tidying up model outputs
+library(RCurl) # get code directly from github
+
+## source and parse github code
+script <- getURL("https://raw.githubusercontent.com/mabarbour/miscellaneous_R/master/model_diagnostic_functions.R", ssl.verifypeer = FALSE)
+eval(parse(text = script))
 
 #### Load required data sets ----
 
 ## wind plant traits
-w.trait.df <- read.csv('~/Documents/Lanphere_Experiments/final_data/wind_trait_df.csv') %>%
+w.trait.df <- read.csv('~/Lanphere_Experiments/final_data/wind_trait_df.csv') %>%
   tbl_df() %>%
   mutate(Block = as.factor(Block), # necessary for properly modelling as a random effect.
          Year = as.factor(Year),
@@ -30,6 +35,7 @@ w.trait.df <- read.csv('~/Documents/Lanphere_Experiments/final_data/wind_trait_d
          #Plot_code = paste(Block, treat.tmp, sep = "."),
          #Sample = paste(Block, treat.tmp, genotype, plant.position, sep = ""))
 glimpse(w.trait.df)
+summary(w.trait.df$Height)
 
 ## wind soil properties
 #w.soil <- read.csv('final_data/wind_soil_df.csv') %>%
@@ -38,7 +44,7 @@ glimpse(w.trait.df)
 
 ## Root C:N
 #rootCN <- read.csv('Output/RootCNdataLanphereDunes.csv') %>%
-  tbl_df() 
+#  tbl_df() 
 
 # discuss with angelica on limiting to biologically reasonable values
 #table(rootCN$Nitrogen_percent) # 3 zeros
@@ -78,7 +84,7 @@ glimpse(w.trait.df)
 #w.trait.df$Year <- as.factor(w.trait.df$Year)
 
 ## ant-aphid above-ground plant traits
-aa.trait.df <- read.csv('~/Documents/Lanphere_Experiments/final_data/ant_aphid_trait_df.csv') %>%
+aa.trait.df <- read.csv('~/Lanphere_Experiments/final_data/ant_aphid_trait_df.csv') %>%
   tbl_df() %>%
   filter(Year == "2012") %>%
   mutate(fact.Ant.mound.dist = as.factor(Ant.mound.dist), # necessary for modelling as a random effect
@@ -87,6 +93,7 @@ aa.trait.df <- read.csv('~/Documents/Lanphere_Experiments/final_data/ant_aphid_t
          Plot_code = paste(Block, Ant.mound.dist, sep = "_")) %>%
   select(-Year)
 glimpse(aa.trait.df)
+summary(aa.trait.df$Height)
 
 #aa.soil <- read.csv('final_data/ant_aphid_soil_2013.csv') %>%
  # tbl_df() 
