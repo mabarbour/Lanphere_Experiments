@@ -88,7 +88,7 @@ summary(lm(avg.leaf_CN ~ C_N_imputed, C_N_test))
 #w.trait.df$Year <- as.factor(w.trait.df$Year)
 
 ## ant-aphid above-ground plant traits
-aa.trait.df <- read.csv('~/Documents/Lanphere_Experiments/final_data/ant_aphid_trait_df.csv') %>%
+aa.trait.df <- read.csv('final_data/ant_aphid_trait_df.csv') %>%
   tbl_df() %>%
   filter(Year == "2012") %>%
   mutate(fact.Ant.mound.dist = as.factor(Ant.mound.dist), # necessary for modelling as a random effect

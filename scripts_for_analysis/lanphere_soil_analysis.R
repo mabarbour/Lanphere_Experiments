@@ -14,6 +14,11 @@ library(RLRsim) # test significance of random effects
 library(psych) # correlation analysis
 library(effects) # calculating effects
 
+library(RCurl) # for loading github files directly.
+
+script <- getURL("https://raw.githubusercontent.com/mabarbour/miscellaneous_R/master/model_diagnostic_functions.R", ssl.verifypeer = FALSE)
+eval(parse(text = script))
+
 #### upload data ----
 w.soil <- read.csv('final_data/wind_soil_df.csv') %>%
   tbl_df() %>%
