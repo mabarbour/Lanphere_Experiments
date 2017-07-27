@@ -1,0 +1,393 @@
+---
+title: "Lanphere supplementary material"
+author: "Matthew Barbour"
+date: "February 2, 2016"
+output: word_document
+---
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, warning=FALSE, message=FALSE)
+```
+
+Finalized code for analyses
+
+```{r load libraries and datasets, echo=FALSE, include = FALSE}
+## libraries
+devtools::install_github("gavinsimpson/permute")
+library(plyr) # data frame manip
+library(dplyr) # data frame manip
+library(tidyr) # data frame manip
+library(pbkrtest) # for some reason, I have to hve pbkrtest loaded with lmerTest for it to run the Kenward-Roger test appropriately.
+library(lmerTest) # mixed-effect models
+library(knitr) # kable() for tables
+library(broman) # for rounding digits
+library(broom) # tidy up model ouputs
+library(vegan) # community analyses
+
+## wind trait data
+wind.df <- read.csv('~/Documents/Lanphere_Experiments/final_data/wind_trait_df.csv') %>%
+  tbl_df() %>%
+  mutate(block = as.factor(block),
+         Year = as.factor(Year),
+         plant.position = as.character(plant.position),
+         X = as.factor(X)) %>%
+  rename(Genotype = genotype,
+         Wind_exposure = treatment)
+glimpse(wind.df)
+
+## ant-aphid trait data
+aa.df <- read.csv('~/Documents/Lanphere_Experiments/final_data/ant_aphid_trait_df.csv') %>%
+  tbl_df() 
+glimpse(aa.df)
+
+## wind soil data
+w.soil.df <- read.csv('final_data/wind_soil_df.csv') %>%
+  tbl_df() %>%
+  rename(Wind_exposure = Treatment)
+```
+
+You can also embed plots, for example:
+
+```{r wind trait models, echo=FALSE}
+height.2012.lmer <- lmer(log(Height) ~ Wind_exposure*Genotype +
+                           (1|block/Wind_exposure), 
+                         data = filter(wind.df, Year == "2012"))
+anova(height.2012.lmer, ddf = "Kenward-Roger")
+
+height.2013.lmer <- lmer((Height) ~ Wind_exposure*Genotype +
+                           (1|block/Wind_exposure), 
+                         data = filter(wind.df, Year == "2013"))
+
+all.shoot.total.length.2012.lmer <- lmer(all.shoot.total.length ~ Wind_exposure*Genotype + (1|block/Wind_exposure), 
+                         data = filter(wind.df, Year == "2012"))
+
+all.shoot.total.length.2013.lmer <- lmer(log(all.shoot.total.length) ~ Wind_exposure*Genotype + (1|block/Wind_exposure), 
+                         data = filter(wind.df, Year == "2013"))
+
+all.shoot.count.2012.lmer <- lmer(all.shoot.count ~ Wind_exposure*Genotype + (1|block/Wind_exposure), 
+                               data = filter(wind.df, Year == "2012"))
+
+all.shoot.count.2013.lmer <-  lmer(all.shoot.count ~ Wind_exposure*Genotype + (1|block/Wind_exposure), 
+                                data = filter(wind.df, Year == "2013"))
+
+# leaf C:N
+
+leaf_CN.2013.lmer <-  lmer(leaf_C_N ~ Wind_exposure*Genotype + (1|block/Wind_exposure), 
+                                data = filter(wind.df, Year == "2013"))
+
+SLA.2013.lmer <-  lmer(SLA ~ Wind_exposure*Genotype + (1|block/Wind_exposure), 
+                           data = filter(wind.df, Year == "2013"))
+
+# leaf_WC
+
+leaf_WC.2012.lmer <-  lmer(log(leaf_WC) ~ Wind_exposure*Genotype + (1|block/Wind_exposure), 
+                           data = filter(wind.df, Year == "2012"))
+
+leaf_WC.2013.lmer <-  lmer(leaf_WC ~ Wind_exposure*Genotype + (1|block/Wind_exposure), 
+                       data = filter(wind.df, Year == "2013"))
+
+# leaf_trichome.density
+
+leaf_trichome.density.2012.lmer <-  lmer(log(leaf_trichome.density+1) ~ Genotype + (1|block/Wind_exposure), 
+                           data = filter(wind.df, Year == "2012"))
+
+# larva wet weight exp. 1
+
+larva.wet.wt.exp1.lmer <- lmer(larva.wet.wt.exp1 ~ Wind_exposure*Genotype + (1|block/Wind_exposure), 
+                                         data = filter(wind.df, Year == "2013"))
+
+# larva wet weight exp. 2
+
+larva.wet.wt.exp2.lmer <-  lmer(log(larva.wet.wt.exp2+1) ~ Genotype + (1|block/Wind_exposure), 
+                                data = filter(wind.df, Year == "2013"))
+
+```
+
+```{r wind trait analysis, echo=FALSE}
+
+model.trait.list <- c(height.2012.lmer, 
+                height.2013.lmer,
+                all.shoot.total.length.2012.lmer,
+                all.shoot.total.length.2013.lmer,
+                all.shoot.count.2012.lmer,
+                all.shoot.count.2013.lmer,
+                leaf_CN.2013.lmer,
+                SLA.2013.lmer,
+                leaf_WC.2012.lmer,
+                leaf_WC.2013.lmer,
+                leaf_trichome.density.2012.lmer,
+                larva.wet.wt.exp1.lmer,
+                larva.wet.wt.exp2.lmer)
+
+output.trait.list <- list()
+for(i in 1:length(model.trait.list)){
+  output.trait.list[[i]] <- data.frame(name = c(names(model.trait.list[[i]]@frame[1]),
+                                          rep("",2)),
+                                 tidy(anova(model.trait.list[[i]],
+                                            ddf = "Kenward-Roger")))
+}
+
+output.trait.df <- ldply(output.trait.list) %>%
+  select(Response = name, 
+         Factor = term, 
+         num_df = NumDF, 
+         den_df = DenDF, 
+         F = statistic,
+         P = p.value) %>%
+  mutate(den_df = myround(den_df, 1),
+         F = myround(F, 2),
+         P = myround(P, 3))
+
+kable(output.trait.df)
+```
+
+```{r ant-aphid trait models, echo=FALSE}
+# no evidence of 3-way interaction so I've dropped it.
+aa.height.2012.lmer <- lmer(log(Height) ~ (Aphid.Treatment + Ant.Mound.Dist + Genotype)^2 +
+                           (1|Block/Ant.Mound.Dist), 
+                         data = filter(aa.df, Year == "2012"))
+anova(aa.height.2012.lmer)
+# why qon't this work?
+#aa.all.shoot.total.length.2012.lmer <- lmer(all.shoot.total.length ~ Aphid.Treatment*Ant.Mound.Dist*Genotype +
+ #                          (1|Block/Ant.Mound.Dist), 
+  #                       data = filter(aa.df, Year == "2012"))
+
+aa.all.shoot.count.2012.lmer <- lmer(all.shoot.count ~ (Aphid.Treatment + Ant.Mound.Dist + Genotype)^2 +
+                           (1|Block/Ant.Mound.Dist), 
+                               data = filter(aa.df, Year == "2012"))
+
+# leaf_WC
+aa.leaf_WC.2012.lmer <-  lmer(log(leaf_WC) ~ Genotype +
+                           (1|Block/Ant.Mound.Dist), 
+                           data = filter(aa.df, Year == "2012"))
+anova(aa.leaf_WC.2012.lmer, ddf = "Kenward-Roger")
+
+# leaf_trichome.density
+aa.leaf_trichome.density.2012.lmer <-  lmer(log(leaf_trichome.density+1) ~  Genotype  +
+                           (1|Block/Ant.Mound.Dist), 
+                           data = filter(aa.df, Year == "2012"))
+summary(aa.leaf_trichome.density.2012.lmer)
+anova(aa.leaf_trichome.density.2012.lmer, ddf = "Kenward-Roger")
+```
+
+```{r ant-aphid trait analysis, echo=FALSE}
+aa.model.trait.list <- c(aa.height.2012.lmer, 
+                #aa.all.shoot.total.length.2012.lmer,
+                aa.all.shoot.count.2012.lmer,
+                aa.leaf_WC.2012.lmer,
+                aa.leaf_trichome.density.2012.lmer)
+
+aa.output.trait.list <- list()
+for(i in 1:length(aa.model.trait.list)){
+  aa.output.trait.list[[i]] <- data.frame(name = c(names(aa.model.trait.list[[i]]@frame[1]),
+                                          rep("",5)),
+                                 tidy(anova(aa.model.trait.list[[i]],
+                                            ddf = "Kenward-Roger")))
+}
+
+aa.output.trait.df <- ldply(aa.output.trait.list) %>%
+  select(Response = name, 
+         Factor = term, 
+         num_df = NumDF, 
+         den_df = DenDF, 
+         F = statistic,
+         P = p.value) %>%
+  mutate(den_df = myround(den_df, 1),
+         F = myround(F, 2),
+         P = myround(P, 3))
+
+kable(aa.output.trait.df)
+```
+
+```{r wind soil models, echo=FALSE}
+## nutrient models
+nutrients <- names(select(w.soil.df, Total.N:Cd))
+adonis.nut <- adonis(w.soil.df[ ,nutrients] ~
+                       Wind_exposure, 
+                     data = w.soil.df, 
+                     strata = w.soil.df$Block, 
+                     method = "euclidean")
+
+N.lmer <- lmer(log(Total.N) ~ Wind_exposure + (1|Block), 
+               data = w.soil.df) # only nutrients that shows marginally significant effect
+
+## moisture models. Not evaluating temperature and EC. Don't expect any effect a priori and there were not effects.
+w.moist.df <- w.soil.df %>%
+  mutate(Block = as.factor(Block)) %>%
+  select(Block, Wind_exposure, starts_with("moisture.vwc")) %>%
+  gather(Block, Wind_exposure)
+colnames(w.moist.df)[c(3,4)] <- c("Date","moisture.vwc")
+w.moist.df$plot.id <- with(w.moist.df, paste(Block, Wind_exposure, sep = "_"))
+
+w.moist <- lmer(moisture.vwc ~ Wind_exposure + 
+                  (1|Block) + (1|Date) + (1|plot.id),
+                data = w.moist.df)
+#plot(w.moist)
+```
+
+No difference in soil nutrients among wind exposure treatments.
+```{r wind soil analysis}
+nut <- tidy(adonis.nut$aov.tab) %>%
+  filter(term == "Wind_exposure") %>%
+  mutate(den_df = 18) %>%
+  select(Factor = term, num_df = df, den_df, F = F.Model, P = p.value) 
+
+moist <- tidy(anova(w.moist, ddf = "Kenward-Roger")) %>%
+  select(Factor = term, num_df = NumDF, den_df = DenDF, F = statistic, P = p.value)
+
+soil.output.df <- ldply(list(nut, moist)) %>%
+   mutate(Response = c("Nutrient composition","Moisture (VWC)"),
+          F = myround(F, 2),
+          P = myround(P, 3)) %>%
+  select(Response, Factor:P)
+
+kable(soil.output.df)
+```
+
+```{r test permutation design}
+plts <- gl(4, 10) ## 4 Plots of 10 samples each
+blks <- gl(2, 20) ## 2 Blocks of 20 samples each
+h1 <- how(within = Within(type = "series", mirror = TRUE),
+          plots = Plots(strata = plts, type = "series"),
+          blocks = blks)
+
+
+arch.vars <- c("Height",
+               #"all.shoot.total.length",
+               "all.shoot.count")
+arch.2012 <- wind.df %>%
+  filter(Year == "2012") %>%
+  mutate(Dead = as.factor(Dead)) %>%
+  select(block, Genotype, Wind_exposure, plant.id, Dead, Height, all.shoot.total.length, all.shoot.count) %>%
+  filter(Dead == 0)
+#arch.2012[is.na(arch.2012)] <- 0
+
+aa.arch.2012 <- aa.df %>%
+  filter(Year == "2012") %>%
+  #mutate(Dead = as.factor(Dead)) %>%
+  select(Block, Genotype, Aphid.Treatment, Ant.Mound.Dist, 
+         Height, 
+         #all.shoot.total.length, 
+         all.shoot.count) %>%
+  #filter(Dead == 0) %>%
+  na.omit()
+
+aa.LQ.2012 <- aa.df %>%
+  filter(Year == "2012") %>%
+  #mutate(Dead = as.factor(Dead)) %>%
+  select(Block, Genotype, Aphid.Treatment, Ant.Mound.Dist, 
+         leaf_WC, 
+         #all.shoot.total.length, 
+         leaf_trichome.density) %>%
+  #filter(Dead == 0) %>%
+  na.omit()
+
+adonis(decostand(aa.arch.2012[,arch.vars], method = "standardize") ~ Genotype*Aphid.Treatment*Ant.Mound.Dist,
+       data = aa.arch.2012,
+       method = "euclidean",
+       strata = aa.arch.2012$Block)
+
+adonis(decostand(aa.LQ.2012[,c("leaf_WC","leaf_trichome.density")], method = "standardize") ~ Genotype*Aphid.Treatment*Ant.Mound.Dist,
+       data = aa.LQ.2012,
+       method = "euclidean",
+       strata = aa.LQ.2012$Block)
+
+plot(leaf_WC ~ Genotype, aa.LQ.2012)
+plot(leaf_trichome.density ~ Genotype, aa.LQ.2012)
+
+leaf.quality.vars.12 <- c("leaf_trichome.density","leaf_WC")
+leaf.quality.vars.13 <- c("leaf_WC","leaf_C_N", "larva.wet.wt.exp2")#,"larva.wet.wt.exp1","larva.wet.wt.exp2")
+LQ.2012 <- wind.df %>%
+  filter(Year == "2012") %>%
+  select(block, Genotype, Wind_exposure, plant.id, leaf_trichome.density, leaf_WC) %>%
+  na.omit()
+LQ.2013 <- wind.df %>%
+  filter(Year == "2013") %>%
+  select(block, Genotype, Wind_exposure, plant.id, leaf_WC, leaf_C_N, larva.wet.wt.exp2) %>%#, larva.wet.wt.exp1, larva.wet.wt.exp2) %>%
+  na.omit()
+
+cor.test(wind.df$leaf_C_N, wind.df$leaf_N) # strongly determined by leaf_N
+cor.test(wind.df$SLA, wind.df$leaf_WC)
+cor.test(wind.df$leaf_C_N, wind.df$leaf_WC)
+cor.test(wind.df$larva.wet.wt.exp1, wind.df$larva.wet.wt.exp2)
+table(wind.df$larva.wet.wt.exp2)
+table(wind.df$larva.wet.wt.exp1)
+
+test <- interaction(arch.2012$block, arch.2012$Wind_exposure)
+block.only <- how(blocks = arch.2012$block,
+            nperm = 999)
+plot.shuffle <- how(blocks = arch.2012$block, 
+            plots = Plots(strata = arch.2012$Wind_exposure,
+                          type = "free"),
+            within = Within(type = "none"),
+            nperm = 999)
+shuffle.within.plot.block <- how(blocks = arch.2012$block, 
+            plots = Plots(strata = arch.2012$Wind_exposure,
+                          type = "none"),
+            within = Within(type = "free"),
+            nperm = 999)
+split.plot <- how(blocks = arch.2012$block, 
+            plots = Plots(strata = arch.2012$Wind_exposure,
+                          type = "free"),
+            within = Within(type = "free"),
+            nperm = 999)
+no.shuffle <- how(blocks = arch.2012$block, 
+            plots = Plots(strata = arch.2012$Wind_exposure,
+                          type = "none"),
+            within = Within(type = "none"),
+            nperm = 999)
+
+nobs <- nrow(arch.2012)
+
+shuffle(nobs, control = block.only) # this is what I expected.
+shuffle(nobs, control = plot.shuffle) # this is what I expected
+shuffle(nobs, control = shuffle.within.plot.block) # this is what I expected
+shuffle(nobs, control = split.plot) # not replicating plot.shuffle behavior that I expected.
+shuffle(nobs, control = no.shuffle) # keeps everything in same order
+
+shuffleSet(nobs, nset = 10, control = split.plot) # plot.shuffle and split.plot doesn't work. Something with Plots(type = "free") behavior?
+
+library(mvabund)
+test <- manyany(fn = "glmer", yMat = arch.2012[,arch.vars], y ~ Wind_exposure*Genotype + (1|block/Wind_exposure), data = arch.2012, family = "poisson")
+test1 <- manyany(fn = "glmer", yMat = arch.2012[,arch.vars], y ~ 1 + (1|block/Wind_exposure), data = arch.2012, family = "poisson")
+plot(test)
+anova(test1, test)
+
+adonis(decostand(arch.2012[ ,arch.vars], 
+                 method = "standardize") ~ Dead + Wind_exposure*Genotype,
+       data = arch.2012, 
+       method = "euclidean",
+       permutations = split.plot)
+       #strata = arch.2012$block)
+
+adonis(decostand(LQ.2012[ ,leaf.quality.vars.12], 
+                 method = "standardize") ~ Wind_exposure*Genotype,
+       data = LQ.2012, 
+       method = "euclidean",
+       strata = LQ.2012$block) # strong effect of genotype
+
+adonis(decostand(LQ.2013[ ,leaf.quality.vars.13], 
+                 method = "standardize") ~ Wind_exposure*Genotype,
+       data = LQ.2013, 
+       method = "euclidean",
+       strata = LQ.2013$block) # strong effect of genotype
+
+LQ.rda <- rda(LQ.2013[ ,leaf.quality.vars.13] ~ Genotype + Condition(block),
+              scale = TRUE, data = LQ.2013)
+summary(LQ.rda)
+anova(LQ.rda, by = "axis", stata = LQ.2013$block)
+plot(LQ.rda, display = c("cn","sp"))
+
+arch.rda <- rda(arch.2012[ ,arch.vars] ~ Genotype + Wind_exposure +
+                  Condition(block),
+                scale = TRUE, 
+                data = arch.2012)
+summary(arch.rda)
+anova(arch.rda, by = "axis", strata = arch.2012$block)
+plot(arch.rda, display = c("cn","sp"))
+plot(arch.rda, display = c("cn","sp"), choices = c(2,3))
+```
+
+```{r wind - aboveground community}
+
+```

@@ -1,11 +1,9 @@
-## load required libraries ----
-#library(devtools)
-#install_github("gavinsimpson/ggvegan")
-library(ggvegan) # requires devtools and install_github()
+## load libraryd libraries ----
+library(ggvegan)
 library(cowplot)
-#source('~/Documents/miscellaneous_R/autoplot.custom.R')
-#library(devtools)
-#install_github("jslefche/piecewiseSEM")
+#source('miscellaneous_R/autoplot.custom.R')
+library(devtools)
+install_github("jslefche/piecewiseSEM")
 library(piecewiseSEM) # dev version as of Nov. 10
 #library(missMDA) # for imputing missing values in PCA
 library(dplyr)
@@ -16,9 +14,8 @@ library(lmerTest)
 library(vegan) # community composition analysis
 library(effects)
 library(car)
-library(RCurl) # get code directly from github
+library(RCurl) # for loading github files directly.
 
-## source and parse github code
 script <- getURL("https://raw.githubusercontent.com/mabarbour/miscellaneous_R/master/autoplot.custom.R", ssl.verifypeer = FALSE)
 eval(parse(text = script))
 
@@ -53,14 +50,14 @@ bacteria.df <- read.csv("bacteria.df.csv") %>% tbl_df() %>% mutate(Block = as.fa
 b.OTUs <- colnames(select(bacteria.df, -(X:bacteria.rarerich)))
 
 ## load arthropod community data ----
-wind.arth.df <- read.csv('~/Lanphere_Experiments/final_data/wind_arthropod_df.csv') %>%
+wind.arth.df <- read.csv('final_data/wind_arthropod_df.csv') %>%
   tbl_df() %>% #rename(plant_ID = plant_code) %>%
   mutate(Block = as.factor(Block), Year = as.factor(Year), Plot_code = paste(Block, Wind.Exposure, sep = "."))
 
 w.arth.names <- colnames(select(wind.arth.df, Gracilliaridae_miner:Spider))
 
 ## load plant trait data ----
-w.trait.df <- read.csv('~/Lanphere_Experiments/final_data/wind_trait_df.csv') %>% tbl_df() %>% mutate(Block = as.factor(Block), Year = as.factor(Year), Plot_code = paste(Block, Wind.Exposure, sep = "."))
+w.trait.df <- read.csv('final_data/wind_trait_df.csv') %>% tbl_df() %>% mutate(Block = as.factor(Block), Year = as.factor(Year), Plot_code = paste(Block, Wind.Exposure, sep = "."))
 glimpse(w.trait.df)
 
 ## combine datasets into data frame ----
@@ -158,18 +155,17 @@ fixef(bact.rarerich.2013)
 sem.model.fits(bact.rarerich.2013)
 
 # for an unknown reason, I receive an error when I try to include all of the models together. I'm going to work around this by manually calculating Fisher's C, df, and P-value.
-mods.rarerich <- list(traitPC1.2013, traitPC2.2013, soilPC1.2013, soilPC2.2013, rootCN.2013, fung.rarerich.2013, bact.rarerich.2013)#, arth.rarerich.2013)
-mods.rarerich2 <- list(traitPC1.2013, traitPC2.2013, soilPC1.2013, soilPC2.2013, arth.rarerich.2013) 
+mods.rarerich <- list(traitPC1.2013, traitPC2.2013, soilPC1.2013, soilPC2.2013, rootCN.2013, fung.rarerich.2013, bact.rarerich.2013) #, rootCN.2013,
+mods.rarerich2 <- list(traitPC1.2013, traitPC2.2013, soilPC1.2013, soilPC2.2013, arth.rarerich.2013) #, rootCN.2013,
 
-sem.fit(mods.rarerich, data = w.SEM.2013, corr.errors = c("fungal.rarerich~~bacteria.rarerich", "trait.PC1~~trait.PC2","soil.PC1~~soil.PC2")) # adequate fit to the data: Fisher.C = 22.26, df = 38, P = 0.98; AIC = 174.26, AICc = 6026.26, K = 76, n = 79
-sem.fit(mods.rarerich2, data = w.SEM.2013, corr.errors = c("trait.PC1~~trait.PC2","soil.PC1~~soil.PC2"))
+sem.fit(mods.rarerich, data = w.SEM.2013, corr.errors = c("fungal.rarerich~~bacteria.rarerich","trait.PC1~~trait.PC2","soil.PC1~~soil.PC2")) # adequate fit to the data: Fisher.C = 22.26, df = 38, P = 0.98; AIC = 174.26, AICc = 6026.26, K = 76, n = 79
+#sem.fit(mods.rarerich2, data = w.SEM.2013, corr.errors = c("trait.PC1~~trait.PC2","soil.PC1~~soil.PC2"))
 
 rarerich.sem <- sem.missing.paths(mods.rarerich, w.SEM.2013, corr.errors = c("fungal.rarerich~~bacteria.rarerich","trait.PC1~~trait.PC2","soil.PC1~~soil.PC2"), conditional = TRUE) %>% 
   rbind.data.frame(., sem.missing.paths(mods.rarerich2, data = w.SEM.2013, corr.errors = c("trait.PC1~~trait.PC2","soil.PC1~~soil.PC2"), conditional = TRUE)[-c(1,2), ]) # remove overlapping missing paths
 
-rarerich.sem.C <- -2*sum(log(rarerich.sem$p.value)) # Fisher.C = 22.32
-rarerich.df <- 2 * length(rarerich.sem$p.value)*2 # df = 32
-1 - pchisq(rarerich.sem.C, rarerich.df) # P = 0.899
+rarerich.sem.C <- -2*sum(log(rarerich.sem$p.value)) # Fisher.C = 21.17
+1 - pchisq(rarerich.sem.C, 2 * length(rarerich.sem$p.value)) # df = 32, P = 0.928
 
 #mods.rarerich.coefs <- sem.coefs(mods.rarerich2, data = w.SEM.2013, corr.errors = c("fungal.rarerich~~bacteria.rarerich","trait.PC1~~trait.PC2","soil.PC1~~soil.PC2"), standardize = "none")
 #mods.rarerich.coefs <- mutate(mods.rarerich.coefs, plot.scale = estimate*25)
@@ -244,7 +240,7 @@ w.arth.hell.rda.wind <- rda(w.arth.hell.plots.df[ ,1:10] ~ Condition(Block) + Wi
 anova(w.arth.hell.rda.wind, by = "margin",permuations = how(block = w.arth.hell.plots.df$Block, nperm = 999))  # suggest that wind exposure did not have a direct effect on community composition (after accounting for indirect effects on plant traits).
 
 ## Wind: fungal community assembly ----
-fungal.df.mech <- left_join(fungal.df, select(filter(w.trait.df, Year == "2013"), plant_ID, root_CN)) %>% left_join(., select(w.soil, Plot_code, soil.PC1, soil.PC2)) %>% left_join(select(filter(w.trait.df, Year == "2013"), plant_ID, trait.PC1, trait.PC2))
+fungal.df.mech <- left_join(fungal.df, select(filter(w.trait.df, Year == "2013"), plant_ID, root_CN, trait.PC1, trait.PC2)) %>% left_join(., select(w.soil, Plot_code, soil.PC1, soil.PC2)) %>% left_join(., chem.data)
 
 fungal.df.mech.rootCNsub <- filter(fungal.df.mech, root_CN > 0)
 
@@ -273,8 +269,12 @@ adonis(f.hell.mech.rootCNsub ~ soil.PC1 + soil.PC2 + root_CN, data = fungal.df.m
 
 adonis(f.hell.mech.rootCNsub ~ soil.PC1 + soil.PC2 + root_CN + Genotype, data = fungal.df.mech.rootCNsub, permutations = how(block = fungal.df.mech.rootCNsub$Block, nperm = 999), method = "euclidean") # test whether Genotype still has an effect after accounting for these factors.nGenotype effect is significant after accounting for all of the factors, suggesting we don't know what is mediating the assembly of the fungal community.
 
-# do not appear to be any correlated effects of aboveground plant traits, such as trait.PC1 and trait.PC2 which we know is strongly controlled by plant genotype.
-adonis(f.hell.mech.rootCNsub ~ soil.PC1 + soil.PC2 + root_CN + trait.PC1 + trait.PC2, data = fungal.df.mech.rootCNsub, permutations = how(block = fungal.df.mech.rootCNsub$Block, nperm = 999), method = "euclidean") 
+# test the effect of other plant chemical traits
+adonis(f.hell.mech.rootCNsub ~ soil.PC1 + soil.PC2 + root_CN + cinn.PC1 + flavonOLES.PC1 + flavanonOLES.PC1, data = fungal.df.mech.rootCNsub, permutations = how(block = fungal.df.mech.rootCNsub$Block, nperm = 999), method = "euclidean") # test whether Genotype still has an effect after accounting for these factors.nGenotype effect is significant after accounting for all of the factors, suggesting we don't know what is mediating the assembly of the fungal community.
+adonis(f.hell.mech.rootCNsub ~ soil.PC1 + soil.PC2 + root_CN + cinn.PC1 + flavanonOLES.PC1  + flavonOLES.PC1, data = fungal.df.mech.rootCNsub, permutations = how(block = fungal.df.mech.rootCNsub$Block, nperm = 999), method = "euclidean") # test whether Genotype still has an effect after accounting for these factors.nGenotype effect is significant after accounting for all of the factors, suggesting we don't know what is mediating the assembly of the fungal community.
+adonis(f.hell.mech.rootCNsub ~ soil.PC1 + soil.PC2 + root_CN + flavonOLES.PC1 + flavanonOLES.PC1 + cinn.PC1, data = fungal.df.mech.rootCNsub, permutations = how(block = fungal.df.mech.rootCNsub$Block, nperm = 999), method = "euclidean") # test whether Genotype still has an effect after accounting for these factors.nGenotype effect is significant after accounting for all of the factors, suggesting we don't know what is mediating the assembly of the fungal community.
+#adonis(f.hell.mech.rootCNsub ~ soil.PC1 + soil.PC2 + root_CN + flavonOLES.PC1 + flavanonOLES.PC1 + cinn.PC1 + trait.PC2 + trait.PC1, data = fungal.df.mech.rootCNsub, permutations = how(block = fungal.df.mech.rootCNsub$Block, nperm = 999), method = "euclidean") # test whether Genotype still has an effect after accounting for these factors.nGenotype effect is significant after accounting for all of the factors, suggesting we don't know what is mediating the assembly of the fungal community.
+#adonis(f.hell.mech.rootCNsub ~ soil.PC1 + soil.PC2 + root_CN + flavonOLES.PC1 + flavanonOLES.PC1 + cinn.PC1 + trait.PC1 + trait.PC2, data = fungal.df.mech.rootCNsub, permutations = how(block = fungal.df.mech.rootCNsub$Block, nperm = 999), method = "euclidean") # test whether Genotype still has an effect after accounting for these factors.nGenotype effect is significant after accounting for all of the factors, suggesting we don't know what is mediating the assembly of the fungal community.
 
 #anova(w.f.mech.rootCN.rda, by = "term", permutations = how(block = fungal.df.mech.rootCNsub$Block, nperm = 999)) # 
 
@@ -307,10 +307,10 @@ anova(w.b.soil.rda, by = "margin",  permutations = how(block = w.b.plots.centr.h
 adonis(b.hell.mech.rootCNsub ~ soil.PC1 + soil.PC2 + root_CN, data = bacteria.df.mech.rootCNsub, method = "euclidean", permutations = how(block = bacteria.df.mech.rootCNsub$Block, nperm = 999)) # effect of root C:N is marginal (explains 1% of variance)
 
 ## Ant-aphid: SEM data management ----
-aa.arth.df <- read.csv('~/Lanphere_Experiments/final_data/ant_aphid_arthropod_df.csv') %>% tbl_df() %>% mutate(Block = as.factor(Block), fact.Ant.mound.dist = as.factor(Ant.mound.dist)) %>% select(-X)
+aa.arth.df <- read.csv('final_data/ant_aphid_arthropod_df.csv') %>% tbl_df() %>% mutate(Block = as.factor(Block), fact.Ant.mound.dist = as.factor(Ant.mound.dist)) %>% select(-X)
 aa.arth.names <- colnames(select(aa.arth.df, Gracilliaridae_miner:Spider))
 
-aa.trait.df <- read.csv('~/Lanphere_Experiments/final_data/ant_aphid_trait_df.csv') %>% tbl_df() %>% #mutate(fact.Ant.Mound.Dist = as.factor(Ant.mound.dist), Plot_code = paste(Block, Ant.mound.dist, sep = "_"), Block = as.factor(Block)) %>% 
+aa.trait.df <- read.csv('final_data/ant_aphid_trait_df.csv') %>% tbl_df() %>% #mutate(fact.Ant.Mound.Dist = as.factor(Ant.mound.dist), Plot_code = paste(Block, Ant.mound.dist, sep = "_"), Block = as.factor(Block)) %>% 
   filter(Year == "2012") %>% select(plant_ID, trait.PC1, trait.PC2)
 
 aa.mech.df <- left_join(aa.arth.df, aa.trait.df)
@@ -321,6 +321,18 @@ aa.vars <- colnames(select(aa.SEM.df, Ant.mound.dist:trait.PC2))
 aa.SEM.df[ ,aa.vars] <- scale(aa.SEM.df[ ,aa.vars])
 
 p.scale <- 15
+
+# upload garden chemistry data to try and explain Genotype effects
+garden.data <- read.csv('herb.trait.data.csv') # downloaded from dryad
+filter.genos <- c("U","I","T","G","J","X","W","S","F","L")
+
+chem.data <- garden.data %>% 
+  filter(Genotype %in% filter.genos) %>% 
+  select(Genotype, C_N_imputed, sal_tannin.PC1:flavanonOLES.PC1) %>%
+  group_by(Genotype) %>%
+  summarise_all(funs(mean(., na.rm = TRUE)))
+
+aa.SEM.df <- left_join(aa.SEM.df, chem.data) %>% mutate(Genotype = as.factor(Genotype))
 
 ## Ant-aphid SEM: richness ----
 # We only observed an effect of willow genotype on arthropod richness, therefore, we only modelled the indirect effects of willow genotype on richness mediated through plant traits.
@@ -334,6 +346,15 @@ fixef(aa.arth.rich.2012)*p.scale
 aa.arth.rich.2012.Gmiss <- lmerTest::lmer(total.rich ~ trait.PC1 + trait.PC2 + Genotype + (1|Block) + (1|Block:fact.Ant.mound.dist), aa.SEM.df, contrasts = list(Genotype = "contr.sum"))
 sd(fixef(aa.arth.rich.2012.Gmiss)[-(1:3)]) # missing Genotype SD = 0.38
 sd(fixef(aa.arth.rich.2012.Gmiss)[-(1:3)])*p.scale # plot scale = 5.6
+sem.model.fits(aa.arth.rich.2012.Gmiss)
+
+# can I explain genotype effect with chemistry data? I started with all of the chemical trait principle components and only kept those that were significant.
+aa.arth.rich.2012.chem <- lmerTest::lmer(total.rich ~ trait.PC1 + trait.PC2 + cinn.PC1 + flavanonOLES.PC1 + (1|Block) + (1|Block:fact.Ant.mound.dist), aa.SEM.df)
+summary(aa.arth.rich.2012.chem)
+anova(aa.arth.rich.2012.chem, ddf = "Kenward-Roger", type = 2)
+sem.model.fits(aa.arth.rich.2012.chem)
+
+anova(aa.arth.rich.2012, aa.arth.rich.2012.chem, aa.arth.rich.2012.Gmiss) # slightly better AIC and much better BIC for the chemical models.
 
 aa.traitPC1.2012 <- lmerTest::lmer(trait.PC1 ~ Genotype + (1|Block) + (1|Block:fact.Ant.mound.dist), aa.SEM.df, contrasts = list(Genotype = "contr.sum"))
 sd(fixef(aa.traitPC1.2012)[-1]) # Genotype SD = 0.39
@@ -388,6 +409,13 @@ aa.aphis.2012.treats.Gmiss <- lmerTest::lmer(aphid_Aphis ~ num.Aphid*Ant.mound.d
 sd(fixef(aa.aphis.2012.treats.Gmiss)[-(c(1:5,15))]) # Genotype SD = 0.28
 sd(fixef(aa.aphis.2012.treats.Gmiss)[-(c(1:5,15))])*p.scale # plot scale = 4.3
 
+# can I explain genotype effect with chemistry data? I started with all of the chemical trait principle components and only kept those that with P < 0.10
+aa.aphis.2012.treats.CHEM <- lmerTest::lmer(aphid_Aphis ~ num.Aphid*Ant.mound.dist + trait.PC1 + trait.PC2 + cinn.PC1 + flavonOLES.PC2  + (1|Block) + (1|Block:fact.Ant.mound.dist), aa.SEM.df) # added Ant.mound.dist because this was one of the interactive effects driving total abundance
+summary(aa.aphis.2012.treats.CHEM)
+anova(aa.aphis.2012.treats.CHEM, ddf = "Kenward-Roger", type = 2)
+
+anova(aa.aphis.2012.treats, aa.aphis.2012.treats.CHEM, aa.aphis.2012.treats.Gmiss)
+
 aa.Fobs.2012.dist <- lmerTest::lmer(ant_F_obscuripes ~ aphid_Aphis + Ant.mound.dist + (1|Block) + (1|Block:fact.Ant.mound.dist), aa.SEM.df)
 sem.model.fits(aa.Fobs.2012) # marginal R2 = 0.18
 
@@ -401,7 +429,7 @@ aa.arth.abund.2012.add <- lmerTest::lmer(total.abund ~ ant_F_obscuripes + aphid_
 summary(aa.arth.abund.2012.add) # p-values of 0.000944 after accounting for significance of main effects
 0.188881*p.scale # 2.83 plot scale
 
-aa.traitPC1.2012.add <- lmerTest::lmer(trait.PC1 ~ Genotype + num.Aphid*Ant.mound.dist + (1|Block) + (1|Block:fact.Ant.mound.dist), aa.SEM.df, contrasts = list(Genotype = "contr.sum"))
+aa.traitPC1.2012.add <- lmerTest::lmer(trait.PC1 ~ Genotype + num.Aphid*Ant.mound.dist + (1|Block) + (1|Block:fact.Ant.mound.dist), aa.SEM.df, contrasts = list(Genotype = "contr.Sum"))
 summary(aa.traitPC1.2012.add) # 0.854631, interactive effect is not significant after accounting for main effects (maintaining marginality)
 
 aa.traitPC2.2012.add <- lmerTest::lmer(trait.PC2 ~ Genotype + num.Aphid*Ant.mound.dist + (1|Block) + (1|Block:fact.Ant.mound.dist), aa.SEM.df, contrasts = list(Genotype = "contr.sum"))
@@ -423,22 +451,32 @@ with(aa.mech.df, cor.test(Formica_ant, aphid_Aphis))
 with(aa.mech.df, cor.test((Syrphidae + Formica_ant + Spider), aphid_Aphis)) # higher correlation with just Formica_ants
 
 ## Ant-aphid: arthropod composition mechanisms ----
-aa.arth.hell.mech.df <- filter(aa.mech.df, total.abund > 1) %>% rename(A_farinosa_abund = aphid_Aphis, F_obscuripes_abund = ant_F_obscuripes, Trait_PC1 = trait.PC1, Trait_PC2 = trait.PC2)
+aa.arth.hell.mech.df <- filter(aa.mech.df, total.abund > 1) %>% rename(A_farinosa_abund = aphid_Aphis, F_obscuripes_abund = ant_F_obscuripes, Trait_PC1 = trait.PC1, Trait_PC2 = trait.PC2) %>% 
+  left_join(., chem.data) %>% mutate(Genotype = as.factor(Genotype))
 
 aa.arth.hell <- decostand(aa.arth.hell.mech.df[ ,aa.arth.names], method = "hellinger")
 
 # test effect of F obscuripes 
-aa.hell.mech.rda <- rda(aa.arth.hell ~ A_farinosa_abund + F_obscuripes_abund + Trait_PC1 + Trait_PC2, data = aa.arth.hell.mech.df) # nonsig.
+aa.hell.mech.rda <- rda(aa.arth.hell ~ F_obscuripes_abund + A_farinosa_abund*(Trait_PC1 + Trait_PC2), data = aa.arth.hell.mech.df) # nonsig.
 vif(aa.hell.mech.rda) # multicollinearity shouldn't be a problem
 summary(aa.hell.mech.rda)
 anova(aa.hell.mech.rda, by = "margin", permutations = how(block = aa.arth.hell.mech.df$Block, nperm = 999))
+anova(update(aa.hell.mech.rda, .~. -A_farinosa_abund:Trait_PC1 -A_farinosa_abund:Trait_PC2), by = "margin", permutations = how(block = aa.arth.hell.mech.df$Block, nperm = 999))
 
-aa.hell.mech.p <- autoplot.custom(aa.hell.mech.rda, scaling = 3, color = "grey") + scale_shape_manual(values = 21) + scale_color_manual(values = "grey") + theme(legend.position = "none") + xlab("RDA 1 (2%)") + ylab("RDA 2 (1%)") + scale_x_continuous(limits = c(-0.8,1.3))
+#aa.hell.mech.p <- autoplot.custom(aa.hell.mech.rda, scaling = 3, color = "grey") + scale_shape_manual(values = 21) + scale_color_manual(values = "grey") + theme(legend.position = "none") + xlab("RDA 1 (2%)") + ylab("RDA 2 (1%)") + scale_x_continuous(limits = c(-0.8,1.3))
 
-save_plot("fig_aa_comm_mech.png", aa.hell.mech.p, base_height = 5, base_width = 5)
+#save_plot("fig_aa_comm_mech.png", aa.hell.mech.p, base_height = 5, base_width = 5)
 
 # test remainder effect of genotype*aphid interaction
 RsquareAdj(update(aa.hell.mech.rda, .~. + Genotype*Aphid.treatment))
 anova(update(aa.hell.mech.rda, .~. + Genotype*Aphid.treatment), by = "margin", permutations = how(block = aa.arth.hell.mech.df$Block, nperm = 999)) # only interpreting GxE effect. 
 anova(update(aa.hell.mech.rda, .~. + Genotype + Aphid.treatment), by = "margin", permutations = how(block = aa.arth.hell.mech.df$Block, nperm = 999)) # only interpreting G and Aphid.treatment effects.
+
+# playing around with chemical data
+aa.hell.mech.rda <- rda(aa.arth.hell ~ A_farinosa_abund + F_obscuripes_abund + Trait_PC1 + Trait_PC2 + Aphid.treatment*(flavonOLES.PC1 + flavanonOLES.PC1), data = aa.arth.hell.mech.df)#aa.arth.hell.mech.df) 
+vif(aa.hell.mech.rda) 
+summary(aa.hell.mech.rda)
+anova(aa.hell.mech.rda, by = "margin", permutations = how(block = aa.arth.hell.mech.df$Block, nperm = 999))
+RsquareAdj(aa.hell.mech.rda)
+autoplot(aa.hell.mech.rda)
 

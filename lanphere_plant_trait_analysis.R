@@ -5,7 +5,7 @@
 ############################################
 
 #### Load required libraries and fucnctions ----
-source('~/Documents/miscellaneous_R/model_diagnostic_functions.R')
+#source('~/Documents/miscellaneous_R/model_diagnostic_functions.R')
 library(merTools) # must be loaded before dplyr
 library(dplyr)
 library(tidyr)
@@ -16,16 +16,15 @@ library(effects) # calculating mean and confidence intervals of treatment and ge
 library(psych) # for correlation tests
 #library(car) # for Anova function
 #library(broom) # for tidying up model outputs
-library(RCurl) # get code directly from github
 
-## source and parse github code
 script <- getURL("https://raw.githubusercontent.com/mabarbour/miscellaneous_R/master/model_diagnostic_functions.R", ssl.verifypeer = FALSE)
 eval(parse(text = script))
+
 
 #### Load required data sets ----
 
 ## wind plant traits
-w.trait.df <- read.csv('~/Lanphere_Experiments/final_data/wind_trait_df.csv') %>%
+w.trait.df <- read.csv('final_data/wind_trait_df.csv') %>%
   tbl_df() %>%
   mutate(Block = as.factor(Block), # necessary for properly modelling as a random effect.
          Year = as.factor(Year),
@@ -35,8 +34,13 @@ w.trait.df <- read.csv('~/Lanphere_Experiments/final_data/wind_trait_df.csv') %>
          #Plot_code = paste(Block, treat.tmp, sep = "."),
          #Sample = paste(Block, treat.tmp, genotype, plant.position, sep = ""))
 glimpse(w.trait.df)
-summary(w.trait.df$Height)
 
+C_N_test <- w.trait.df %>% group_by(Genotype) %>% summarise(avg.leaf_CN = mean(leaf_C_N, na.rm = TRUE)) %>%
+  left_join(., chem.data)
+
+plot(avg.leaf_CN ~ C_N_imputed, C_N_test)
+cor.test(C_N_test$avg.leaf_CN, C_N_test$C_N_imputed)
+summary(lm(avg.leaf_CN ~ C_N_imputed, C_N_test))
 ## wind soil properties
 #w.soil <- read.csv('final_data/wind_soil_df.csv') %>%
  # tbl_df() 
@@ -84,7 +88,7 @@ summary(w.trait.df$Height)
 #w.trait.df$Year <- as.factor(w.trait.df$Year)
 
 ## ant-aphid above-ground plant traits
-aa.trait.df <- read.csv('~/Lanphere_Experiments/final_data/ant_aphid_trait_df.csv') %>%
+aa.trait.df <- read.csv('~/Documents/Lanphere_Experiments/final_data/ant_aphid_trait_df.csv') %>%
   tbl_df() %>%
   filter(Year == "2012") %>%
   mutate(fact.Ant.mound.dist = as.factor(Ant.mound.dist), # necessary for modelling as a random effect
@@ -93,7 +97,6 @@ aa.trait.df <- read.csv('~/Lanphere_Experiments/final_data/ant_aphid_trait_df.cs
          Plot_code = paste(Block, Ant.mound.dist, sep = "_")) %>%
   select(-Year)
 glimpse(aa.trait.df)
-summary(aa.trait.df$Height)
 
 #aa.soil <- read.csv('final_data/ant_aphid_soil_2013.csv') %>%
  # tbl_df() 
@@ -139,6 +142,7 @@ plot(height.lmer) # diamond shaped...
 
 # Effects
 Effect(c("Wind.Exposure","Genotype","Year"), height.lmer)
+plot(Effect(c("Wind.Exposure","Genotype","Year"), height.lmer))
 Effect(c("Wind.Exposure","Year"), height.lmer) # effect of unexposed plots increased from 1.2-fold in 2012 to 2-fold in 2013.
 Effect(c("Year"), height.lmer) # plants were 39% shorter in 2013 vs. 2012. 
 Effect(c("Wind.Exposure"), height.lmer) # plants were 29% shorter in unexposed plots
