@@ -1,4 +1,0 @@
-# arthropod morgue
-aa.GxE.df <- as.data.frame(Effect(c("Aphid.treatment","Genotype"), aa.arth.rich.glmer)) 
-levels(aa.GxE.df$Aphid.treatment)[1:2] <- c("Aphids","None")
-aa.rGE <- ggplot(aa.GxE.df, aes(x = Aphid.treatment, y = fit, group = Genotype, color = Genotype, shape = Aphid.treatment, fill = Genotype)) + geom_line(size = l.size) + geom_point(size = p.size)  + scale_color_manual(values = cbPal.10) + scale_fill_manual(values = cbPal.10) +scale_shape_manual(values = c(23,21)) + ylab("No. of species") + xlab("Aphid addition")+ theme(legend.position = "none") + ggtitle("Arthropods") #+ scale_y_log10(breaks = c(0,1,2,3,4))
