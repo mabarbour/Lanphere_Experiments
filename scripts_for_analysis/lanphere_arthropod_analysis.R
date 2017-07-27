@@ -5,7 +5,7 @@
 ############################################
 
 ## load required libraries ----
-source('~/Documents/miscellaneous_R/model_diagnostic_functions.R')
+#source('~/Documents/miscellaneous_R/model_diagnostic_functions.R')
 library(merTools) # must load before dplyr since this package requires 'MASS' which requires 'plyr'
 library(dplyr)
 library(tidyr)
@@ -19,17 +19,23 @@ library(effects)
 library(ggplot2)
 library(cowplot)
 
+library(RCurl) # for loading github files directly.
+
+script <- getURL("https://raw.githubusercontent.com/mabarbour/miscellaneous_R/master/autoplot.custom.R", ssl.verifypeer = FALSE)
+eval(parse(text = script))
+
+
 ## upload datasets ----
 
 ## ant-aphid: aphid growth rates
-aa.aphid.GR <- read.csv("~/Documents/Lanphere_Experiments/final_data/ant_aphid_Aphis_popgrowth_df.csv") %>%
+aa.aphid.GR <- read.csv('final_data/ant_aphid_Aphis_popgrowth_df.csv') %>%
   tbl_df() %>%
   mutate(Block = as.factor(Block)) %>%
   select(Date_rel:plant_ID, Aphis.growth.rate)
 glimpse(aa.aphid.GR)
 
 ## ant-aphid: arthropod community
-aa.arth.df <- read.csv('~/Documents/Lanphere_Experiments/final_data/ant_aphid_arthropod_df.csv') %>%
+aa.arth.df <- read.csv('final_data/ant_aphid_arthropod_df.csv') %>%
   tbl_df() %>%
   mutate(#Ants_all = ant_F_obscuripes + ant_black,
          #Aphids_nonAphis = aphid_Tuberolachnus + aphid_LG,
@@ -106,7 +112,7 @@ aa.arth.12.pos <- aa.arth.df %>%
 
 ## wind: arthropod community
 # dead plants have already been removed
-wind.arth.df <- read.csv('~/Documents/Lanphere_Experiments/final_data/wind_arthropod_df.csv') %>%
+wind.arth.df <- read.csv('final_data/wind_arthropod_df.csv') %>%
   tbl_df() %>%
   mutate(X = as.factor(X),
          Block = as.factor(Block),
