@@ -323,7 +323,7 @@ aa.SEM.df[ ,aa.vars] <- scale(aa.SEM.df[ ,aa.vars])
 p.scale <- 15
 
 # upload garden chemistry data to try and explain Genotype effects
-garden.data <- read.csv('herb.trait.data.csv') # downloaded from dryad
+garden.data <- read.csv('final_data/herb.trait.data.csv') # downloaded from dryad
 filter.genos <- c("U","I","T","G","J","X","W","S","F","L")
 
 chem.data <- garden.data %>% 

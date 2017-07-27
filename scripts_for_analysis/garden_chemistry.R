@@ -1,6 +1,6 @@
 library(tidyverse)
 
-garden.data <- read_csv('herb.trait.data.csv') # downloaded from dryad
+garden.data <- read_csv('final_data/herb.trait.data.csv') # downloaded from dryad
 filter.genos <- c("U","I","T","G","J","X","W","S","F","L")
 
 base <- ggplot(garden.data %>% filter(Genotype %in% filter.genos), aes(x = Genotype))
