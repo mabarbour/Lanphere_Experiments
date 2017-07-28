@@ -12,13 +12,13 @@ library(missMDA) # for imputing missing values in PCA
 #### Manage Wind data ----
 
 ## upload wind plant info ----
-wind_plant_info <- read.csv("~/Documents/Lanphere_Experiments/wind_experiment/data/wind_plant_info.csv") %>%
+wind_plant_info <- read.csv("manage_raw_data/raw_data/wind_plant_info.csv") %>%
   tbl_df() %>%
   mutate(block = as.factor(block)) %>%
   select(block, treatment, genotype, plant.position, plant.id)
 
 ## plant architecture 2012 ----
-wind.arch2012 <- read.csv("~/Documents/Lanphere_Experiments/wind_experiment/data/wind_plant_traits_field_summer_2012.csv") %>%
+wind.arch2012 <- read.csv("manage_raw_data/raw_data/wind_plant_traits_field_summer_2012.csv") %>%
   tbl_df() %>%
   mutate(treatment = ifelse(Wind.Exposure == "Exposed", "E", "U"),
          plant.id = paste0(Block,treatment,Plant.Position))
@@ -37,7 +37,7 @@ wind.arch2012 <- wind.arch2012 %>%
   mutate(all.shoot.count = mature.shoot.count + immature.shoot.count)
 
 ## leaf wet weights 2012 ----
-wind.WetLeafWts.2012 <- read.csv("~/Documents/Lanphere_Experiments/wind_experiment/data/Wind leaf trait data.csv") %>%
+wind.WetLeafWts.2012 <- read.csv("manage_raw_data/raw_data/Wind leaf trait data.csv") %>%
   tbl_df() %>%
   .[-which(.$Collection.Number %in% 
              names(which(table(.$Collection.Number) > 1))), ] %>% # removes all duplicates
@@ -53,7 +53,7 @@ wind.WetLeafWts.2012 <- wind.WetLeafWts.2012 %>%
          leaf_percent.browned = Percent.Browned)
 
 ## leaf trichome densities 2012 ----
-wind.trichomes.2012 <- read.csv("~/Documents/Lanphere_Experiments/wind_experiment/data/Trichome Density - Wind Experiment 2012.csv", skip = 1) %>%
+wind.trichomes.2012 <- read.csv("manage_raw_data/raw_data/Trichome Density - Wind Experiment 2012.csv", skip = 1) %>%
   tbl_df() %>% 
   .[-c(9,89), ] %>% # remove NA6.10 (unknown treatment) and U7.9-2 (duplicate sample)
   .[-which(.$Collection.No. %in% names(which(table(.$Collection.No.) > 1))), ] %>% # removes all duplicates
@@ -64,7 +64,7 @@ wind.trichomes.2012 <- read.csv("~/Documents/Lanphere_Experiments/wind_experimen
   select(plant.id, leaf_trichome.density = Trichome.Density) 
 
 ## leaf dry weights 2012 ----
-wind.DryLeafWt.2012 <- read.csv("~/Documents/Lanphere_Experiments/wind_experiment/data/Leaf Weights - Dry - Wind Experiment 2012.csv", skip = 1) %>%
+wind.DryLeafWt.2012 <- read.csv("manage_raw_data/raw_data/Leaf Weights - Dry - Wind Experiment 2012.csv", skip = 1) %>%
   tbl_df() %>%
   .[-c(38,112), ] %>% # remove U7.9-2 (duplicate sample) and NA6.10 (unknown treatment)
   .[-which(.$Collection.No. %in% names(which(table(.$Collection.No.) > 1))), ] %>% # removes all duplicates
@@ -103,7 +103,7 @@ trait.PCA.12$rotation # high values of PC1 indicate larger plants, high values o
 wind.traits.2012 <- mutate(wind.traits.2012, trait.PC1 = trait.PCA.12$x[ ,"PC1"], trait.PC2 = trait.PCA.12$x[ ,"PC2"])
 
 ## plant architecture 2013 ----
-wind.arch2013 <- read.csv("~/Documents/Lanphere_Experiments/wind_experiment/data/wind_plant_growth_data_July10_2013.csv", skip = 1) %>%
+wind.arch2013 <- read.csv("manage_raw_data/raw_data/wind_plant_growth_data_July10_2013.csv", skip = 1) %>%
   tbl_df() %>%
   mutate(treatment = ifelse(Wind.Exposure == "Exposed", "E", "U"),
          plant.id = paste0(Block,treatment,Plant.Position))
@@ -118,7 +118,7 @@ wind.arch2013 <- wind.arch2013 %>%
          all.shoot.total.length, all.shoot.avg.length, all.shoot.count)
 
 ## leaf dry weight 2013 ----
-wind.drywt.2013 <- read.csv("~/Documents/Lanphere_Experiments/wind_experiment/data/SLA_leaf_wts_2013.csv") %>%
+wind.drywt.2013 <- read.csv("manage_raw_data/raw_data/SLA_leaf_wts_2013.csv") %>%
   .[-which(.$plant.code %in% names(which(table(.$plant.code) > 1))), ] %>% # removes all duplicates
   tbl_df() %>%
   mutate(plant.code.tmp = gsub("u","U",plant.code)) %>%
@@ -127,7 +127,7 @@ wind.drywt.2013 <- read.csv("~/Documents/Lanphere_Experiments/wind_experiment/da
 wind.drywt.2013[which(wind.drywt.2013$plant.id == "3E6"), "leaf_dry.wt.g"] <- 0.0446 # type double checked with data.
 
 ## leaf wet weight 2013 ----
-wind.wetwt.2013 <- read.csv("~/Documents/Lanphere_Experiments/wind_experiment/data/wet_leaf_weights_wind_experiment_2013.csv") %>%
+wind.wetwt.2013 <- read.csv("manage_raw_data/raw_data/wet_leaf_weights_wind_experiment_2013.csv") %>%
   tbl_df() %>%
   mutate(Treat.tmp = ifelse(treatment == "u", "U", "E"),
          plant.id = paste0(block,Treat.tmp,position)) %>%
@@ -135,7 +135,7 @@ wind.wetwt.2013 <- read.csv("~/Documents/Lanphere_Experiments/wind_experiment/da
   .[-which(.$plant.id %in% names(which(table(.$plant.id) > 1))), ] # removes all duplicates
 
 ## leaf area 2013 ----
-wind.leafarea.2013 <- read.csv("~/Documents/Lanphere_Experiments/wind_experiment/data/Wind_Leaf_Scans_July_2013.csv") %>%
+wind.leafarea.2013 <- read.csv("manage_raw_data/raw_data/Wind_Leaf_Scans_July_2013.csv") %>%
   .[-which(.$plant.code %in% names(which(table(.$plant.code) > 1))), ] %>% # removes all duplicates
   .[-103, ] %>% # innaccurate leaf measurement so I removed it.
   tbl_df() %>%
@@ -143,25 +143,25 @@ wind.leafarea.2013 <- read.csv("~/Documents/Lanphere_Experiments/wind_experiment
   select(plant.id, leaf_area.mm2 = leaf.area.mm2) 
 
 ## manage C:N data 2013 ----
-batch1 <- read.csv("~/Documents/Lanphere_Experiments/wind_experiment/data/C_N_data/Lanphere_Wind_run_1_results_CN.csv", stringsAsFactors = FALSE)
+batch1 <- read.csv("manage_raw_data/raw_data/Lanphere_Wind_run_1_results_CN.csv", stringsAsFactors = FALSE)
 colnames(batch1) <- c("sample.time","unknown.variable", "sample.id", "sample.amount.mg", "N.reten.time.min","N.weight.mg","N.weight.percent","C.reten.time.min","C.weight.mg","C.weight.percent")
 batch1 <- batch1[-1, ] # remove first line which has no data
 batch1$sample.id[which(batch1$sample.amount.mg == 5.15)] <- "3E01" # typo that I double checked with the original data.
 
-batch2 <- read.csv("~/Documents/Lanphere_Experiments/wind_experiment/data/C_N_data/Lanphere_Wind_run_2_results_CN.csv", stringsAsFactors = FALSE) # unknown why there is a warning error, loaded data looks okay
+batch2 <- read.csv("manage_raw_data/raw_data/Lanphere_Wind_run_2_results_CN.csv", stringsAsFactors = FALSE) # unknown why there is a warning error, loaded data looks okay
 colnames(batch2) <- c("sample.time","unknown.variable", "sample.id", "sample.amount.mg", "N.reten.time.min","N.weight.mg","N.weight.percent","C.reten.time.min","C.weight.mg","C.weight.percent")
 batch2 <- batch2[-1, ]
 batch2$sample.id[2:3] <- c("6E1","2E5") # changed them to their appropriate ID
 
-batch3 <- read.csv("~/Documents/Lanphere_Experiments/wind_experiment/data/C_N_data/Lanphere_Wind_run_3_results_CN.csv", stringsAsFactors = FALSE)
+batch3 <- read.csv("manage_raw_data/raw_data/Lanphere_Wind_run_3_results_CN.csv", stringsAsFactors = FALSE)
 colnames(batch3) <- c("sample.time","unknown.variable", "sample.id", "sample.amount.mg", "N.reten.time.min","N.weight.mg","N.weight.percent","C.reten.time.min","C.weight.mg","C.weight.percent","possible.switch","notes")
 batch3 <- batch3[-c(1,15,16), ] # also removed the ones that may have been possibly switched
 
-batch4 <- read.csv("~/Documents/Lanphere_Experiments/wind_experiment/data/C_N_data/Lanphere_wind_run_4_results_CN.csv", stringsAsFactors = FALSE)
+batch4 <- read.csv("manage_raw_data/raw_data/Lanphere_wind_run_4_results_CN.csv", stringsAsFactors = FALSE)
 colnames(batch4) <- c("sample.time","unknown.variable", "sample.id", "sample.amount.mg", "N.reten.time.min","N.weight.mg","N.weight.percent","C.reten.time.min","C.weight.mg","C.weight.percent")
 batch4$sample.id[c(5,8,11,14,17,19,20,23,25,27,30,31,32)] <- c("1E4","1E9","7E1","2E2","5E1","4E8","3E3","5E5","1E10","3E8","7E3","2E9","6E6") # changed them to their appropriate ID
 
-batch7 <- read.csv("~/Documents/Lanphere_Experiments/wind_experiment/data/C_N_data/Lanphere_wind_run_7_results_CN.csv", stringsAsFactors = FALSE)
+batch7 <- read.csv("manage_raw_data/raw_data/Lanphere_wind_run_7_results_CN.csv", stringsAsFactors = FALSE)
 colnames(batch7) <- c("sample.time","unknown.variable", "sample.id", "sample.amount.mg", "N.reten.time.min","N.weight.mg","N.weight.percent","C.reten.time.min","C.weight.mg","C.weight.percent")
 batch7 <- batch7[-c(1:42), ] # removed samples that were not part of the wind experiment
 
@@ -179,7 +179,7 @@ C_N_combined <- combined[-c(row.remove, duplicate.samples), ] %>% # removes unec
          leaf_C.perc = C.weight.percent, leaf_N.perc = N.weight.percent)
 
 ## spodoptera experiment #1 2013 ----
-spod.1 <- read.csv("~/Documents/Lanphere_Experiments/wind_experiment/data/spodoptera/spodoptera_herbivory_wind_experiment_1.csv", skip = 1) %>%
+spod.1 <- read.csv("manage_raw_data/raw_data/spodoptera_herbivory_wind_experiment_1.csv", skip = 1) %>%
   tbl_df() %>%
   filter(missing.larva != "missing_larva") %>%
   mutate(treatment = ifelse(treatment == "e", "E", "U"),
@@ -189,7 +189,7 @@ spod.1 <- read.csv("~/Documents/Lanphere_Experiments/wind_experiment/data/spodop
          larva.survival.exp1 = survival.exp1)
 
 ## spodoptera experiment #2 2013 ----
-spod.2 <- read.csv("~/Documents/Lanphere_Experiments/wind_experiment/data/spodoptera/spodoptera_herbivory_wind_experiment_2.csv", skip = 1) %>%
+spod.2 <- read.csv("manage_raw_data/raw_data/spodoptera_herbivory_wind_experiment_2.csv", skip = 1) %>%
   tbl_df() %>%
   filter(missing.larva != "missing_larva") %>%
   mutate(treatment = ifelse(treatment == "e", "E", "U"),
@@ -199,7 +199,7 @@ spod.2 <- read.csv("~/Documents/Lanphere_Experiments/wind_experiment/data/spodop
          larva.survival.exp2 = survival.exp2)
 
 ## root C:N 2013 ----
-rootCN <- read.csv('Output/RootCNdataLanphereDunes.csv', stringsAsFactors = FALSE) 
+rootCN <- read.csv('manage_raw_data/raw_data/RootCNdataLanphereDunes.csv', stringsAsFactors = FALSE) 
 rootCN[2,"Sample"] <- "1EF3" # double-checked with plant info and this is the correct code
 rootCN[76,"Sample"] <- "10UI6"
 
@@ -259,12 +259,12 @@ wind.traits.df <- wind.traits.df %>% mutate(treat.tmp = ifelse(treatment == "Exp
 #wind.traits.df$Height[which(wind.traits.df$Height > 80)] <- NA # replacing biologically unreasonable values with NA
 #wind.traits.df$leaf_WC[which(wind.traits.df$leaf_WC < 0)] <- NA # replacing biologically unreasonable values with NA
 
-write.csv(wind.traits.df, "~/Documents/Lanphere_Experiments/final_data/wind_trait_df.csv")
+write.csv(wind.traits.df, "final_data/wind_trait_df.csv")
 
 #### Manage ant-aphid data ----
 
 ## ant-aphid setup (plant info) ----
-aa.setup <- read.csv("~/Documents/Lanphere_Experiments/ant_aphid_experiment/data/Ant-Aphid_Experiment_Setup.csv") %>%
+aa.setup <- read.csv("manage_raw_data/raw_data/Ant-Aphid_Experiment_Setup.csv") %>%
   tbl_df() %>% 
   select(Block, Aphid.Treatment = Aphids.or.No.Aphids, 
          Ant.Mound.Dist = Distant.to.Ant.Mound,
@@ -273,7 +273,7 @@ aa.setup <- read.csv("~/Documents/Lanphere_Experiments/ant_aphid_experiment/data
          Block = as.factor(Block))
 
 ## ant-aphid plant architecture data 2012 ----
-aa.arch2012 <- read.csv("~/Documents/Lanphere_Experiments/ant_aphid_experiment/data/ant_aphid_architecture_data_2012.csv") %>% 
+aa.arch2012 <- read.csv("manage_raw_data/raw_data/ant_aphid_architecture_data_2012.csv") %>% 
   tbl_df() %>%
   mutate(plant.id = as.character(paste(Block, Plant.Position, sep = ".")),
          Dead = ifelse(Survived == 1, 0, 1)) %>%
@@ -293,7 +293,7 @@ aa.arch2012 <- aa.arch2012 %>%
          all.shoot.count, mature.shoot.total.length, mature.shoot.avg.length)
 
 ## ant-aphid plant architecture data 2013 ----
-aa.arch2013 <- read.csv("~/Documents/Lanphere_Experiments/ant_aphid_experiment/data/ant_aphid_plant_growth_2013.csv", skip = 1) %>%
+aa.arch2013 <- read.csv("manage_raw_data/raw_data/ant_aphid_plant_growth_2013.csv", skip = 1) %>%
   tbl_df() %>%
   mutate(plant.id = as.character(paste(Block, Plant.Position, sep = ".")))  %>%
   select(plant.id, Dead:X22.shoot.length)
@@ -309,19 +309,19 @@ aa.arch2013 <- aa.arch2013 %>%
   select(plant.id, Dead, Height, all.shoot.total.length, all.shoot.avg.length, all.shoot.count)
 
 ## ant-aphid leaf quality data 2012 ----
-aa.trich2012 <- read.csv("~/Documents/Lanphere_Experiments/ant_aphid_experiment/data/Plant Traits/Trichome Density - Ant-Aphid Experiment 2012.csv") %>%
+aa.trich2012 <- read.csv("manage_raw_data/raw_data/Trichome Density - Ant-Aphid Experiment 2012.csv") %>%
   .[-which(.$Collection.No. %in% names(which(table(.$Collection.No.) > 1))), ] %>% # removes all duplicates
   tbl_df() %>%
   mutate(plant.id = as.character(Collection.No.)) %>%
   select(plant.id, leaf_trichome.density = Trichome.Density)
 
-aa.DryLeafWt2012 <- read.csv("~/Documents/Lanphere_Experiments/ant_aphid_experiment/data/Plant Traits/Leaf Weights - Dry - Ant-Aphid Experiment 2012.csv") %>%
+aa.DryLeafWt2012 <- read.csv("manage_raw_data/raw_data/Leaf Weights - Dry - Ant-Aphid Experiment 2012.csv") %>%
   .[-which(.$Collection.No. %in% names(which(table(.$Collection.No.) > 1))), ] %>% # removes all duplicates
   tbl_df() %>%
   mutate(plant.id = as.character(Collection.No.)) %>%
   select(plant.id, leaf_dry.wt.g = Dry.Leaf.Weight)
 
-aa.WetLeafWt2012 <- read.csv("~/Documents/Lanphere_Experiments/ant_aphid_experiment/data/Plant Traits/Ant-aphid Plant Trait Data.csv") %>% # checked for duplicates and there were none
+aa.WetLeafWt2012 <- read.csv("manage_raw_data/raw_data/Ant-aphid Plant Trait Data.csv") %>% # checked for duplicates and there were none
   tbl_df() %>%
   mutate(plant.id = as.character(Collection.Number)) %>%
   select(plant.id, leaf_wet.wt.g = Wet.Leaf.Weight,
@@ -367,4 +367,4 @@ glimpse(aa.traits.df)
 
 aa.traits.df <- aa.traits.df %>% mutate(plant_ID = paste(Block, Ant.Mound.Dist, Aphid.Treatment, Genotype, Plant_Position, sep = "_")) %>% select(Year, Block, Aphid.treatment = Aphid.Treatment, Ant.mound.dist = Ant.Mound.Dist, Genotype, plant_ID, Height, all.shoot.count, mature.shoot.avg.length, leaf_WC, leaf_trichome.density, trait.PC1, trait.PC2)
 
-write.csv(aa.traits.df, "~/Documents/Lanphere_Experiments/final_data/ant_aphid_trait_df.csv")
+write.csv(aa.traits.df, "final_data/ant_aphid_trait_df.csv")

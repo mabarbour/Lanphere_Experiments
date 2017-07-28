@@ -14,7 +14,7 @@ left_join_NA_to_0 <- function(x, y, ...) {
 ## upload and manage wind experiment data ----
 
 ## wind visual data 2012
-wind.2012.vis <- read.csv("~/Documents/Lanphere_Experiments/wind_experiment/data/arthropod_wind_visual_data_2012.csv") %>%
+wind.2012.vis <- read.csv("manage_raw_data/raw_data/arthropod_wind_visual_data_2012.csv") %>%
   tbl_df() %>%
   mutate(Block = as.factor(Block),
          Year = 2012, Date = "July22") %>%
@@ -43,7 +43,7 @@ wind.2012.vis <- read.csv("~/Documents/Lanphere_Experiments/wind_experiment/data
 glimpse(wind.2012.vis)
 
 ## load leaf miner data for wind 2012 
-wind_leaf_miners <- read.csv("~/Documents/Lanphere_Experiments/wind_experiment/data/wind_dissections_leaf_miner_summer_2012.csv", stringsAsFactors=F, skip = 1) %>% # this data set focuses on the leaf mining moth, Caloptilia pruniella
+wind_leaf_miners <- read.csv("manage_raw_data/raw_data/wind_dissections_leaf_miner_summer_2012.csv", stringsAsFactors=F, skip = 1) %>% # this data set focuses on the leaf mining moth, Caloptilia pruniella
   tbl_df() %>%
   mutate(plant_code = paste(Treatment, Block, Plant, sep="_"),
          dead_Caloptilia = gallery_mine_dead + gallery_mine_fresh_but_stiff + gallery_freshly_dead + tent_mine_stiff + tent_mine_freshly_dead + tent_mine_dead + tent_mine_fresh_but_stiff + LTF_dead + LEF_dead_larva,
@@ -68,7 +68,7 @@ wind_leaf_miners <- read.csv("~/Documents/Lanphere_Experiments/wind_experiment/d
   summarise_each(funs(sum))
 
 ## load leaf tie data for wind 2012 
-wind_leaf_ties <- read.csv("~/Documents/Lanphere_Experiments/wind_experiment/data/wind_dissections_leaf_tie_summer_2012.csv", skip = 1, stringsAsFactors=F) %>%
+wind_leaf_ties <- read.csv("manage_raw_data/raw_data/wind_dissections_leaf_tie_summer_2012.csv", skip = 1, stringsAsFactors=F) %>%
   tbl_df() %>%
   mutate(plant_code = paste(Treatment, Block, Plant, sep="_"),
          live_tortricid = LT_sp_328 + live_320_LT + LB_moth_pupa_LT + living_319_LT + living_320_LT + living_320_321_LT + living_321_LT + living_322 + letter_T_moth_LT, # live tortricid moths (sp. 319 - 322 and sp. 328). Assuming they are all the same species.  Evidence suggests this, because I have seen some "intermediates" mophotypes between life stages
@@ -89,15 +89,15 @@ wind.2012.arth.df <- left_join_NA_to_0(wind.2012.vis, wind_leaf_miners) %>%
   left_join_NA_to_0(wind_leaf_ties)
 
 ## upload and manage wind data for 2013 (visual surveys only)
-May10 <- read.csv('~/Documents/Lanphere_Experiments/wind_experiment/data/Wind_Arthropod_data_survey_1_May_10_2013.csv', skip = 4, stringsAsFactors = FALSE) %>%
+May10 <- read.csv('manage_raw_data/raw_data/Wind_Arthropod_data_survey_1_May_10_2013.csv', skip = 4, stringsAsFactors = FALSE) %>%
   tbl_df() %>%
   mutate(plant_code = paste(Wind.Exposure, Block, Plant.Position, sep = "_"), Year = 2013, Date = "May10")
 
-June27 <- read.csv('~/Documents/Lanphere_Experiments/wind_experiment/data/Wind_Arthropod_data_survey_2_June_27_2013.csv', skip = 1, stringsAsFactors = FALSE) %>%
+June27 <- read.csv('manage_raw_data/raw_data/Wind_Arthropod_data_survey_2_June_27_2013.csv', skip = 1, stringsAsFactors = FALSE) %>%
   tbl_df() %>%
   mutate(plant_code = paste(Wind.Exposure, Block, Plant.Position, sep = "_"), Year = 2013, Date = "June27")
 
-July10 <- read.csv('~/Documents/Lanphere_Experiments/wind_experiment/data/wind_arthropod_data_survey_3_July_10_2013.csv', skip = 1, stringsAsFactors = FALSE) %>%
+July10 <- read.csv('manage_raw_data/raw_data/wind_arthropod_data_survey_3_July_10_2013.csv', skip = 1, stringsAsFactors = FALSE) %>%
   tbl_df() %>%
   mutate(plant_code = paste(Wind.Exposure, Block, Plant.Position, sep = "_"), Year = 2013, Date = "July10")
 
@@ -184,7 +184,7 @@ wind.arth.df.families <- wind.arth.df %>%
          Formica_ant = ant_F_obscuripes + ant_black,
          Spider = spider_Theridion + spider_BY + spider_NW + spider_Tetragnathid + spider_CS + spider_Larionoides + spider_unk)
 
-write.csv(wind.arth.df.families, '~/Documents/Lanphere_Experiments/final_data/wind_arthropod_df.csv')
+write.csv(wind.arth.df.families, 'final_data/wind_arthropod_df.csv')
 
 ## upload and manage ant-aphid data for 2012 ----
 
@@ -195,7 +195,7 @@ write.csv(wind.arth.df.families, '~/Documents/Lanphere_Experiments/final_data/wi
   #select(Block, Aphids.or.No.Aphids, Distant.to.Ant.Mound, Plant.Position, Genotype, plant_code)
 
 # ant-aphid visual survey data 2012. Starting with just ants and focal aphids
-aa.2012.vis <- read.csv("~/Documents/Lanphere_Experiments/ant_aphid_experiment/data/Ant-Aphid_Data_v2.csv", stringsAsFactors=F, skip = 1) %>%
+aa.2012.vis <- read.csv("manage_raw_data/raw_data/Ant-Aphid_Data_v2.csv", stringsAsFactors=F, skip = 1) %>%
   tbl_df() %>%
   mutate(X = as.factor(1:1800), # unique ID for each data point
          #plant_code = paste(Block, Plant.Position, sep = "_"),
@@ -271,7 +271,7 @@ aphid.growth.df <- aa.2012.vis %>%
 
 ## ant-aphid leaf miner dissection data 2012 
 # note that there is no leaf tier dissection data.
-aa.leafminers.2012 <- read.csv("~/Documents/Lanphere_Experiments/ant_aphid_experiment/data/ant_aphid_arthropod_dissection_summer_2012.csv", stringsAsFactor=F, skip=1) %>%
+aa.leafminers.2012 <- read.csv("manage_raw_data/raw_data/ant_aphid_arthropod_dissection_summer_2012.csv", stringsAsFactor=F, skip=1) %>%
   tbl_df() %>%
   mutate(plant_code = paste(Block, Plant, sep="_"),
          fresh_gallery_mine = gallery_mine_living + gallery_mine_fresh_but_stiff + gallery_mine_freshly_dead, # composite variable for living or freshly dead gallery mines (late season cohort abundance)
@@ -314,5 +314,5 @@ aa.arth.df.families <- aa.arth.df %>%
          Formica_ant = ant_black, # not including ant_F_obscuripes since they were part of the experiment
          Spider = spiders)
   
-write.csv(aa.arth.df.families, '~/Documents/Lanphere_Experiments/final_data/ant_aphid_arthropod_df.csv')
-write.csv(aphid.growth.df, '~/Documents/Lanphere_Experiments/final_data/ant_aphid_Aphis_popgrowth_df.csv')
+write.csv(aa.arth.df.families, 'final_data/ant_aphid_arthropod_df.csv')
+write.csv(aphid.growth.df, 'final_data/ant_aphid_Aphis_popgrowth_df.csv')

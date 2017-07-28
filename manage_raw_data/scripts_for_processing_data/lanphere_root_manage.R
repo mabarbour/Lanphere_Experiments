@@ -13,7 +13,7 @@ library(vegan)
 
 ## Upload and manage fungal community data ----
 
-fungal <- read.csv('~/Documents/Lanphere_Experiments/Output/hfNormalizedCounts.csv', check.names = FALSE) 
+fungal <- read.csv('manage_raw_data/raw_data/hfNormalizedCounts.csv', check.names = FALSE) 
 f.OTUs <- fungal[ ,1]
 t.fungal <- as.data.frame(t(fungal[ ,-1]))
 colnames(t.fungal) <- as.character(f.OTUs)#fungal$X)
@@ -50,11 +50,11 @@ fungal.df <- data.frame(Block = fungal.df$Block,
                         #fungal.rarerich = rarefy(round(fungal.df[ ,f.OTUs],0), 2) - 1, # round abundance since rarefy only works on integers
                         fungal.df[ ,f.OTUs]) 
 
-write.csv(x = fungal.df, file = "fungal.df.csv")
+write.csv(x = fungal.df, file = "final_data/fungal.df.csv")
 
 ## Upload and manage bacterial community data ----
 
-bacteria <- read.csv('~/Documents/Lanphere_Experiments/Output/hbNormalizedCounts.csv', check.names = FALSE) 
+bacteria <- read.csv('manage_raw_data/raw_data/hbNormalizedCounts.csv', check.names = FALSE) 
 #bacteria <- read.csv("~/Documents/Lanphere_Experiments/bacteria_phyla_otutable.csv", check.names = FALSE, stringsAsFactors = FALSE)
 b.OTUs <- bacteria[ ,1]
 t.bacteria <- as.data.frame(t(bacteria[ ,-1]))
@@ -94,7 +94,7 @@ bacteria.df <- data.frame(Block = bacteria.df$Block,
                           #bacteria.rarerich = rarefy(round(bacteria.df[ ,b.OTUs],0), 2) - 1,
                           bacteria.df[ ,b.OTUs]) 
 
-write.csv(x = bacteria.df, file = "bacteria.df.csv")
+write.csv(x = bacteria.df, file = "final_data/bacteria.df.csv")
 
 
 #bacteria.df$plant_code <- with(bacteria.df, interaction(Wind.Expos.alt, Block, Plant.Position))

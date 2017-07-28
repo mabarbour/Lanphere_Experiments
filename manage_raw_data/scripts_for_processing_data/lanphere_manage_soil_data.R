@@ -12,7 +12,7 @@ library(car) # for visualizing correlations
 library(missMDA) # for imputing missing values in PCA
 
 #### Manage soil nutrient data ----
-prs <- read.csv('~/Documents/Lanphere_Experiments/wind_experiment/data/PRS Probes/PRS_probe_data_2012.csv') %>%
+prs <- read.csv('manage_raw_data/raw_data/PRS_probe_data_2012.csv') %>%
   tbl_df() %>%
   select(Sample.Label:Cd) %>%
   mutate(wind.treat = ifelse(Treatment == "e", "exposed", "unexposed"),
@@ -21,7 +21,7 @@ prs <- read.csv('~/Documents/Lanphere_Experiments/wind_experiment/data/PRS Probe
 glimpse(prs)
 
 #### Manage total organic matter ----
-windTOM <- read.csv("~/Documents/Lanphere_Experiments/wind_experiment/data/Lanphere Soil Measurements/Wind - Soil Total Organic Matter.csv") %>%
+windTOM <- read.csv('manage_raw_data/raw_data/Wind - Soil Total Organic Matter.csv') %>%
   tbl_df() %>%
   filter(BAD.Sample == "n") %>%
   mutate(OvenWt = Cruc....Oven.Dry.Wt. - Crucible.Wt.,
@@ -34,12 +34,12 @@ glimpse(windTOM)
 #### Soil moisture, temperature, and electrical conductivity ----
 
 ## September 18th, 2012
-wind.sep.18.2012 <- read.csv("~/Documents/Lanphere_Experiments/wind_experiment/data/Lanphere Soil Measurements/Lanphere Dunes - Soil Moisture-Temp-EC - Sep 18 2012.csv") %>%
+wind.sep.18.2012 <- read.csv('manage_raw_data/raw_data/Lanphere Dunes - Soil Moisture-Temp-EC - Sep 18 2012.csv') %>%
   tbl_df() %>%
   filter(Treatment %in% c("unexposed","exposed")) %>%
   select(Measurement.Time:EC.2) %>%
   group_by(Site, Treatment) %>%
-  summarise_each(funs(mean.narm = mean(., na.rm = TRUE))) %>%
+  summarise_each(funs(mean(., na.rm = TRUE))) %>%
   mutate(moisture.vwc.Sep18_2012 = (moisture + moisture.1 + moisture.2)/3,
          temp.C.Sep18_2012 = (temp + temp.1 + temp.2)/3,
          EC.Sep18_2012 = (EC + EC.1 + EC.2)/3,
@@ -49,7 +49,7 @@ wind.sep.18.2012 <- read.csv("~/Documents/Lanphere_Experiments/wind_experiment/d
 glimpse(wind.sep.18.2012)
 
 ## Sep 22, 2012
-wind.sep.22.2012 <- read.csv("~/Documents/Lanphere_Experiments/wind_experiment/data/Lanphere Soil Measurements/Lanphere Dunes - Soil Moisture-Temp-EC - Sep 22 2012.csv") %>%
+wind.sep.22.2012 <- read.csv('manage_raw_data/raw_data/Lanphere Dunes - Soil Moisture-Temp-EC - Sep 22 2012.csv') %>%
   tbl_df() %>%
   filter(Treatment %in% c("unexposed","exposed")) %>%
   select(Wind.Site:EC.2) %>%
@@ -64,11 +64,11 @@ wind.sep.22.2012 <- read.csv("~/Documents/Lanphere_Experiments/wind_experiment/d
 glimpse(wind.sep.22.2012)
 
 ## 2013 (both wind and ant-aphid experiments)
-soil.2013 <- read.csv('~/Documents/Lanphere_Experiments/wind_experiment/data/wind_soil_2013.csv', skip = 1) %>%
+soil.2013 <- read.csv('manage_raw_data/raw_data/wind_soil_2013.csv', skip = 1) %>%
   tbl_df() %>%
   select(-survey.time) %>%
   group_by(experiment, date, block, treatment) %>%
-  summarise_each(funs(mean_na.rm = mean(., na.rm = TRUE))) 
+  summarise_each(funs(mean(., na.rm = TRUE))) 
 
 aa.soil.2013 <- soil.2013 %>%
   filter(experiment == "ant_aphid") %>%
@@ -147,5 +147,5 @@ props.PCA$loadings[ ,c(1,2)] # positive values of PC1 indicate moist soil with l
 wind.soil.df <- wind.soil.df %>% mutate(soil.PC1 = props.PCA$scores[ ,"Comp.1"], soil.PC2 = props.PCA$scores[ ,"Comp.2"], Wind.Exposure = ifelse(Treatment == "exposed","Exposed","Unexposed")) %>% select(Block, Wind.Exposure, Plot_code, Total.N:percent.TOM, avg.moisture.vwc, nut.PC1:soil.PC2)
 
 #### Save .csv files ----
-write.csv(aa.soil.2013, "~/Documents/Lanphere_Experiments/final_data/ant_aphid_soil_2013.csv")
-write.csv(wind.soil.df, "~/Documents/Lanphere_Experiments/final_data/wind_soil_df.csv")
+write.csv(aa.soil.2013, "final_data/ant_aphid_soil_2013.csv")
+write.csv(wind.soil.df, "final_data/wind_soil_df.csv")

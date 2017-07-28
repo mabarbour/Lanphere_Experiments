@@ -3,12 +3,13 @@
 
 library(dplyr)
 library(tidyr)
+library(lme4)
 #library(lmerTest)
 library(car)
 library(effects)
 
 ## upload data
-speed <- read.csv('~/Documents/Lanphere_Experiments/wind_experiment/data/wind_speed_data_2013.csv') %>%
+speed <- read.csv('manage_raw_data/raw_data/wind_speed_data_2013.csv') %>%
   tbl_df() %>%
   mutate(block = as.factor(block))
 
