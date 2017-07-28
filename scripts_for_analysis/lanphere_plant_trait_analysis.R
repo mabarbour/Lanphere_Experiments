@@ -16,7 +16,7 @@ library(effects) # calculating mean and confidence intervals of treatment and ge
 library(psych) # for correlation tests
 #library(car) # for Anova function
 #library(broom) # for tidying up model outputs
-
+library(RCurl)
 script <- getURL("https://raw.githubusercontent.com/mabarbour/miscellaneous_R/master/model_diagnostic_functions.R", ssl.verifypeer = FALSE)
 eval(parse(text = script))
 

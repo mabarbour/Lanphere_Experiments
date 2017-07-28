@@ -24,6 +24,8 @@ library(RCurl) # for loading github files directly.
 script <- getURL("https://raw.githubusercontent.com/mabarbour/miscellaneous_R/master/autoplot.custom.R", ssl.verifypeer = FALSE)
 eval(parse(text = script))
 
+script <- getURL("https://raw.githubusercontent.com/mabarbour/miscellaneous_R/master/veganCovEllipse.R", ssl.verifypeer = FALSE)
+eval(parse(text = script))
 
 ## upload datasets ----
 

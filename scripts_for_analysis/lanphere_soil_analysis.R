@@ -5,7 +5,7 @@
 ############################################
 
 #### load libraries ----
-source('~/Documents/miscellaneous_R/model_diagnostic_functions.R')
+#source('~/Documents/miscellaneous_R/model_diagnostic_functions.R')
 library(merTools) # must be before dplyr
 library(dplyr)
 library(lme4) # for mixed-effect models
