@@ -1,3 +1,5 @@
+
+## LOAD REQUIRED LIBRARIES ----
 library(tidyverse)
 
 garden.data <- read_csv('final_data/herb.trait.data.csv') # downloaded from dryad
