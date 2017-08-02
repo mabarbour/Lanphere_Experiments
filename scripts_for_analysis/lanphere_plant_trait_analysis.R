@@ -1,10 +1,6 @@
-############################################
-## Description: This script analyzes data for plant traits of the Lanphere experiments.
-## Code author: Matt Barbour
-## Email: barbour@zoology.ubc.ca
-############################################
+#### ANALYZE PLANT TRAIT DATA IN LANPHERE GXE EXPERIMENT 
 
-#### Load required libraries and fucnctions ----
+## Load required libraries and fucnctions ----
 #source('~/Documents/miscellaneous_R/model_diagnostic_functions.R')
 library(merTools) # must be loaded before dplyr
 library(dplyr)
@@ -20,6 +16,7 @@ library(RCurl)
 script <- getURL("https://raw.githubusercontent.com/mabarbour/miscellaneous_R/master/model_diagnostic_functions.R", ssl.verifypeer = FALSE)
 eval(parse(text = script))
 
+library(tidyverse)
 
 #### Load required data sets ----
 
