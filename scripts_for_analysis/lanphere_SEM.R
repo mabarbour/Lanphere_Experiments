@@ -1,23 +1,7 @@
-## load libraryd libraries ----
-library(ggvegan)
-library(cowplot)
-#source('miscellaneous_R/autoplot.custom.R')
-library(devtools)
-install_github("jslefche/piecewiseSEM")
-library(piecewiseSEM) # dev version as of Nov. 10
-#library(missMDA) # for imputing missing values in PCA
-library(dplyr)
-library(tidyr) # for separate()
-library(psych) # for correlations
-library(lme4)
-library(lmerTest)
-library(vegan) # community composition analysis
-library(effects)
-library(car)
-library(RCurl) # for loading github files directly.
 
-script <- getURL("https://raw.githubusercontent.com/mabarbour/miscellaneous_R/master/autoplot.custom.R", ssl.verifypeer = FALSE)
-eval(parse(text = script))
+## load required libraries ----
+source('scripts_for_analysis/required_libraries.R')
+source('scripts_for_analysis/garden_chemistry.R')
 
 
 ## Wind SEM data management ----
@@ -84,12 +68,6 @@ arth.rich.2013 <- lmerTest::lmer(total.rich ~ trait.PC1 + trait.PC2 + num.Wind +
 fixef(arth.rich.2013)
 sem.model.fits(arth.rich.2013)
 
-#fung.rich.2013 <- lmerTest::lmer(fungal.rich ~ soil.PC1 + soil.PC2 + root_CN + (1|Block) + (1|Block:Wind.Exposure), data = w.SEM.2013)
-#sem.model.fits(fung.rich.2013)
-
-#bact.rich.2013 <- lmerTest::lmer(bacteria.rich ~ soil.PC1 + soil.PC2 + root_CN + (1|Block) + (1|Block:Wind.Exposure), data = w.SEM.2013)
-#sem.model.fits(bact.rich.2013)
-
 soilPC1.2013 <- lmerTest::lmer(soil.PC1 ~ num.Wind + (1|Block), data = w.SEM.2013)
 
 soilPC2.2013 <- lmerTest::lmer(soil.PC2 ~ num.Wind + (1|Block), data = w.SEM.2013) # note that the coefficient is approximately correct, however, the p-value for is not based on the appropriate residual degrees of freedom (way too liberal). This means I will have to manually adjust the p-value for this path-coefficient in the structural equation model.
@@ -124,12 +102,6 @@ arth.abund.2013 <- lmerTest::lmer(total.abund ~ trait.PC1 + trait.PC2 + num.Wind
 fixef(arth.abund.2013)
 sem.model.fits(arth.abund.2013)
 
-#fung.abund.2013 <- lmerTest::lmer(fungal.abund ~ soil.PC1 + soil.PC2 + root_CN + (1|Block) + (1|Block:Wind.Exposure), data = w.SEM.2013)
-#sem.model.fits(fung.abund.2013)
-
-#bact.abund.2013 <- lmerTest::lmer(bacteria.abund ~ soil.PC1 + soil.PC2 + root_CN + (1|Block) + (1|Block:Wind.Exposure), data = w.SEM.2013)
-#sem.model.fits(bact.abund.2013)
-
 mods.abund <- list(traitPC1.2013,traitPC2.2013, soilPC1.2013, soilPC2.2013, arth.abund.2013) #, rootCN.2013, fung.abund.2013, bact.abund.2013)
 
 sem.fit(mods.abund, data = w.SEM.2013, corr.errors = c("trait.PC1~~trait.PC2","soil.PC1~~soil.PC2")) # adequate fit to the data: Fisher.C = 6.73, df = 10, P = 0.751
@@ -159,17 +131,12 @@ mods.rarerich <- list(traitPC1.2013, traitPC2.2013, soilPC1.2013, soilPC2.2013, 
 mods.rarerich2 <- list(traitPC1.2013, traitPC2.2013, soilPC1.2013, soilPC2.2013, arth.rarerich.2013) #, rootCN.2013,
 
 sem.fit(mods.rarerich, data = w.SEM.2013, corr.errors = c("fungal.rarerich~~bacteria.rarerich","trait.PC1~~trait.PC2","soil.PC1~~soil.PC2")) # adequate fit to the data: Fisher.C = 22.26, df = 38, P = 0.98; AIC = 174.26, AICc = 6026.26, K = 76, n = 79
-#sem.fit(mods.rarerich2, data = w.SEM.2013, corr.errors = c("trait.PC1~~trait.PC2","soil.PC1~~soil.PC2"))
 
 rarerich.sem <- sem.missing.paths(mods.rarerich, w.SEM.2013, corr.errors = c("fungal.rarerich~~bacteria.rarerich","trait.PC1~~trait.PC2","soil.PC1~~soil.PC2"), conditional = TRUE) %>% 
   rbind.data.frame(., sem.missing.paths(mods.rarerich2, data = w.SEM.2013, corr.errors = c("trait.PC1~~trait.PC2","soil.PC1~~soil.PC2"), conditional = TRUE)[-c(1,2), ]) # remove overlapping missing paths
 
 rarerich.sem.C <- -2*sum(log(rarerich.sem$p.value)) # Fisher.C = 21.17
 1 - pchisq(rarerich.sem.C, 2 * length(rarerich.sem$p.value)) # df = 32, P = 0.928
-
-#mods.rarerich.coefs <- sem.coefs(mods.rarerich2, data = w.SEM.2013, corr.errors = c("fungal.rarerich~~bacteria.rarerich","trait.PC1~~trait.PC2","soil.PC1~~soil.PC2"), standardize = "none")
-#mods.rarerich.coefs <- mutate(mods.rarerich.coefs, plot.scale = estimate*25)
-#filter(mods.rarerich.coefs, predictor %in% c("num.Wind","soil.PC1","soil.PC2","trait.PC1","trait.PC2","root_CN"))
 
 ## Wind: arthropods 2012 ----
 vars.2012 <- colnames(select(w.SEM.2012, num.Wind, total.rich, total.abund, total.rarerich, trait.PC1, trait.PC2,soil.PC1, soil.PC2))
@@ -264,7 +231,6 @@ anova(w.f.mech.soil.rda, by = "margin", permutations = how(block = w.f.plots.cen
 adonis(w.f.plots.hell$centroids ~ Block + soil.PC1 + soil.PC2, data = w.f.plots.centr.hell, permutations = how(block = w.f.plots.centr.hell$Block, nperm = 999), method = "euclidean") # this is proof of concept that the F-test on soil.PC2 is the exact same as the RDA.
 
 # test effect of root_CN (type 2) and effect of Genotype (type 1). Used adonis because it was much faster than RDA and should give the same results with Euclidean distance. Put root_CN last though so the test would effectively be the same as type 2 SS for this test.
-#w.f.mech.rootCN.rda <- rda(f.hell.mech.rootCNsub ~ Condition(soil.PC1) + Condition(soil.PC2) + root_CN + Genotype, data = fungal.df.mech.rootCNsub) 
 adonis(f.hell.mech.rootCNsub ~ soil.PC1 + soil.PC2 + root_CN, data = fungal.df.mech.rootCNsub, permutations = how(block = fungal.df.mech.rootCNsub$Block, nperm = 999), method = "euclidean") # important to have root_CN in last position to make sure the test preserves marginality. Note that the tests for soil.PC1 and soil.PC2 are bogous because they aren't based on the appropriate degrees of freedom. Effect of root C:N is marginal.
 
 adonis(f.hell.mech.rootCNsub ~ soil.PC1 + soil.PC2 + root_CN + Genotype, data = fungal.df.mech.rootCNsub, permutations = how(block = fungal.df.mech.rootCNsub$Block, nperm = 999), method = "euclidean") # test whether Genotype still has an effect after accounting for these factors.nGenotype effect is significant after accounting for all of the factors, suggesting we don't know what is mediating the assembly of the fungal community.
@@ -273,12 +239,6 @@ adonis(f.hell.mech.rootCNsub ~ soil.PC1 + soil.PC2 + root_CN + Genotype, data = 
 adonis(f.hell.mech.rootCNsub ~ soil.PC1 + soil.PC2 + root_CN + cinn.PC1 + flavonOLES.PC1 + flavanonOLES.PC1, data = fungal.df.mech.rootCNsub, permutations = how(block = fungal.df.mech.rootCNsub$Block, nperm = 999), method = "euclidean") # test whether Genotype still has an effect after accounting for these factors.nGenotype effect is significant after accounting for all of the factors, suggesting we don't know what is mediating the assembly of the fungal community.
 adonis(f.hell.mech.rootCNsub ~ soil.PC1 + soil.PC2 + root_CN + cinn.PC1 + flavanonOLES.PC1  + flavonOLES.PC1, data = fungal.df.mech.rootCNsub, permutations = how(block = fungal.df.mech.rootCNsub$Block, nperm = 999), method = "euclidean") # test whether Genotype still has an effect after accounting for these factors.nGenotype effect is significant after accounting for all of the factors, suggesting we don't know what is mediating the assembly of the fungal community.
 adonis(f.hell.mech.rootCNsub ~ soil.PC1 + soil.PC2 + root_CN + flavonOLES.PC1 + flavanonOLES.PC1 + cinn.PC1, data = fungal.df.mech.rootCNsub, permutations = how(block = fungal.df.mech.rootCNsub$Block, nperm = 999), method = "euclidean") # test whether Genotype still has an effect after accounting for these factors.nGenotype effect is significant after accounting for all of the factors, suggesting we don't know what is mediating the assembly of the fungal community.
-#adonis(f.hell.mech.rootCNsub ~ soil.PC1 + soil.PC2 + root_CN + flavonOLES.PC1 + flavanonOLES.PC1 + cinn.PC1 + trait.PC2 + trait.PC1, data = fungal.df.mech.rootCNsub, permutations = how(block = fungal.df.mech.rootCNsub$Block, nperm = 999), method = "euclidean") # test whether Genotype still has an effect after accounting for these factors.nGenotype effect is significant after accounting for all of the factors, suggesting we don't know what is mediating the assembly of the fungal community.
-#adonis(f.hell.mech.rootCNsub ~ soil.PC1 + soil.PC2 + root_CN + flavonOLES.PC1 + flavanonOLES.PC1 + cinn.PC1 + trait.PC1 + trait.PC2, data = fungal.df.mech.rootCNsub, permutations = how(block = fungal.df.mech.rootCNsub$Block, nperm = 999), method = "euclidean") # test whether Genotype still has an effect after accounting for these factors.nGenotype effect is significant after accounting for all of the factors, suggesting we don't know what is mediating the assembly of the fungal community.
-
-#anova(w.f.mech.rootCN.rda, by = "term", permutations = how(block = fungal.df.mech.rootCNsub$Block, nperm = 999)) # 
-
-#w.f.mech.rootCN.p <- autoplot.custom(w.f.mech.rootCN.rda, scaling = 3, color = "grey") + scale_shape_manual(values = 21) + scale_color_manual(values = "grey") + theme(legend.position = "none") + xlab("RDA 1 (15%)") + ylab("RDA 2 (1%)") + scale_x_continuous(limits = c(-1.6,1.2)); w.f.mech.rootCN.p 
 
 ## Wind: Bacteria community assembly ----
 bacteria.df.mech <- left_join(bacteria.df, select(filter(w.trait.df, Year == "2013"), plant_ID, root_CN)) %>% left_join(., select(w.soil, Plot_code, soil.PC1, soil.PC2)) 
@@ -322,15 +282,7 @@ aa.SEM.df[ ,aa.vars] <- scale(aa.SEM.df[ ,aa.vars])
 
 p.scale <- 15
 
-# upload garden chemistry data to try and explain Genotype effects
-garden.data <- read.csv('final_data/herb.trait.data.csv') # downloaded from dryad
-filter.genos <- c("U","I","T","G","J","X","W","S","F","L")
-
-chem.data <- garden.data %>% 
-  filter(Genotype %in% filter.genos) %>% 
-  select(Genotype, C_N_imputed, sal_tannin.PC1:flavanonOLES.PC1) %>%
-  group_by(Genotype) %>%
-  summarise_all(funs(mean(., na.rm = TRUE)))
+# merge Lanphere data with garden chemistry data. 
 
 aa.SEM.df <- left_join(aa.SEM.df, chem.data) %>% mutate(Genotype = as.factor(Genotype))
 
@@ -472,7 +424,7 @@ RsquareAdj(update(aa.hell.mech.rda, .~. + Genotype*Aphid.treatment))
 anova(update(aa.hell.mech.rda, .~. + Genotype*Aphid.treatment), by = "margin", permutations = how(block = aa.arth.hell.mech.df$Block, nperm = 999)) # only interpreting GxE effect. 
 anova(update(aa.hell.mech.rda, .~. + Genotype + Aphid.treatment), by = "margin", permutations = how(block = aa.arth.hell.mech.df$Block, nperm = 999)) # only interpreting G and Aphid.treatment effects.
 
-# playing around with chemical data
+# add common garden chemical data
 aa.hell.mech.rda <- rda(aa.arth.hell ~ A_farinosa_abund + F_obscuripes_abund + Trait_PC1 + Trait_PC2 + Aphid.treatment*(flavonOLES.PC1 + flavanonOLES.PC1), data = aa.arth.hell.mech.df)#aa.arth.hell.mech.df) 
 vif(aa.hell.mech.rda) 
 summary(aa.hell.mech.rda)
