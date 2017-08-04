@@ -418,7 +418,7 @@ a.rr.p <- a.rr %>% mutate(lower = ifelse(lower < 0, 0, lower)) %>% ggplot(aes(x 
 ## Generate multi-panelled figs ----
 
 lanphere.fig1 <- plot_grid(a.ab.p, w.ab.p, a.rr.p, w.rr.p, w.frr.p, w.brr.p, ncol = 2, labels = "AUTO", label_size = 12, align = 'hv'); lanphere.fig1
-save_plot(lanphere.fig1, filename = "fig_1.png", base_height = 11, base_width = 8.5)
+save_plot(lanphere.fig1, filename = "figures/fig_1.png", base_height = 11, base_width = 8.5)
 
 lanphere.fig2 <- plot_grid(aa.arth.ord.GxE, w.arth.ord.wind, f.ord, b.ord.wind, ncol = 2, labels = "AUTO", label_size = 12, align = 'hv'); lanphere.fig2
-save_plot(lanphere.fig2, filename = "fig_2.png", base_height = 8.5, base_width = 8.5)
+save_plot(lanphere.fig2, filename = "figures/fig_2.png", base_height = 8.5, base_width = 8.5)
