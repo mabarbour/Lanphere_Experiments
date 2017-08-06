@@ -409,14 +409,13 @@ aa.arth.hell.mech.df <- filter(aa.mech.df, total.abund > 1) %>% rename(A_farinos
 aa.arth.hell <- decostand(aa.arth.hell.mech.df[ ,aa.arth.names], method = "hellinger")
 
 # test effect of F obscuripes 
-aa.hell.mech.rda <- rda(aa.arth.hell ~ F_obscuripes_abund + A_farinosa_abund*(Trait_PC1 + Trait_PC2), data = aa.arth.hell.mech.df) # nonsig.
+aa.hell.mech.rda <- rda(aa.arth.hell ~ F_obscuripes_abund + A_farinosa_abund + Trait_PC1 + Trait_PC2, data = aa.arth.hell.mech.df) # nonsig.
 vif(aa.hell.mech.rda) # multicollinearity shouldn't be a problem
 summary(aa.hell.mech.rda)
 anova(aa.hell.mech.rda, by = "margin", permutations = how(block = aa.arth.hell.mech.df$Block, nperm = 999))
 anova(update(aa.hell.mech.rda, .~. -A_farinosa_abund:Trait_PC1 -A_farinosa_abund:Trait_PC2), by = "margin", permutations = how(block = aa.arth.hell.mech.df$Block, nperm = 999))
 
-aa.hell.mech.p <- autoplot.custom(aa.hell.mech.rda, scaling = 3, color = "grey") + scale_shape_manual(values = 21) + scale_color_manual(values = "grey") + theme(legend.position = "none") + xlab("RDA 1 (2%)") + ylab("RDA 2 (1%)") + scale_x_continuous(limits = c(-0.8,1.3))
-
+aa.hell.mech.p <- autoplot.custom(aa.hell.mech.rda, geom = c("point","text"), scaling = 3, color = "grey") + scale_shape_manual(values = 21) + scale_color_manual(values = "grey") + theme(legend.position = "none") + xlab("RDA 1 (2%)") + ylab("RDA 2 (1%)") + scale_x_continuous(limits = c(-0.8,1.3)); aa.hell.mech.p
 save_plot("figures/fig_aa_comm_mech.png", aa.hell.mech.p, base_height = 5, base_width = 5)
 
 # test remainder effect of genotype*aphid interaction
