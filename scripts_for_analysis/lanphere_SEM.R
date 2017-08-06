@@ -194,7 +194,6 @@ vif(w.arth.hell.rda)
 anova(w.arth.hell.rda, by = "margin", permutations = how(block = w.arth.hell.mech.df$Block, nperm = 999))
 
 w.arth.hell.mech.p <- autoplot.custom(w.arth.hell.rda, scaling = 3, color = "grey") + scale_shape_manual(values = 21) + scale_color_manual(values = "grey") + theme(legend.position = "none") + xlab("RDA 1 (15%)") + ylab("RDA 2 (1%)") + scale_x_continuous(limits = c(-1.6,1.2)); w.arth.hell.mech.p
-
 save_plot("figures/fig_w_arth_comm_mech.png", w.arth.hell.mech.p, base_height = 5, base_width = 5)
 
 # get plot-level centroids after controlling for trait effects
@@ -424,10 +423,10 @@ anova(update(aa.hell.mech.rda, .~. + Genotype*Aphid.treatment), by = "margin", p
 anova(update(aa.hell.mech.rda, .~. + Genotype + Aphid.treatment), by = "margin", permutations = how(block = aa.arth.hell.mech.df$Block, nperm = 999)) # only interpreting G and Aphid.treatment effects.
 
 # add common garden chemical data
-aa.hell.mech.rda <- rda(aa.arth.hell ~ A_farinosa_abund + F_obscuripes_abund + Trait_PC1 + Trait_PC2 + Aphid.treatment*(flavonOLES.PC1 + flavanonOLES.PC1), data = aa.arth.hell.mech.df)#aa.arth.hell.mech.df) 
-vif(aa.hell.mech.rda) 
-summary(aa.hell.mech.rda)
-anova(aa.hell.mech.rda, by = "margin", permutations = how(block = aa.arth.hell.mech.df$Block, nperm = 999))
-RsquareAdj(aa.hell.mech.rda)
-autoplot(aa.hell.mech.rda)
+aa.hell.mech.rda.chem <- rda(aa.arth.hell ~ A_farinosa_abund + F_obscuripes_abund + Trait_PC1 + Trait_PC2 + Aphid.treatment*(flavonOLES.PC1 + flavanonOLES.PC1), data = aa.arth.hell.mech.df) 
+vif(aa.hell.mech.rda.chem) 
+summary(aa.hell.mech.rda.chem)
+anova(aa.hell.mech.rda.chem, by = "margin", permutations = how(block = aa.arth.hell.mech.df$Block, nperm = 999))
+RsquareAdj(aa.hell.mech.rda.chem)
+autoplot(aa.hell.mech.rda.chem)
 
