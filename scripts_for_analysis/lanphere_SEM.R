@@ -27,10 +27,10 @@ fixef(soil.PC2.lmer) # SD = 0.20, wind exposure does influence soil chemistry
 sem.model.fits(soil.PC2.lmer) # marginal R2 = 0.04
 
 ## load fungal and bacteria community data ----
-fungal.df <- read.csv("fungal.df.csv") %>% tbl_df() %>% mutate(Block = as.factor(Block), Plot_code = paste(Block, Wind.Exposure, sep = "."))
+fungal.df <- read.csv("final_data/fungal.df.csv") %>% tbl_df() %>% mutate(Block = as.factor(Block), Plot_code = paste(Block, Wind.Exposure, sep = "."))
 f.OTUs <- colnames(select(fungal.df, -(X:fungal.rarerich)))
 
-bacteria.df <- read.csv("bacteria.df.csv") %>% tbl_df() %>% mutate(Block = as.factor(Block), Plot_code = paste(Block, Wind.Exposure, sep = "."))
+bacteria.df <- read.csv("final_data/bacteria.df.csv") %>% tbl_df() %>% mutate(Block = as.factor(Block), Plot_code = paste(Block, Wind.Exposure, sep = "."))
 b.OTUs <- colnames(select(bacteria.df, -(X:bacteria.rarerich)))
 
 ## load arthropod community data ----
@@ -195,7 +195,7 @@ anova(w.arth.hell.rda, by = "margin", permutations = how(block = w.arth.hell.mec
 
 w.arth.hell.mech.p <- autoplot.custom(w.arth.hell.rda, scaling = 3, color = "grey") + scale_shape_manual(values = 21) + scale_color_manual(values = "grey") + theme(legend.position = "none") + xlab("RDA 1 (15%)") + ylab("RDA 2 (1%)") + scale_x_continuous(limits = c(-1.6,1.2)); w.arth.hell.mech.p
 
-save_plot("fig_w_arth_comm_mech.png", w.arth.hell.mech.p, base_height = 5, base_width = 5)
+save_plot("figures/fig_w_arth_comm_mech.png", w.arth.hell.mech.p, base_height = 5, base_width = 5)
 
 # get plot-level centroids after controlling for trait effects
 w.arth.hell.plots <- rda(w.arth.hell ~ Condition(Trait_PC1) + Condition(Trait_PC2) + Plot_code, data = w.arth.hell.mech.df)
@@ -415,9 +415,9 @@ summary(aa.hell.mech.rda)
 anova(aa.hell.mech.rda, by = "margin", permutations = how(block = aa.arth.hell.mech.df$Block, nperm = 999))
 anova(update(aa.hell.mech.rda, .~. -A_farinosa_abund:Trait_PC1 -A_farinosa_abund:Trait_PC2), by = "margin", permutations = how(block = aa.arth.hell.mech.df$Block, nperm = 999))
 
-#aa.hell.mech.p <- autoplot.custom(aa.hell.mech.rda, scaling = 3, color = "grey") + scale_shape_manual(values = 21) + scale_color_manual(values = "grey") + theme(legend.position = "none") + xlab("RDA 1 (2%)") + ylab("RDA 2 (1%)") + scale_x_continuous(limits = c(-0.8,1.3))
+aa.hell.mech.p <- autoplot.custom(aa.hell.mech.rda, scaling = 3, color = "grey") + scale_shape_manual(values = 21) + scale_color_manual(values = "grey") + theme(legend.position = "none") + xlab("RDA 1 (2%)") + ylab("RDA 2 (1%)") + scale_x_continuous(limits = c(-0.8,1.3))
 
-#save_plot("fig_aa_comm_mech.png", aa.hell.mech.p, base_height = 5, base_width = 5)
+save_plot("figures/fig_aa_comm_mech.png", aa.hell.mech.p, base_height = 5, base_width = 5)
 
 # test remainder effect of genotype*aphid interaction
 RsquareAdj(update(aa.hell.mech.rda, .~. + Genotype*Aphid.treatment))
