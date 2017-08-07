@@ -195,7 +195,7 @@ write.csv(wind.arth.df.families, 'final_data/wind_arthropod_df.csv')
   #select(Block, Aphids.or.No.Aphids, Distant.to.Ant.Mound, Plant.Position, Genotype, plant_code)
 
 # ant-aphid visual survey data 2012. Starting with just ants and focal aphids
-aa.2012.vis <- read.csv("manage_raw_data/raw_data/Ant-Aphid_Data_v2.csv", stringsAsFactors=F, skip = 1) %>%
+aa.2012.vis <- read.csv("manage_raw_data/raw_data/Ant_Aphid_Data_v2.csv", stringsAsFactors=F, skip = 1) %>%
   tbl_df() %>%
   mutate(X = as.factor(1:1800), # unique ID for each data point
          #plant_code = paste(Block, Plant.Position, sep = "_"),

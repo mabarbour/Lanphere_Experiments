@@ -37,7 +37,7 @@ wind.arch2012 <- wind.arch2012 %>%
   mutate(all.shoot.count = mature.shoot.count + immature.shoot.count)
 
 ## leaf wet weights 2012 ----
-wind.WetLeafWts.2012 <- read.csv("manage_raw_data/raw_data/Wind leaf trait data.csv") %>%
+wind.WetLeafWts.2012 <- read.csv("manage_raw_data/raw_data/Wind_leaf_trait_data.csv") %>%
   tbl_df() %>%
   .[-which(.$Collection.Number %in% 
              names(which(table(.$Collection.Number) > 1))), ] %>% # removes all duplicates
@@ -53,7 +53,7 @@ wind.WetLeafWts.2012 <- wind.WetLeafWts.2012 %>%
          leaf_percent.browned = Percent.Browned)
 
 ## leaf trichome densities 2012 ----
-wind.trichomes.2012 <- read.csv("manage_raw_data/raw_data/Trichome Density - Wind Experiment 2012.csv", skip = 1) %>%
+wind.trichomes.2012 <- read.csv("manage_raw_data/raw_data/Trichome_Density_Wind_Experiment_2012.csv", skip = 1) %>%
   tbl_df() %>% 
   .[-c(9,89), ] %>% # remove NA6.10 (unknown treatment) and U7.9-2 (duplicate sample)
   .[-which(.$Collection.No. %in% names(which(table(.$Collection.No.) > 1))), ] %>% # removes all duplicates
@@ -64,7 +64,7 @@ wind.trichomes.2012 <- read.csv("manage_raw_data/raw_data/Trichome Density - Win
   select(plant.id, leaf_trichome.density = Trichome.Density) 
 
 ## leaf dry weights 2012 ----
-wind.DryLeafWt.2012 <- read.csv("manage_raw_data/raw_data/Leaf Weights - Dry - Wind Experiment 2012.csv", skip = 1) %>%
+wind.DryLeafWt.2012 <- read.csv("manage_raw_data/raw_data/Leaf_Weights_Dry_Wind_Experiment_2012.csv", skip = 1) %>%
   tbl_df() %>%
   .[-c(38,112), ] %>% # remove U7.9-2 (duplicate sample) and NA6.10 (unknown treatment)
   .[-which(.$Collection.No. %in% names(which(table(.$Collection.No.) > 1))), ] %>% # removes all duplicates
@@ -264,7 +264,7 @@ write.csv(wind.traits.df, "final_data/wind_trait_df.csv")
 #### Manage ant-aphid data ----
 
 ## ant-aphid setup (plant info) ----
-aa.setup <- read.csv("manage_raw_data/raw_data/Ant-Aphid_Experiment_Setup.csv") %>%
+aa.setup <- read.csv("manage_raw_data/raw_data/Ant_Aphid_Experiment_Setup.csv") %>%
   tbl_df() %>% 
   select(Block, Aphid.Treatment = Aphids.or.No.Aphids, 
          Ant.Mound.Dist = Distant.to.Ant.Mound,
@@ -309,19 +309,19 @@ aa.arch2013 <- aa.arch2013 %>%
   select(plant.id, Dead, Height, all.shoot.total.length, all.shoot.avg.length, all.shoot.count)
 
 ## ant-aphid leaf quality data 2012 ----
-aa.trich2012 <- read.csv("manage_raw_data/raw_data/Trichome Density - Ant-Aphid Experiment 2012.csv") %>%
+aa.trich2012 <- read.csv("manage_raw_data/raw_data/Trichome_Density_Ant-Aphid_Experiment_2012.csv") %>%
   .[-which(.$Collection.No. %in% names(which(table(.$Collection.No.) > 1))), ] %>% # removes all duplicates
   tbl_df() %>%
   mutate(plant.id = as.character(Collection.No.)) %>%
   select(plant.id, leaf_trichome.density = Trichome.Density)
 
-aa.DryLeafWt2012 <- read.csv("manage_raw_data/raw_data/Leaf Weights - Dry - Ant-Aphid Experiment 2012.csv") %>%
+aa.DryLeafWt2012 <- read.csv("manage_raw_data/raw_data/Leaf_Weights_Dry_Ant-Aphid_Experiment_2012.csv") %>%
   .[-which(.$Collection.No. %in% names(which(table(.$Collection.No.) > 1))), ] %>% # removes all duplicates
   tbl_df() %>%
   mutate(plant.id = as.character(Collection.No.)) %>%
   select(plant.id, leaf_dry.wt.g = Dry.Leaf.Weight)
 
-aa.WetLeafWt2012 <- read.csv("manage_raw_data/raw_data/Ant-aphid Plant Trait Data.csv") %>% # checked for duplicates and there were none
+aa.WetLeafWt2012 <- read.csv("manage_raw_data/raw_data/Ant_aphid_Plant_Trait_Data.csv") %>% # checked for duplicates and there were none
   tbl_df() %>%
   mutate(plant.id = as.character(Collection.Number)) %>%
   select(plant.id, leaf_wet.wt.g = Wet.Leaf.Weight,

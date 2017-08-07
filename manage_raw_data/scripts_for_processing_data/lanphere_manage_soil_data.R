@@ -21,7 +21,7 @@ prs <- read.csv('manage_raw_data/raw_data/PRS_probe_data_2012.csv') %>%
 glimpse(prs)
 
 #### Manage total organic matter ----
-windTOM <- read.csv('manage_raw_data/raw_data/Wind - Soil Total Organic Matter.csv') %>%
+windTOM <- read.csv('manage_raw_data/raw_data/Wind_Soil_Total_Organic_Matter.csv') %>%
   tbl_df() %>%
   filter(BAD.Sample == "n") %>%
   mutate(OvenWt = Cruc....Oven.Dry.Wt. - Crucible.Wt.,
@@ -34,7 +34,7 @@ glimpse(windTOM)
 #### Soil moisture, temperature, and electrical conductivity ----
 
 ## September 18th, 2012
-wind.sep.18.2012 <- read.csv('manage_raw_data/raw_data/Lanphere Dunes - Soil Moisture-Temp-EC - Sep 18 2012.csv') %>%
+wind.sep.18.2012 <- read.csv('manage_raw_data/raw_data/Lanphere_Dunes_Soil_Moisture-Temp-EC_Sep_18_2012.csv') %>%
   tbl_df() %>%
   filter(Treatment %in% c("unexposed","exposed")) %>%
   select(Measurement.Time:EC.2) %>%
@@ -49,7 +49,7 @@ wind.sep.18.2012 <- read.csv('manage_raw_data/raw_data/Lanphere Dunes - Soil Moi
 glimpse(wind.sep.18.2012)
 
 ## Sep 22, 2012
-wind.sep.22.2012 <- read.csv('manage_raw_data/raw_data/Lanphere Dunes - Soil Moisture-Temp-EC - Sep 22 2012.csv') %>%
+wind.sep.22.2012 <- read.csv('manage_raw_data/raw_data/Lanphere_Dunes_Soil_Moisture-Temp-EC_Sep_22_2012.csv') %>%
   tbl_df() %>%
   filter(Treatment %in% c("unexposed","exposed")) %>%
   select(Wind.Site:EC.2) %>%
