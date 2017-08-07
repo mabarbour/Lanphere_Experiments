@@ -1,0 +1,810 @@
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2016.8.8)  7 AUG 2017 17:09
+entering extended mode
+ restricted \write18 enabled.
+ %&-line parsing enabled.
+**Lanphere_cover_letter.tex
+(./Lanphere_cover_letter.tex
+LaTeX2e <2016/02/01>
+Babel <3.9q> and hyphenation patterns for 81 language(s) loaded.
+(/usr/share/texlive/texmf-dist/tex/latex/koma-script/scrlttr2.cls
+Document Class: scrlttr2 2015/10/03 v3.19a KOMA-Script document class (letter)
+(/usr/share/texlive/texmf-dist/tex/latex/koma-script/scrkbase.sty
+Package: scrkbase 2015/10/03 v3.19a KOMA-Script package (KOMA-Script-dependent 
+basics and keyval usage)
+
+(/usr/share/texlive/texmf-dist/tex/latex/koma-script/scrbase.sty
+Package: scrbase 2015/10/03 v3.19a KOMA-Script package (KOMA-Script-independent
+ basics and keyval usage)
+
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/keyval.sty
+Package: keyval 2014/10/28 v1.15 key=value parser (DPC)
+\KV@toks@=\toks14
+)
+(/usr/share/texlive/texmf-dist/tex/latex/koma-script/scrlfile.sty
+Package: scrlfile 2015/10/03 v3.19a KOMA-Script package (loading files)
+
+Package scrlfile, 2015/10/03 v3.19a KOMA-Script package (loading files)
+                  Copyright (C) Markus Kohm
+
+)))
+Class scrlttr2 Info: File `scrsize12pt.clo' used instead of
+(scrlttr2)           file `scrsize12.clo' to setup font sizes on input line 176
+3.
+ (/usr/share/texlive/texmf-dist/tex/latex/koma-script/scrsize12pt.clo
+File: scrsize12pt.clo 2015/10/03 v3.19a KOMA-Script font size class option (12p
+t)
+)
+LaTeX Info: Redefining \textsubscript on input line 1857.
+
+(/usr/share/texlive/texmf-dist/tex/latex/koma-script/typearea.sty
+Package: typearea 2015/10/03 v3.19a KOMA-Script package (type area)
+
+Package typearea, 2015/10/03 v3.19a KOMA-Script package (type area)
+                  Copyright (C) Frank Neukam, 1992-1994
+                  Copyright (C) Markus Kohm, 1994-
+
+\ta@bcor=\skip41
+\ta@div=\count79
+\ta@hblk=\skip42
+\ta@vblk=\skip43
+\ta@temp=\skip44
+\footheight=\skip45
+Package typearea Info: These are the values describing the layout:
+(typearea)             DIV  = 12
+(typearea)             BCOR = 0.0pt
+(typearea)             \paperwidth      = 597.50793pt
+(typearea)              \textwidth      = 448.13095pt
+(typearea)              DIV departure   = -6%
+(typearea)              \evensidemargin = 2.4185pt
+(typearea)              \oddsidemargin  = 2.4185pt
+(typearea)             \paperheight     = 845.04694pt
+(typearea)              \textheight     = 635.5pt
+(typearea)              \topmargin      = -41.72441pt
+(typearea)              \headheight     = 18.125pt
+(typearea)              \headsep        = 21.75pt
+(typearea)              \topskip        = 12.0pt
+(typearea)              \footskip       = 50.75pt
+(typearea)              \baselineskip   = 14.5pt
+(typearea)              on input line 1509.
+)
+\c@letter=\count80
+)
+Class scrlttr2 Info: Letter-Class-Option `DIN' loaded on input line 9.
+ (/usr/share/texlive/texmf-dist/tex/latex/koma-script/DIN.lco
+File: DIN.lco 2015/10/03 v3.19a KOMA-Script letter-class-option
+)
+Class scrlttr2 Info: Letter-Class-Option `uzh-en' loaded on input line 9.
+
+(/home/matt/texmf/tex/latex/uzh/uzh-en.lco
+File: uzh-en.lco 2010/11/25 KOMA letter class option UZH-EN (JSpitzm)
+
+
+Letter-class-option infoblck Warning: This letter class option file was made
+(uzh-en.lco)                        only to be used with KOMA-Script letter
+(uzh-en.lco)                        class `scrlttr2' with version date
+(uzh-en.lco)                        before 2002-06-28. Use with other
+(uzh-en.lco)                        versions of `scrlttr2' may result in a
+(uzh-en.lco)                        lot of errors or unexpected behaviour.
+
+Class scrlttr2 Info: Letter-Class-Option `uzh' loaded on input line 69.
+(/home/matt/texmf/tex/latex/uzh/uzh.lco
+File: uzh.lco 2010/11/25 KOMA letter class option UZH (JSpitzm)
+
+
+Letter-class-option infoblck Warning: This letter class option file was made
+(uzh.lco)                        only to be used with KOMA-Script letter
+(uzh.lco)                        class `scrlttr2' with version date
+(uzh.lco)                        before 2002-06-28. Use with other
+(uzh.lco)                        versions of `scrlttr2' may result in a
+(uzh.lco)                        lot of errors or unexpected behaviour.
+
+(/home/matt/texmf/tex/latex/ua1/uarial.sty
+Package: uarial 2006/03/21 1.0 (WaS)
+)
+Class scrlttr2 Info: File `scrsize10pt.clo' used to setup font sizes on input l
+ine 72.
+
+(/usr/share/texlive/texmf-dist/tex/latex/koma-script/scrsize10pt.clo
+File: scrsize10pt.clo 2015/10/03 v3.19a KOMA-Script font size class option (10p
+t)
+)
+Class scrlttr2 Info: Letter-Class-Option `KOMAold' loaded on input line 82.
+
+(/usr/share/texlive/texmf-dist/tex/latex/koma-script/KOMAold.lco
+File: KOMAold.lco 2015/10/03 v3.19a KOMA-Script letter-class-option
+)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/graphicx.sty
+Package: graphicx 2014/10/28 v1.0g Enhanced LaTeX Graphics (DPC,SPQR)
+
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/graphics.sty
+Package: graphics 2016/01/03 v1.0q Standard LaTeX Graphics (DPC,SPQR)
+
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/trig.sty
+Package: trig 2016/01/03 v1.10 sin cos tan (DPC)
+)
+(/usr/share/texlive/texmf-dist/tex/latex/latexconfig/graphics.cfg
+File: graphics.cfg 2010/04/23 v1.9 graphics configuration of TeX Live
+)
+Package graphics Info: Driver file: pdftex.def on input line 95.
+
+(/usr/share/texlive/texmf-dist/tex/latex/pdftex-def/pdftex.def
+File: pdftex.def 2011/05/27 v0.06d Graphics/color for pdfTeX
+
+(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/infwarerr.sty
+Package: infwarerr 2010/04/08 v1.3 Providing info/warning/error messages (HO)
+)
+(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/ltxcmds.sty
+Package: ltxcmds 2011/11/09 v1.22 LaTeX kernel commands for general use (HO)
+)
+\Gread@gobject=\count81
+))
+\Gin@req@height=\dimen102
+\Gin@req@width=\dimen103
+)
+(/usr/share/texlive/texmf-dist/tex/latex/geometry/geometry.sty
+Package: geometry 2010/09/12 v5.6 Page Geometry
+
+(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/ifpdf.sty
+Package: ifpdf 2011/01/30 v2.3 Provides the ifpdf switch (HO)
+Package ifpdf Info: pdfTeX in PDF mode is detected.
+)
+(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/ifvtex.sty
+Package: ifvtex 2010/03/01 v1.5 Detect VTeX and its facilities (HO)
+Package ifvtex Info: VTeX not detected.
+)
+(/usr/share/texlive/texmf-dist/tex/generic/ifxetex/ifxetex.sty
+Package: ifxetex 2010/09/12 v0.6 Provides ifxetex conditional
+)
+\Gm@cnth=\count82
+\Gm@cntv=\count83
+\c@Gm@tempcnt=\count84
+\Gm@bindingoffset=\dimen104
+\Gm@wd@mp=\dimen105
+\Gm@odd@mp=\dimen106
+\Gm@even@mp=\dimen107
+\Gm@layoutwidth=\dimen108
+\Gm@layoutheight=\dimen109
+\Gm@layouthoffset=\dimen110
+\Gm@layoutvoffset=\dimen111
+\Gm@dimlist=\toks15
+)
+
+Class scrlttr2 Warning: Deprecated usage of \firsthead.
+(scrlttr2)              You should use \setkomavar{firsthead}
+(scrlttr2)              instead of \firsthead on input line 136.
+
+
+Class scrlttr2 Warning: Deprecated usage of \nexthead.
+(scrlttr2)              You should use \setkomavar{nexthead}
+(scrlttr2)              instead of \nexthead on input line 153.
+
+(/usr/share/texlive/texmf-dist/tex/latex/lastpage/lastpage.sty
+Package: lastpage 2015/03/29 v1.2m Refers to last page's name (HMM; JPG)
+)
+
+Class scrlttr2 Warning: Deprecated usage of \firstfoot.
+(scrlttr2)              You should use \setkomavar{firstfoot}
+(scrlttr2)              instead of \firstfoot on input line 162.
+
+
+Class scrlttr2 Warning: Deprecated usage of \nextfoot.
+(scrlttr2)              You should use \setkomavar{nextfoot}
+(scrlttr2)              instead of \nextfoot on input line 163.
+
+)
+
+Class scrlttr2 Warning: Deprecated usage of \firsthead.
+(scrlttr2)              You should use \setkomavar{firsthead}
+(scrlttr2)              instead of \firsthead on input line 76.
+
+
+Class scrlttr2 Warning: Deprecated usage of \nexthead.
+(scrlttr2)              You should use \setkomavar{nexthead}
+(scrlttr2)              instead of \nexthead on input line 93.
+
+
+Class scrlttr2 Warning: Deprecated usage of \firstfoot.
+(scrlttr2)              You should use \setkomavar{firstfoot}
+(scrlttr2)              instead of \firstfoot on input line 101.
+
+
+Class scrlttr2 Warning: Deprecated usage of \nextfoot.
+(scrlttr2)              You should use \setkomavar{nextfoot}
+(scrlttr2)              instead of \nextfoot on input line 102.
+
+) (/usr/share/texlive/texmf-dist/tex/latex/base/fontenc.sty
+Package: fontenc 2005/09/27 v1.99g Standard LaTeX package
+
+(/usr/share/texlive/texmf-dist/tex/latex/base/t1enc.def
+File: t1enc.def 2005/09/27 v1.99g Standard LaTeX file
+LaTeX Font Info:    Redeclaring font encoding T1 on input line 48.
+))
+(/usr/share/texlive/texmf-dist/tex/latex/base/inputenc.sty
+Package: inputenc 2015/03/17 v1.2c Input encoding file
+\inpenc@prehook=\toks16
+\inpenc@posthook=\toks17
+
+(/usr/share/texlive/texmf-dist/tex/latex/base/latin9.def
+File: latin9.def 2015/03/17 v1.2c Input encoding file
+))
+(/usr/share/texlive/texmf-dist/tex/generic/babel/babel.sty
+Package: babel 2016/02/24 3.9q The Babel package
+
+(/usr/share/texlive/texmf-dist/tex/generic/babel-english/english.ldf
+Language: english 2012/08/20 v3.3p English support from the babel system
+
+(/usr/share/texlive/texmf-dist/tex/generic/babel/babel.def
+File: babel.def 2016/02/24 3.9q Babel common definitions
+\babel@savecnt=\count85
+\U@D=\dimen112
+)
+\l@canadian = a dialect from \language\l@american 
+\l@australian = a dialect from \language\l@british 
+\l@newzealand = a dialect from \language\l@british 
+))
+(/usr/share/texlive/texmf-dist/tex/latex/opensans/opensans.sty
+Package: opensans 2011/11/11 Opensans
+
+(/usr/share/texlive/texmf-dist/tex/latex/slantsc/slantsc.sty
+Package: slantsc 2012/01/01 v2.11 Provide Slanted an Italic Small Caps
+
+(/usr/share/texlive/texmf-dist/tex/latex/base/ifthen.sty
+Package: ifthen 2014/09/29 v1.1c Standard LaTeX ifthen package (DPC)
+)
+LaTeX Info: Redefining \upshape on input line 35.
+LaTeX Info: Redefining \slshape on input line 45.
+LaTeX Info: Redefining \itshape on input line 55.
+LaTeX Info: Redefining \scshape on input line 65.
+))
+(/usr/share/texlive/texmf-dist/tex/latex/setspace/setspace.sty
+Package: setspace 2011/12/19 v6.7a set line spacing
+)
+(./Lanphere_cover_letter.aux)
+\openout1 = `Lanphere_cover_letter.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 32.
+LaTeX Font Info:    ... okay on input line 32.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 32.
+LaTeX Font Info:    ... okay on input line 32.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 32.
+LaTeX Font Info:    ... okay on input line 32.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 32.
+LaTeX Font Info:    ... okay on input line 32.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 32.
+LaTeX Font Info:    ... okay on input line 32.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 32.
+LaTeX Font Info:    ... okay on input line 32.
+LaTeX Font Info:    Try loading font information for T1+ua1 on input line 32.
+ (/home/matt/texmf/tex/latex/ua1/t1ua1.fd
+File: t1ua1.fd 2006/03/21 Fontinst v1.928 font definitions for T1/ua1.
+)
+Package scrbase Info: activating english \yourrefname on input line 32.
+Package scrbase Info: activating english \yourmailname on input line 32.
+Package scrbase Info: activating english \myrefname on input line 32.
+Package scrbase Info: activating english \customername on input line 32.
+Package scrbase Info: activating english \invoicename on input line 32.
+Package scrbase Info: activating english \subjectname on input line 32.
+Package scrbase Info: activating english \ccname on input line 32.
+Package scrbase Info: activating english \enclname on input line 32.
+Package scrbase Info: activating english \headtoname on input line 32.
+Package scrbase Info: activating english \headfromname on input line 32.
+Package scrbase Info: activating english \datename on input line 32.
+Package scrbase Info: activating english \pagename on input line 32.
+Package scrbase Info: activating english \phonename on input line 32.
+Package scrbase Info: activating english \mobilephonename on input line 32.
+Package scrbase Info: activating english \faxname on input line 32.
+Package scrbase Info: activating english \emailname on input line 32.
+Package scrbase Info: activating english \wwwname on input line 32.
+Package scrbase Info: activating english \bankname on input line 32.
+Class scrlttr2 Info: no date found for language `american'
+(scrlttr2)           --> skipped on input line 32.
+Class scrlttr2 Info: no date found for language `australien'
+(scrlttr2)           --> skipped on input line 32.
+Class scrlttr2 Info: no date found for language `british'
+(scrlttr2)           --> skipped on input line 32.
+Class scrlttr2 Info: no date found for language `canadian'
+(scrlttr2)           --> skipped on input line 32.
+Class scrlttr2 Info: no date found for language `newzealand'
+(scrlttr2)           --> skipped on input line 32.
+Class scrlttr2 Info: no date found for language `USenglish'
+(scrlttr2)           --> skipped on input line 32.
+Class scrlttr2 Info: no date found for language `UKenglish'
+(scrlttr2)           --> skipped on input line 32.
+Class scrlttr2 Info: no date found for language `german'
+(scrlttr2)           --> skipped on input line 32.
+Class scrlttr2 Info: no date found for language `ngerman'
+(scrlttr2)           --> skipped on input line 32.
+Class scrlttr2 Info: no date found for language `austrian'
+(scrlttr2)           --> skipped on input line 32.
+Class scrlttr2 Info: no date found for language `naustrian'
+(scrlttr2)           --> skipped on input line 32.
+Class scrlttr2 Info: no date found for language `swissgerman'
+(scrlttr2)           --> skipped on input line 32.
+Class scrlttr2 Info: no date found for language `nswissgerman'
+(scrlttr2)           --> skipped on input line 32.
+Class scrlttr2 Info: no date found for language `acadian'
+(scrlttr2)           --> skipped on input line 32.
+Class scrlttr2 Info: no date found for language `canadien'
+(scrlttr2)           --> skipped on input line 32.
+Class scrlttr2 Info: no date found for language `francais'
+(scrlttr2)           --> skipped on input line 32.
+Class scrlttr2 Info: no date found for language `french'
+(scrlttr2)           --> skipped on input line 32.
+Class scrlttr2 Info: no date found for language `italian'
+(scrlttr2)           --> skipped on input line 32.
+Class scrlttr2 Info: no date found for language `spanish'
+(scrlttr2)           --> skipped on input line 32.
+Class scrlttr2 Info: no date found for language `croatian'
+(scrlttr2)           --> skipped on input line 32.
+Class scrlttr2 Info: no date found for language `dutch'
+(scrlttr2)           --> skipped on input line 32.
+Class scrlttr2 Info: no date found for language `finnish'
+(scrlttr2)           --> skipped on input line 32.
+Class scrlttr2 Info: no date found for language `norsk'
+(scrlttr2)           --> skipped on input line 32.
+Class scrlttr2 Info: no date found for language `swedish'
+(scrlttr2)           --> skipped on input line 32.
+Class scrlttr2 Info: no date found for language `polish'
+(scrlttr2)           --> skipped on input line 32.
+Class scrlttr2 Info: no date found for language `czech'
+(scrlttr2)           --> skipped on input line 32.
+Class scrlttr2 Info: no date found for language `slovak'
+(scrlttr2)           --> skipped on input line 32.
+Class scrlttr2 Info: trying to activate captions and date
+(scrlttr2)           of language `english' on input line 32.
+Class scrlttr2 Info: used language is `english'.
+(scrlttr2)           Supported languages are: `english', `UKenglish',
+(scrlttr2)           `british', `american', `USenglish', `australian`,
+(scrlttr2)           `canadian', `newzealand',
+(scrlttr2)           `german', `ngerman', `austrian', `naustrian',
+(scrlttr2)           `swissgerman', `nswissgermsn',
+(scrlttr2)           `acadian', `canadien', `francais', `french', 
+(scrlttr2)           `dutch', `italian', `spanish', `polish',
+(scrlttr2)           `croatian', `finnish', `norsk', `swedish',
+(scrlttr2)           `czech'. `slovak'  on input line 32.
+
+(/usr/share/texlive/texmf-dist/tex/context/base/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+\scratchcounter=\count86
+\scratchdimen=\dimen113
+\scratchbox=\box26
+\nofMPsegments=\count87
+\nofMParguments=\count88
+\everyMPshowfont=\toks18
+\MPscratchCnt=\count89
+\MPscratchDim=\dimen114
+\MPnumerator=\count90
+\makeMPintoPDFobject=\count91
+\everyMPtoPDFconversion=\toks19
+) (/usr/share/texlive/texmf-dist/tex/generic/oberdiek/pdftexcmds.sty
+Package: pdftexcmds 2011/11/29 v0.20 Utility functions of pdfTeX for LuaTeX (HO
+)
+
+(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/ifluatex.sty
+Package: ifluatex 2010/03/01 v1.3 Provides the ifluatex switch (HO)
+Package ifluatex Info: LuaTeX not detected.
+)
+Package pdftexcmds Info: LuaTeX not detected.
+Package pdftexcmds Info: \pdf@primitive is available.
+Package pdftexcmds Info: \pdf@ifprimitive is available.
+Package pdftexcmds Info: \pdfdraftmode found.
+)
+(/usr/share/texlive/texmf-dist/tex/latex/oberdiek/epstopdf-base.sty
+Package: epstopdf-base 2010/02/09 v2.5 Base part for package epstopdf
+
+(/usr/share/texlive/texmf-dist/tex/latex/oberdiek/grfext.sty
+Package: grfext 2010/08/19 v1.1 Manage graphics extensions (HO)
+
+(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/kvdefinekeys.sty
+Package: kvdefinekeys 2011/04/07 v1.3 Define keys (HO)
+))
+(/usr/share/texlive/texmf-dist/tex/latex/oberdiek/kvoptions.sty
+Package: kvoptions 2011/06/30 v3.11 Key value format for package options (HO)
+
+(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/kvsetkeys.sty
+Package: kvsetkeys 2012/04/25 v1.16 Key value parser (HO)
+
+(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/etexcmds.sty
+Package: etexcmds 2011/02/16 v1.5 Avoid name clashes with e-TeX commands (HO)
+Package etexcmds Info: Could not find \expanded.
+(etexcmds)             That can mean that you are not using pdfTeX 1.50 or
+(etexcmds)             that some package has redefined \expanded.
+(etexcmds)             In the latter case, load this package earlier.
+)))
+Package grfext Info: Graphics extension search list:
+(grfext)             [.png,.pdf,.jpg,.mps,.jpeg,.jbig2,.jb2,.PNG,.PDF,.JPG,.JPE
+G,.JBIG2,.JB2,.eps]
+(grfext)             \AppendGraphicsExtensions on input line 452.
+
+(/usr/share/texlive/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
+File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
+e
+))
+*geometry* driver: auto-detecting
+*geometry* detected driver: pdftex
+*geometry* verbose mode - [ preamble ] result:
+* driver: pdftex
+* paper: a4paper
+* layout: <same size as paper>
+* layoutoffset:(h,v)=(0.0pt,0.0pt)
+* modes: 
+* h-part:(L,W,R)=(91.04881pt, 435.32718pt, 71.13188pt)
+* v-part:(T,H,B)=(142.26378pt, 631.65118pt, 71.13188pt)
+* \paperwidth=597.50787pt
+* \paperheight=845.04684pt
+* \textwidth=435.32718pt
+* \textheight=631.65118pt
+* \oddsidemargin=18.77882pt
+* \evensidemargin=18.77882pt
+* \topmargin=-53.40631pt
+* \headheight=18.125pt
+* \headsep=105.2751pt
+* \topskip=12.0pt
+* \footskip=28.45274pt
+* \marginparwidth=49.79233pt
+* \marginparsep=12.8401pt
+* \columnsep=0.0pt
+* \skip\footins=9.0pt plus 4.0pt minus 2.0pt
+* \hoffset=0.0pt
+* \voffset=0.0pt
+* \mag=1000
+* \@twocolumnfalse
+* \@twosidefalse
+* \@mparswitchfalse
+* \@reversemarginfalse
+* (1in=72.27pt=25.4mm, 1cm=28.453pt)
+
+Package lastpage Info: Please have a look at the pageslts package at
+(lastpage)             https://www.ctan.org/pkg/pageslts
+(lastpage)             ! on input line 32.
+LaTeX Font Info:    Try loading font information for T1+fos on input line 56.
+(/usr/share/texlive/texmf-dist/tex/latex/opensans/t1fos.fd
+File: t1fos.fd 2011/11/11 Fontinst v1.927 font definitions for T1/fos.
+)
+LaTeX Font Info:    Font shape `T1/fos/m/n' will be
+(Font)              scaled to size 8.99994pt on input line 56.
+
+Foldmarks: yes
+Head of first page
+<uzh_logo_e_pos.pdf, id=1, 154.5775pt x 49.18375pt>
+File: uzh_logo_e_pos.pdf Graphic file (type pdf)
+ <use uzh_logo_e_pos.pdf>
+Package pdftex.def Info: uzh_logo_e_pos.pdf used on input line 61.
+(pdftex.def)             Requested size: 154.5771pt x 49.18361pt.
+LaTeX Font Info:    Font shape `T1/fos/bx/n' in size <10> not available
+(Font)              Font shape `T1/fos/b/n' tried instead on input line 61.
+LaTeX Font Info:    Font shape `T1/fos/b/n' will be
+(Font)              scaled to size 8.99994pt on input line 61.
+LaTeX Font Info:    Font shape `T1/fos/m/n' will be
+(Font)              scaled to size 6.74995pt on input line 61.
+
+Overfull \vbox (50.69127pt too high) detected at line 61
+ []
+
+File: uzh_logo_e_pos.pdf Graphic file (type pdf)
+<use uzh_logo_e_pos.pdf>
+Package pdftex.def Info: uzh_logo_e_pos.pdf used on input line 61.
+(pdftex.def)             Requested size: 154.5771pt x 49.18361pt.
+
+
+Class scrlttr2 Warning: head of first page is 50.69127pt too high.
+(scrlttr2)              You have to change `firstheadvpos'
+(scrlttr2)              or you have to define a smaller
+(scrlttr2)              head of first page using \setkomavar.
+(scrlttr2)              Because of this too high head of first page
+(scrlttr2)              you've got an overfull \vbox message on input line 61.
+
+Foot of first page
+Address (backaddress, addressee)
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <7> on input line 61.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <5> on input line 61.
+LaTeX Font Info:    Font shape `T1/fos/m/n' will be
+(Font)              scaled to size 6.29996pt on input line 61.
+
+Class scrlttr2 Warning: backaddress is 8.29039pt too high.
+(scrlttr2)              You have to change `backaddrheight'
+(scrlttr2)              or you have to define a smaller
+(scrlttr2)              backaddress using \setkomavar.
+(scrlttr2)              Because of this too high backaddress
+(scrlttr2)              you've got an overfull \vbox message on input line 61.
+
+LaTeX Font Info:    Font shape `T1/fos/m/n' will be
+(Font)              scaled to size 8.09995pt on input line 61.
+
+Underfull \hbox (badness 10000) in paragraph at lines 61--61
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 61--61
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 61--61
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 61--61
+
+ []
+
+Location field: yes
+LaTeX Font Info:    Font shape `T1/fos/bx/n' in size <7.5> not available
+(Font)              Font shape `T1/fos/b/n' tried instead on input line 61.
+LaTeX Font Info:    Font shape `T1/fos/b/n' will be
+(Font)              scaled to size 6.74995pt on input line 61.
+
+Underfull \hbox (badness 10000) in paragraph at lines 61--61
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 61--61
+
+ []
+
+Reference line: only place and date
+Title: no
+Subject: before opening
+LaTeX Font Info:    Font shape `T1/ua1/bx/n' in size <10> not available
+(Font)              Font shape `T1/ua1/b/n' tried instead on input line 61.
+
+! Package inputenc Error: Keyboard character used is undefined
+(inputenc)                in inputencoding `latin9'.
+
+See the inputenc package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.70 ...cited to submit our manuscript entitled ‚Ä
+                                                  úHost-plant genetic variat...
+
+You need to provide a definition with \DeclareInputText 
+or \DeclareInputMath before using this key.
+
+
+! Package inputenc Error: Keyboard character used is undefined
+(inputenc)                in inputencoding `latin9'.
+
+See the inputenc package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.70 ...ited to submit our manuscript entitled ‚Äú
+                                                  Host-plant genetic variati...
+
+You need to provide a definition with \DeclareInputText 
+or \DeclareInputMath before using this key.
+
+
+! Package inputenc Error: Keyboard character used is undefined
+(inputenc)                in inputencoding `latin9'.
+
+See the inputenc package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.70 ...turing above and belowground communities‚Ä
+                                                  ù for consideration to be ...
+
+You need to provide a definition with \DeclareInputText 
+or \DeclareInputMath before using this key.
+
+
+! Package inputenc Error: Keyboard character used is undefined
+(inputenc)                in inputencoding `latin9'.
+
+See the inputenc package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.70 ...uring above and belowground communities‚Äù
+                                                   for consideration to be p...
+
+You need to provide a definition with \DeclareInputText 
+or \DeclareInputMath before using this key.
+
+
+! Package inputenc Error: Keyboard character used is undefined
+(inputenc)                in inputencoding `latin9'.
+
+See the inputenc package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.74 ... our study provides a new benchmark for ‚Ä
+                                                  òcommunity genetics‚Äô res...
+
+You need to provide a definition with \DeclareInputText 
+or \DeclareInputMath before using this key.
+
+
+! Package inputenc Error: Keyboard character used is undefined
+(inputenc)                in inputencoding `latin9'.
+
+See the inputenc package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.74 ...our study provides a new benchmark for ‚Äò
+                                                  community genetics‚Äô rese...
+
+You need to provide a definition with \DeclareInputText 
+or \DeclareInputMath before using this key.
+
+
+! Package inputenc Error: Keyboard character used is undefined
+(inputenc)                in inputencoding `latin9'.
+
+See the inputenc package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.74 ... new benchmark for ‚Äòcommunity genetics‚Ä
+                                                  ô research, as one of the ...
+
+You need to provide a definition with \DeclareInputText 
+or \DeclareInputMath before using this key.
+
+
+! Package inputenc Error: Keyboard character used is undefined
+(inputenc)                in inputencoding `latin9'.
+
+See the inputenc package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.74 ...new benchmark for ‚Äòcommunity genetics‚Äô
+                                                   research, as one of the m...
+
+You need to provide a definition with \DeclareInputText 
+or \DeclareInputMath before using this key.
+
+! Missing $ inserted.
+<inserted text> 
+                $
+l.76 ...de: Luis Abdala-Roberts (Universidad Aut√≥
+                                                  noma de Yucat√°n), Tobias ...
+I've inserted a begin-math/end-math symbol since I think
+you left one out. Proceed, with fingers crossed.
+
+! Extra }, or forgotten $.
+\maththreesuperior ->{^3}
+                         
+l.76 ...de: Luis Abdala-Roberts (Universidad Aut√≥
+                                                  noma de Yucat√°n), Tobias ...
+I've deleted a group-closing symbol because it seems to be
+spurious, as in `$x}$'. But perhaps the } is legitimate and
+you forgot something else, as in `\hbox{$x}'. In such cases
+the way to recover is to insert both the forgotten and the
+deleted material, e.g., by typing `I$}'.
+
+
+LaTeX Warning: Command \~ invalid in math mode on input line 76.
+
+
+LaTeX Warning: Command \textexclamdown invalid in math mode on input line 76.
+
+
+LaTeX Warning: Command \~ invalid in math mode on input line 76.
+
+
+LaTeX Warning: Command \OE invalid in math mode on input line 76.
+
+! Missing $ inserted.
+<inserted text> 
+                $
+l.77 
+     
+I've inserted a begin-math/end-math symbol since I think
+you left one out. Proceed, with fingers crossed.
+
+Missing character: There is no √ in font cmr10!
+Missing character: There is no Ω in font cmr10!
+Missing character: There is no √ in font cmr10!
+Missing character: There is no ◊ in font cmr10!
+
+Overfull \hbox (296.92744pt too wide) in paragraph at lines 76--77
+\T1/fos/m/n/10 Aut√$[]\OML/cmm/m/it/10 nomadeYucatn\OT1/cmr/m/n/10 )\OML/cmm/m/
+it/10 ; TobiasZst\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 UniversityofBern\OT1/cmr/m/n
+/10 )\OML/cmm/m/it/10 ; ErikaHersch \OMS/cmsy/m/n/10 ^^@ \OML/cmm/m/it/10 Green
+\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 MichiganTechnologicalUniversity\OT1/cmr/m/n/1
+0 )\OML/cmm/m/it/10 ; andJenniferSchweitzer\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 Un
+iversityofTennessee\OT1/cmr/m/n/10 )\OML/cmm/m/it/10 :$ 
+ []
+
+[1
+
+
+
+{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map} </home/matt/texmf/tex/latex
+/uzh/uzh_logo_e_pos.pdf>] <signature.png, id=15, 323.2075pt x 212.795pt>
+File: signature.png Graphic file (type png)
+
+<use signature.png>
+Package pdftex.def Info: signature.png used on input line 82.
+(pdftex.def)             Requested size: 130.59947pt x 85.98343pt.
+
+
+! LaTeX Error: There's no line here to end.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.82 ...e {Warm regards,}\\[5pt]\vspace*{-1.85cm}}
+                                                  
+Your command was ignored.
+Type  I <command> <return>  to replace it with another command,
+or  <return>  to continue without it.
+
+File: signature.png Graphic file (type png)
+<use signature.png>
+Package pdftex.def Info: signature.png used on input line 82.
+(pdftex.def)             Requested size: 130.59947pt x 85.98343pt.
+LaTeX Font Info:    Font shape `T1/ua1/m/sl' in size <10> not available
+(Font)              Font shape `T1/ua1/m/it' tried instead on input line 84.
+File: uzh_logo_e_pos.pdf Graphic file (type pdf)
+ <use uzh_logo_e_pos.pdf>
+Package pdftex.def Info: uzh_logo_e_pos.pdf used on input line 84.
+(pdftex.def)             Requested size: 154.5771pt x 49.18361pt.
+LaTeX Font Info:    Font shape `T1/fos/m/sl' in size <10> not available
+(Font)              Font shape `T1/fos/m/it' tried instead on input line 84.
+LaTeX Font Info:    Font shape `T1/fos/m/it' will be
+(Font)              scaled to size 8.99994pt on input line 84.
+
+Underfull \hbox (badness 10000) has occurred while \output is active
+| [][]
+ []
+
+
+Overfull \vbox (31.05861pt too high) has occurred while \output is active []
+
+LaTeX Font Info:    Font shape `T1/ua1/m/sl' in size <7.5> not available
+(Font)              Font shape `T1/ua1/m/it' tried instead on input line 84.
+
+[2 <./signature.png>]
+! Missing } inserted.
+<inserted text> 
+                }
+l.84 \end{letter}
+                 
+I've inserted something that you may have forgotten.
+(See the <inserted text> above.)
+With luck, this will get me unwedged. But if you
+really didn't forget anything, try typing `2' now; then
+my insertion and my current dilemma will both disappear.
+
+
+AED: lastpage setting LastPage
+(./Lanphere_cover_letter.aux) ) 
+Here is how much of TeX's memory you used:
+ 4387 strings out of 493029
+ 67947 string characters out of 6136235
+ 211600 words of memory out of 5000000
+ 7823 multiletter control sequences out of 15000+600000
+ 58255 words of font info for 49 fonts, out of 8000000 for 9000
+ 1141 hyphenation exceptions out of 8191
+ 50i,12n,49p,1390b,373s stack positions out of 5000i,500n,10000p,200000b,80000s
+{/usr/share/texlive/texmf-dist/fonts/enc/dvips/b
+ase/8r.enc}{/usr/share/texlive/texmf-dist/fonts/enc/dvips/opensans/opensans-03.
+enc}{/usr/share/texlive/texmf-dist/fonts/enc/dvips/opensans/opensans-04.enc}{/u
+sr/share/texlive/texmf-dist/fonts/enc/dvips/opensans/opensans-01.enc}</usr/shar
+e/texlive/texmf-dist/fonts/type1/public/opensans/OpenSans-Bold.pfb></usr/share/
+texlive/texmf-dist/fonts/type1/public/opensans/OpenSans-Regular.pfb></usr/share
+/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texli
+ve/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texm
+f-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/share/texlive/texmf-dist/f
+onts/type1/public/amsfonts/cm/cmsy10.pfb></home/matt/texmf/fonts/type1/urw/aria
+l/ua1r8a.pfb>
+Output written on Lanphere_cover_letter.pdf (2 pages, 105378 bytes).
+PDF statistics:
+ 55 PDF objects out of 1000 (max. 8388607)
+ 39 compressed objects within 1 object stream
+ 0 named destinations out of 1000 (max. 500000)
+ 11 words of extra memory for PDF output out of 10000 (max. 10000000)
+

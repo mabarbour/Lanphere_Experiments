@@ -1,0 +1,86 @@
+%============================================
+% TEMPLATE MODIFIED FROM OFFICIAL.  IT CHANGES:
+% (i) FONT TYPE (THIS IS OPENSANS
+% (ii) DISTANCE BETWEEN LINES (FROM 1 TO 0.8)
+% NOTE: BOLD NEEDS {\bfseries xxx}
+%============================================
+
+\documentclass[english,uzh-en]{scrlttr2}
+\usepackage[T1]{fontenc}
+\usepackage[latin9]{inputenc}
+
+%% CUSTOMIZATION
+\KOMAoptions{%
+%backaddress=false%  No return address in address field
+%,foldmarks=false%  no foldmarks
+}
+ 
+\usepackage{babel}
+\usepackage{uarial}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage[scale=0.9]{opensans} %if this is commented, by default it uses arial
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\renewcommand{\sfdefault}{ua1} % Redefine el /sfdefault (usado en los encabezados) como arial
+%\renewcommand{\rmdefault }{fve}
+\usepackage{setspace}
+
+\newcommand{\mytitle}{\emph{post-doctoral award at Scripps Institution of Oceanography}} %TITLE OR POSITION REPITED THROUGH THE TEXT
+%\mytitle
+
+\begin{document}
+
+%% VARIABLES
+% USER DATA
+\setkomavar{fromname}{Dr. Matthew Barbour}
+\setkomavar{function}{}
+\setkomavar{fromphone}{+41 446356163}
+\setkomavar{fromemail}{matthew.barbour@ieu.uzh.ch}
+\setkomavar{fromurl}{} 
+\setkomavar{assistantheader}{}
+\setkomavar{assistantname}{}
+\setkomavar{assistantemail}{}
+\setkomavar{assistantphoneheader}{}
+\setkomavar{assistantphone}{}
+% If the signature differs from the defines name:
+\setkomavar{signature}{
+\vspace*{-2.5cm}\hspace*{-3cm} \centerline {\includegraphics[width=0.3\columnwidth]{signature.png}}\\
+ \hspace*{-3cm}\centerline {Matthew Barbour}} %MY SIGNATURE
+\setkomavar{subject}{\fosfamily{Re: Change this subject}} %SUBJECT LINE
+%\setkomavar{specialmail}{Internal Mail}
+
+\setkomavar{place}{\fosfamily Zurich}
+\setkomavar{date}{\fosfamily \today }
+
+\fosfamily
+\begin{letter}{\fosfamily \begin{spacing}{0.8}{\vspace *{-1.2cm}Name fo the receiver\\  %THIS CONTAINS THE NAME AND ADDRESS OF THE PERSON WE ARE WRITING TO
+       Building, street, number\\  %THIS CONTAINS THE NAME AND ADDRESS OF THE PERSON WE ARE WRITING TO
+       00000 City\\
+       Country} \end{spacing} ~} %NAME AND ADDRESS TO BE DELIVERED
+\opening{}
+%\rmfamily  %if this is commented, by default it uses arial
+
+
+%\renewcommand\baselinestretch{0.8}\selectfont 
+ \setstretch{0.9} 
+
+Dear Editor,
+
+We are excited to submit our manuscript entitled “Host-plant genetic variation dominates phenotypic plasticity in structuring above and belowground communities” for consideration to be published in Journal of Ecology.
+
+There is clear evidence now that host-plant genetic variation can structure their associated above and belowground communities; however, most research has focused on a single community type in a single common garden setting that minimizes the potential influence of the biotic and abiotic environment. Moreover, most genotype-by-environment studies neglect to examine the multiple plant traits that actually mediate community assembly, making it difficult to tease apart the effects of genetic variation, phenotypic plasticity, and direct environmental effects. To fill these knowledge gaps, we conducted two large common garden experiments with a dominant host-plant, Salix hookeriana, across different biotic (ant-aphid interactions) and abiotic (wind exposure) environmental gradients in a coastal dune ecosystem. We then simultaneously measured the community responses of foliar arthropods aboveground and rhizosphere bacteria and fungi belowground as well as a suite of plant growth and leaf quality traits. Our key finding was that genetic variation in host-plant traits was consistently more important than phenotypic plasticity in structuring both above and belowground communities. This suggests that host-plant genetic variation can be a key driver of above and belowground biodiversity, despite natural variation in the biotic and abiotic environment.
+
+We feel that this manuscript provides a novel contribution to ecology for several reasons. First, our study provides a new benchmark for ‘community genetics’ research, as one of the most comprehensive tests of the genetic basis of community assembly in different environments. Next, through measurements of ecologically relevant plant phenotypes, we provide new evidence of the importance of host-plant genetic variation relative to phenotypic plasticity in structuring diverse above and belowground assemblages. Finally, our work integrates research on diverse topics such as ecological genetics, above and belowground linkages, and a trait-based approach to ecology, and therefore should be of interest to the broad readership of Journal of Ecology.
+
+We think that either Dr. Randall Hughes or Dr. Jennifer Lau would be an appropriate associate editor for this submission and suitable reviewers for this manuscript include: Luis Abdala-Roberts (Universidad Autónoma de Yucatán), Tobias Züst (University of Bern), Erika Hersch-Green (Michigan Technological University), and Jennifer Schweitzer (University of Tennessee). 
+
+All of my co-authors have contributed and approved of this version of the manuscript. Thank you for your assistance and I look forward to hearing from you regarding the reviews.
+
+
+
+\closing{\hspace*{-3cm}\centerline {Warm regards,}\\[5pt]\vspace*{-1.85cm}}
+
+\end{letter}
+
+\end{document}

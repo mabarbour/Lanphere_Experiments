@@ -1,0 +1,146 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% uzh-en.lco
+%% Copyright 2010 Jürgen Spitzmüller <spitzmueller@ds.uzh.ch>
+%
+% This work may be distributed and/or modified under the
+% conditions of the LaTeX Project Public License, either version 1.3
+% of this license or (at your option) any later version.
+% The latest version of this license is in
+%   http://www.latex-project.org/lppl.txt
+% and version 1.3 or later is part of all distributions of LaTeX
+% version 2003/12/01 or later.
+%
+% This work has the LPPL maintenance status "maintained".
+% 
+% The Current Maintainer of this work is Jürgen Spitzmüller.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% This is a Letter Class Option File
+%% that needs the scrlttr2 class fromaddress
+%% the KOMA Script bundle
+%% 
+%% This LCO implements the layout as defined by
+%% the new (2010) corporate identity of the
+%% University of Zurich (UZH), English version.
+%% See uzh.lco for a German localization.
+%% (this file requires uzh.lco).
+%%
+%% USAGE: \documentclass[uzh-en]{scrlttr2}
+%%
+%% Sender data can be adjusted at the bottom
+%% of this file.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\ProvidesFile{uzh-en.lco}[%
+  2010/11/25 KOMA letter class option UZH-EN (JSpitzm)]
+\@ifclassloaded{scrlttr2}{%
+  \@ifclasslater{scrlttr2}{2010/11/25}{%
+    \GenericWarning{%
+      (uzh-en.lco)\@spaces\@spaces\@spaces\@spaces\@spaces\@spaces%
+    }{%
+      Letter-class-option infoblck Warning:\space
+      This letter class option file was made\MessageBreak
+      only to be used with KOMA-Script letter\MessageBreak
+      class `scrlttr2' with version date\MessageBreak
+      before 2002-06-28. Use with other\MessageBreak
+      versions of `scrlttr2' may result in a\MessageBreak
+      lot of errors or unexpected behaviour\@gobble
+    }%
+  }{}%
+}{%
+  \GenericWarning{%
+    (uzh-en.lco)\@spaces\@spaces\@spaces\@spaces\@spaces\@spaces%
+  }{%
+    Letter-class-option infoblck Warning:\space
+    This letter class option file was made\MessageBreak
+    only to be used with KOMA-Script letter\MessageBreak
+    class `scrlttr2'. Use with other classes\MessageBreak
+    may result in a lot of errors\@gobble
+  }%
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% General settings
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Load the base lco (uzh)
+\LoadLetterOption{uzh}%                   
+
+%% UZH LOGO
+\RequirePackage{graphicx}
+\setkomavar{fromlogo}{\includegraphics{uzh_logo_e_pos}}
+
+%% DEFINE LETTER HEADS:
+\firsthead{%
+  \hspace*{-1.5cm}\usekomavar{fromlogo}% 
+    \put(185.5,32.5){\parbox[t][40mm][t]{65mm}{\raggedright
+      {\fontsize{10}{12pt}\selectfont\textbf{\usekomavar{unit}}}%
+       \ifkomavarempty{subunit}{\\[9pt]}{\fontsize{10}{12pt}\selectfont\\\usekomavar{subunit}\\[9pt]}
+        {\fontsize{7.5}{9pt}\selectfont University of Zurich\\
+        \usekomavar{unit}\\
+        \usekomavar{fromaddress}\\
+        %\ifkomavarempty{unitphone}{}{%
+          %\usekomavar*{unitphone} \usekomavar{unitphone}\\}%
+        %\ifkomavarempty{unitfax}{}{%
+          %\usekomavar*{unitfax} \usekomavar{unitfax}\\}%
+        %\usekomavar{uniturl}\\
+        ~%
+      }}}%
+}
+
+\nexthead{%
+  \hspace*{-2.1cm}\usekomavar{fromlogo}%
+    \put(185.5,32.5){\parbox[t][40mm][t]{59mm}{\raggedright
+      {\fosfamily\fontsize{10}{12pt}\selectfont\textup{\textbf{\usekomavar{unit}}}}%
+      }}%
+}
+
+%% DEFINE LETTER FOOT:
+\firstfoot{\usekomafont{pagefoot}Page \thepage /\pageref{LastPage}}
+\nextfoot{Page \thepage /\pageref{LastPage}\hfill}
+
+%% CUSTOMIZE SEPARATORS
+\setkomavar{placeseparator}{, }
+\setkomavar{backaddressseparator}{, }
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% SENDER DETAILS
+%%
+%% Adjust to your needs!
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% UNIT (e.g. Institute)
+\setkomavar{unit}{Department of Evolutionary Biology\\and Enviromental Studies}
+
+%% SUBUNIT (e.g. Division)
+%\setkomavar{subunit}{Subdivision}
+
+%% Address detail for your unit:
+\setkomavar{fromaddress}{Winterthurerstrasse 190\\8057 Zurich, Switzerland}
+\setkomavar{unitphone}[Phone]{+41\,00\,000\,00\,00}
+\setkomavar{unitfax}[Fax]{+41\,00\,000\,00\,00}
+\setkomavar{uniturl}{www.universitydivision.uzh.ch}
+
+%% Your own address data:
+\setkomavar{fromname}{Prof. Dr. Jordi Bascompte}
+\setkomavar{function}{}
+\setkomavar{fromphone}[Phone]{+41\,44\,635\,61\,26}
+%\setkomavar{fromfax}[Fax]{+41\,00\,000\,00\,00}
+\setkomavar{fromurl}{http://www.bascompte.net}
+\setkomavar{fromemail}{jordi.bascompte@ieu.uzh.ch}
+\setkomavar{assistantheader}{\\Administrative Assistant}
+\setkomavar{assistantphoneheader}{\\Phone }
+%% Backaddress for the address field
+\setkomavar{backaddress}
+	{University of Zurich\\
+	IEU
+	/ \usekomavar{fromname}}
+
+%% Location. Date will be \today if not specified otherwise.
+\setkomavar{place}{Zurich}
+
+%% That's it
+\endinput
