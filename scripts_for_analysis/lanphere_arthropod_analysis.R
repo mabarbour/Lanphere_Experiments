@@ -68,6 +68,80 @@ w.arth.13.full <- wind.arth.df %>%
 w.arth.13.pos2 <- w.arth.13.full %>%
   filter(total.abund > 1)
 
+## Wind 2012 Arthropod Abundance
+source('~/Dropbox/miscellaneous_R/model_diagnostic_functions.R')
+w.arth.abund.2012 <- lmer(log(total.abund+1) ~ Wind.Exposure + (Wind.Exposure|Genotype) +
+                            #(1|Block) + 
+                            (1|Block:Wind.Exposure),
+                          data = filter(wind.arth.df, Year == "2012"),
+                          contrasts = list(Wind.Exposure = "contr.sum"))
+summary(w.arth.abund.2012)
+fixef(w.arth.abund.2012)
+var.table(w.arth.abund.2012, experiment = "wind")
+
+library(piecewiseSEM)
+var(as.vector(fixef(w.arth.abund.2012) %*% t(w.arth.abund.2012@pp$X)))
+
+library(brms)
+w.arth.abund.2012.brm <- brm(log(total.abund+1) ~ Wind.Exposure + (Wind.Exposure|Genotype) +
+                                      (1|Block) + (1|Block:Wind.Exposure),
+                          data = filter(wind.arth.df, Year == "2012"),
+                          family = "gaussian")
+summary(w.arth.abund.2012.brm)
+
+
+
+hypothesis(w.arth.abund.2012.brm, "Wind.ExposureUnexposed = 0") # NA evidence ratio?
+
+fixef(w.arth.abund.2012.brm)
+VarCorr(w.arth.abund.2012.brm)
+model.matrix(~Wind.Exposure, filter(wind.arth.df, Year == "2012"))
+
+bayes_R2(w.arth.abund.2012.brm)
+
+
+w.arth.abund.2012.brm.noGxE <- brm(log(total.abund+1) ~ Wind.Exposure + (1|Genotype) +
+                               (1|Block) + (1|Block:Wind.Exposure),
+                             data = filter(wind.arth.df, Year == "2012"),
+                             family = "gaussian")
+
+LOO(w.arth.abund.2012.brm, w.arth.abund.2012.brm.noGxE)
+
+w.arth.rich.2012.brm <- brm(total.rich ~ Wind.Exposure + (Wind.Exposure|Genotype) +
+                                  (1|Block) + (1|Block:Wind.Exposure),
+                                data = filter(wind.arth.df, Year == "2012"),
+                                family = "gaussian",
+                                control = list(adapt_delta = 0.95))
+summary(w.arth.rich.2012.brm)
+hypothesis(w.arth.rich.2012.brm, "Wind.ExposureUnexposed = 0") # NA evidence ratio?
+hypothesis(w.arth.rich.2012.brm, "Wind.ExposureUnexposed > 0")
+hypothesis(w.arth.rich.2012.brm, "Wind.ExposureUnexposed = 0", class = "sd", group = "Genotype")
+hypothesis(w.arth.rich.2012.brm, "Intercept = 0", class = "sd", group = "Genotype")
+hypothesis(w.arth.rich.2012.brm, "Intercept > 0", class = "sd", group = "Block")
+
+w.arth.rich.2012.brm.noGxE <- brm(total.rich ~ Wind.Exposure + (1|Genotype) +
+                                        (1|Block) + (1|Block:Wind.Exposure),
+                                      data = filter(wind.arth.df, Year == "2012"),
+                                      family = "gaussian",
+                                      control = list(adapt_delta = 0.95))
+
+LOO(w.arth.rich.2012.brm, w.arth.rich.2012.brm.noGxE)
+
+w.arth.rarerich.2012.brm <- brm(total.rarerich ~ Wind.Exposure + (Wind.Exposure|Genotype) +
+                               (1|Block) + (1|Block:Wind.Exposure),
+                             data = filter(wind.arth.df, Year == "2012"),
+                             family = "gaussian",
+                             control = list(adapt_delta = 0.95))
+summary(w.arth.rarerich.2012.brm)
+hypothesis(w.arth.rarerich.2012.brm, "Wind.ExposureUnexposed = 0") # NA evidence ratio?
+
+w.arth.rarerich.2012.brm.noGxE <- brm(total.rarerich ~ Wind.Exposure + (1|Genotype) +
+                                     (1|Block) + (1|Block:Wind.Exposure),
+                                   data = filter(wind.arth.df, Year == "2012"),
+                                   family = "gaussian",
+                                   control = list(adapt_delta = 0.95))
+summary(w.arth.rarerich.2012.brm.noGxE)
+LOO(w.arth.rarerich.2012.brm, w.arth.rarerich.2012.brm.noGxE)
 
 ## Wind: arthropod abundance analysis ----
 
