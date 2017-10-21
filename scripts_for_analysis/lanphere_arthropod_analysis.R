@@ -70,14 +70,35 @@ w.arth.13.pos2 <- w.arth.13.full %>%
 
 ## Wind 2012 Arthropod Abundance
 source('~/Dropbox/miscellaneous_R/model_diagnostic_functions.R')
-w.arth.abund.2012 <- lmer(log(total.abund+1) ~ Wind.Exposure + (Wind.Exposure|Genotype) +
-                            #(1|Block) + 
+w.arth.rich.2012 <- lmer(total.rich ~ Wind.Exposure*Genotype +
+                            (1|Block) + 
                             (1|Block:Wind.Exposure),
                           data = filter(wind.arth.df, Year == "2012"),
-                          contrasts = list(Wind.Exposure = "contr.sum"))
-summary(w.arth.abund.2012)
-fixef(w.arth.abund.2012)
-var.table(w.arth.abund.2012, experiment = "wind")
+                          contrasts = list(Wind.Exposure = "contr.sum",
+                                           Genotype = "contr.sum"))
+
+
+summary(w.arth.rich.2012)
+fixef.var <- var(as.vector(fixef(w.arth.rich.2012)[1:20] %*% t(w.arth.rich.2012@pp$X[ ,1:20])))
+wind.var <- var(as.vector(fixef(w.arth.rich.2012)[1:2] %*% t(w.arth.rich.2012@pp$X[ ,1:2])))
+geno.var <- var(as.vector(fixef(w.arth.rich.2012)[c(1,3:11)] %*% t(w.arth.rich.2012@pp$X[, c(1,3:11)])))
+GxE.var <- var(as.vector(fixef(w.arth.rich.2012)[c(1,12:20)] %*% t(w.arth.rich.2012@pp$X[, c(1,12:20)])))
+
+w.arth.rich.2012.alt <- lmer(total.rich ~ Wind.Exposure + (Wind.Exposure |Genotype) +
+                           (1|Block) + 
+                           (1|Block:Wind.Exposure),
+                         data = filter(wind.arth.df, Year == "2012"),
+                         contrasts = list(Wind.Exposure = "contr.sum",
+                                          Genotype = "contr.sum"))
+wind.var.alt <- var(as.vector(fixef(w.arth.rich.2012.alt) %*% t(w.arth.rich.2012.alt@pp$X)))
+summary(w.arth.rich.2012.alt)
+geno.var.alt <- 0.07457
+
+fixef.var
+wind.var + geno.var + GxE.var
+sum(var.table(w.arth.rich.2012, experiment = "wind")$var[1:20])
+
+var(fixef(w.arth.rich.2012)[3:11])
 
 library(piecewiseSEM)
 var(as.vector(fixef(w.arth.abund.2012) %*% t(w.arth.abund.2012@pp$X)))
@@ -107,11 +128,42 @@ w.arth.abund.2012.brm.noGxE <- brm(log(total.abund+1) ~ Wind.Exposure + (1|Genot
 
 LOO(w.arth.abund.2012.brm, w.arth.abund.2012.brm.noGxE)
 
-w.arth.rich.2012.brm <- brm(total.rich ~ Wind.Exposure + (Wind.Exposure|Genotype) +
+contrasts(wind.arth.df$Wind.Exposure) <- "contr.sum"
+w.arth.rich.2012.brm <- brm(total.rarerich ~ Wind.Exposure + (Wind.Exposure|Genotype) +
                                   (1|Block) + (1|Block:Wind.Exposure),
-                                data = filter(wind.arth.df, Year == "2012"),
+                                data = filter(wind.arth.df, Year == "2013"),
                                 family = "gaussian",
                                 control = list(adapt_delta = 0.95))
+library(brms)
+w.arth.rich.2012.brm.noWind <- brm(total.rarerich ~ 1 + (1 | Block) + (1 | Block:Wind.Exposure),
+                            data = filter(wind.arth.df, Year == "2013"),
+                            family = "gaussian",
+                            control = list(adapt_delta = 0.95))
+
+bayes_R2(w.arth.rich.2012.brm)
+bayes_R2(w.arth.rich.2012.brm.noWind)
+
+LOO(w.arth.rich.2012.brm, w.arth.rich.2012.brm.noWind)
+
+str(summary(w.arth.rich.2012.brm))
+str(w.arth.rich.2012.brm[1]$formula$formula)
+model.matrix(w.arth.rich.2012.brm[1]$formula$formula, data = filter(wind.arth.df, Year == "2013"))
+w.arth.rich.2012.brm.GxE <- brm(total.rich ~ Wind.Exposure + (1|Genotype) + (1|GxE)+
+                              (1|Block) + (1|Block:Wind.Exposure),
+                            data = filter(wind.arth.df, Year == "2013"),
+                            family = "poisson",
+                            control = list(adapt_delta = 0.95))
+
+summary(w.arth.rich.2012.brm)
+sd(data.frame(ranef(w.arth.rich.2012.brm)$Block)$Estimate.Intercept)
+mean(data.frame(ranef(w.arth.rich.2012.brm)$Block)$Estimate.Intercept)
+
+stanplot(w.arth.rich.2012.brm)
+stanplot(w.arth.rich.2012.brm.GxE)
+LOO(w.arth.rich.2012.brm, w.arth.rich.2012.brm.GxE)
+summary(w.arth.rich.2012.brm)
+summary(w.arth.rich.2012.brm.GxE)
+
 summary(w.arth.rich.2012.brm)
 hypothesis(w.arth.rich.2012.brm, "Wind.ExposureUnexposed = 0") # NA evidence ratio?
 hypothesis(w.arth.rich.2012.brm, "Wind.ExposureUnexposed > 0")
