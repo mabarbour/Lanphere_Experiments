@@ -24,7 +24,7 @@ aa.arth.df <- read.csv('final_data/ant_aphid_arthropod_df.csv') %>%
          fact.Ant.mound.dist = as.factor(Ant.mound.dist),
          ord.Ant.mound.dist = ordered(Ant.mound.dist),
          GxE = C(interaction(Genotype,Aphid.treatment), "contr.sum")) #%>% #,
-         #Plot_code = paste(Block, fact.Ant.mound.dist, sep = "_")) %>%
+#Plot_code = paste(Block, fact.Ant.mound.dist, sep = "_")) %>%
 
 aa.arth.names <- colnames(select(aa.arth.df, Gracilliaridae_miner:Spider))
 
@@ -42,7 +42,7 @@ wind.arth.df <- read.csv('final_data/wind_arthropod_df.csv') %>%
          Year = as.factor(Year),
          Plot_code = interaction(Block, Wind.Exposure),
          GxE = C(interaction(Genotype, Wind.Exposure), contr = "contr.sum", how.many = 9))  # create a new variable for the interaction to permit testing of main effects with type 3 sum of squares. 
-
+contrasts(wind.arth.df$Wind.Exposure) <- "contr.sum" # important for calculating variance explained
 wind.arth.names <- colnames(select(wind.arth.df, Gracilliaridae_miner:Spider)) # for subsetting community data
 
 
@@ -68,241 +68,60 @@ w.arth.13.full <- wind.arth.df %>%
 w.arth.13.pos2 <- w.arth.13.full %>%
   filter(total.abund > 1)
 
-## Wind 2012 Arthropod Abundance
-source('~/Dropbox/miscellaneous_R/model_diagnostic_functions.R')
-w.arth.rich.2012 <- lmer(total.rich ~ Wind.Exposure*Genotype +
-                            (1|Block) + 
-                            (1|Block:Wind.Exposure),
-                          data = filter(wind.arth.df, Year == "2012"),
-                          contrasts = list(Wind.Exposure = "contr.sum",
-                                           Genotype = "contr.sum"))
-
-
-summary(w.arth.rich.2012)
-fixef.var <- var(as.vector(fixef(w.arth.rich.2012)[1:20] %*% t(w.arth.rich.2012@pp$X[ ,1:20])))
-wind.var <- var(as.vector(fixef(w.arth.rich.2012)[1:2] %*% t(w.arth.rich.2012@pp$X[ ,1:2])))
-geno.var <- var(as.vector(fixef(w.arth.rich.2012)[c(1,3:11)] %*% t(w.arth.rich.2012@pp$X[, c(1,3:11)])))
-GxE.var <- var(as.vector(fixef(w.arth.rich.2012)[c(1,12:20)] %*% t(w.arth.rich.2012@pp$X[, c(1,12:20)])))
-
-w.arth.rich.2012.alt <- lmer(total.rich ~ Wind.Exposure + (Wind.Exposure |Genotype) +
-                           (1|Block) + 
-                           (1|Block:Wind.Exposure),
-                         data = filter(wind.arth.df, Year == "2012"),
-                         contrasts = list(Wind.Exposure = "contr.sum",
-                                          Genotype = "contr.sum"))
-wind.var.alt <- var(as.vector(fixef(w.arth.rich.2012.alt) %*% t(w.arth.rich.2012.alt@pp$X)))
-summary(w.arth.rich.2012.alt)
-geno.var.alt <- 0.07457
-
-fixef.var
-wind.var + geno.var + GxE.var
-sum(var.table(w.arth.rich.2012, experiment = "wind")$var[1:20])
-
-var(fixef(w.arth.rich.2012)[3:11])
-
-library(piecewiseSEM)
-var(as.vector(fixef(w.arth.abund.2012) %*% t(w.arth.abund.2012@pp$X)))
-
-hist(filter(wind.arth.df, Year == "2012")$total.rich)
-w.arth.rich.2012.brm <- brm(total.rich ~ Wind.Exposure + (Wind.Exposure|Genotype) +
-                               (1|Block) + (1|Block:Wind.Exposure) + (1|plant_ID),
-                             data = filter(wind.arth.df, Year == "2012"),
-                             family = "poisson",
-                            control = list(adapt_delta=0.9))
-tidy(w.arth.rich.2012.brm)
-summary(w.arth.rich.2012.brm)
-plot(marginal_effects(w.arth.rich.2012.brm))
-bayes_R2(w.arth.rich.2012.brm)
-pp_check(w.arth.rich.2012.brm)
-get_variance_wind_brms(w.arth.rich.2012.brm, data = filter(wind.arth.df, Year == "2012"), RE_rows = 3:8)
+## ARTHROPOD ABUNDANCE ----
 library(brms)
-w.arth.abund.2012.brm <- brm(log(total.abund+1) ~ Wind.Exposure + (Wind.Exposure|Genotype) +
-                                      (1|Block) + (1|Block:Wind.Exposure),
-                          data = filter(wind.arth.df, Year == "2012"),
-                          family = "gaussian")
-summary(w.arth.abund.2012.brm)
-str(VarCorr(w.arth.abund.2012.brm))
-as.data.frame(VarCorr(w.arth.abund.2012.brm, old=T))
-length(VarCorr(w.arth.abund.2012.brm))
-as.data.frame(VarCorr(w.arth.abund.2012.brm)$Block)
+source('scripts_for_analysis/variance_partitioning_brms.R')
 
-names(VarCorr(w.arth.abund.2012.brm))
-test <- list()
-for(i in 1:length(VarCorr(w.arth.abund.2012.brm))){
-  test[[i]] <- as.data.frame(VarCorr(w.arth.abund.2012.brm)[[i]])
-}
-names(test) <- names(VarCorr(w.arth.abund.2012.brm))
-plyr::ldply(test)
-
-hypothesis(w.arth.abund.2012.brm, "Wind.ExposureUnexposed = 0") # NA evidence ratio?
-
-fixef(w.arth.abund.2012.brm)
-as.data.frame(VarCorr(w.arth.abund.2012.brm, old=T))
-model.matrix(~Wind.Exposure, filter(wind.arth.df, Year == "2012"))
-
-bayes_R2(w.arth.abund.2012.brm)
-
-
-w.arth.abund.2012.brm.noGxE <- brm(log(total.abund+1) ~ Wind.Exposure + (1|Genotype) +
-                               (1|Block) + (1|Block:Wind.Exposure),
-                             data = filter(wind.arth.df, Year == "2012"),
-                             family = "gaussian")
-
-LOO(w.arth.abund.2012.brm, w.arth.abund.2012.brm.noGxE)
-
-contrasts(wind.arth.df$Wind.Exposure) <- "contr.sum"
-w.arth.rich.2012.brm <- brm(total.rarerich ~ Wind.Exposure + (Wind.Exposure|Genotype) +
-                                  (1|Block) + (1|Block:Wind.Exposure),
-                                data = filter(wind.arth.df, Year == "2013"),
-                                family = "gaussian",
-                                control = list(adapt_delta = 0.95))
-library(brms)
-w.arth.rich.2012.brm.noWind <- brm(total.rarerich ~ 1 + (1 | Block) + (1 | Block:Wind.Exposure),
-                            data = filter(wind.arth.df, Year == "2013"),
-                            family = "gaussian",
-                            control = list(adapt_delta = 0.95))
-
-bayes_R2(w.arth.rich.2012.brm)
-bayes_R2(w.arth.rich.2012.brm.noWind)
-
-LOO(w.arth.rich.2012.brm, w.arth.rich.2012.brm.noWind)
-
-str(summary(w.arth.rich.2012.brm))
-str(w.arth.rich.2012.brm[1]$formula$formula)
-model.matrix(w.arth.rich.2012.brm[1]$formula$formula, data = filter(wind.arth.df, Year == "2013"))
-w.arth.rich.2012.brm.GxE <- brm(total.rich ~ Wind.Exposure + (1|Genotype) + (1|GxE)+
-                              (1|Block) + (1|Block:Wind.Exposure),
-                            data = filter(wind.arth.df, Year == "2013"),
-                            family = "poisson",
-                            control = list(adapt_delta = 0.95))
-
-summary(w.arth.rich.2012.brm)
-sd(data.frame(ranef(w.arth.rich.2012.brm)$Block)$Estimate.Intercept)
-mean(data.frame(ranef(w.arth.rich.2012.brm)$Block)$Estimate.Intercept)
-
-stanplot(w.arth.rich.2012.brm)
-stanplot(w.arth.rich.2012.brm.GxE)
-LOO(w.arth.rich.2012.brm, w.arth.rich.2012.brm.GxE)
-summary(w.arth.rich.2012.brm)
-summary(w.arth.rich.2012.brm.GxE)
-
-summary(w.arth.rich.2012.brm)
-hypothesis(w.arth.rich.2012.brm, "Wind.ExposureUnexposed = 0") # NA evidence ratio?
-hypothesis(w.arth.rich.2012.brm, "Wind.ExposureUnexposed > 0")
-hypothesis(w.arth.rich.2012.brm, "Wind.ExposureUnexposed = 0", class = "sd", group = "Genotype")
-hypothesis(w.arth.rich.2012.brm, "Intercept = 0", class = "sd", group = "Genotype")
-hypothesis(w.arth.rich.2012.brm, "Intercept > 0", class = "sd", group = "Block")
-
-w.arth.rich.2012.brm.noGxE <- brm(total.rich ~ Wind.Exposure + (1|Genotype) +
-                                        (1|Block) + (1|Block:Wind.Exposure),
-                                      data = filter(wind.arth.df, Year == "2012"),
-                                      family = "gaussian",
-                                      control = list(adapt_delta = 0.95))
-
-LOO(w.arth.rich.2012.brm, w.arth.rich.2012.brm.noGxE)
-
-w.arth.rarerich.2012.brm <- brm(total.rarerich ~ Wind.Exposure + (Wind.Exposure|Genotype) +
-                               (1|Block) + (1|Block:Wind.Exposure),
-                             data = filter(wind.arth.df, Year == "2012"),
-                             family = "gaussian",
-                             control = list(adapt_delta = 0.95))
-summary(w.arth.rarerich.2012.brm)
-hypothesis(w.arth.rarerich.2012.brm, "Wind.ExposureUnexposed = 0") # NA evidence ratio?
-
-w.arth.rarerich.2012.brm.noGxE <- brm(total.rarerich ~ Wind.Exposure + (1|Genotype) +
-                                     (1|Block) + (1|Block:Wind.Exposure),
-                                   data = filter(wind.arth.df, Year == "2012"),
-                                   family = "gaussian",
-                                   control = list(adapt_delta = 0.95))
-summary(w.arth.rarerich.2012.brm.noGxE)
-LOO(w.arth.rarerich.2012.brm, w.arth.rarerich.2012.brm.noGxE)
-
-## Wind: arthropod abundance analysis ----
-
-# GLMM
-arth.abund.glmer <- glmer(total.abund ~ Wind.Exposure*Genotype*Year +
-                             (1|Block) + 
-                             (1|Block:Wind.Exposure) +
-                             (1|X) +
-                             (1|plant_ID),
-                           data = wind.arth.df,
-                           contrasts = list(Wind.Exposure = "contr.sum",
-                                            Genotype = "contr.sum",
-                                            Year = "contr.sum"),
-                           family = "poisson",
-                           control=glmerControl(optimizer="bobyqa",
-                                                optCtrl=list(maxfun=2e5)))
-print(summary(arth.abund.glmer), correlation = TRUE)
-overdisp_fun(arth.abund.glmer) # accounted for overdispersion by modelling individual-level random effect.
-
-# Likelihood ratio tests
-(w.abund.3 <- drop1(arth.abund.glmer, test = "Chisq"))
-(w.abund.2 <- drop1(update(arth.abund.glmer, .~. -Wind.Exposure:Genotype:Year), test = "Chisq"))
-(w.abund.1 <- drop1(update(arth.abund.glmer, .~. -Wind.Exposure:Genotype:Year -Wind.Exposure:Genotype -Wind.Exposure:Year -Genotype:Year), test = "Chisq"))
-
-
-## Effects
-Effect(c("Year"), arth.abund.glmer) # 1.4-fold more arthropods in 2013 vs. 2012. 
-Effect(c("Wind.Exposure"), arth.abund.glmer) # 1.9 more arthropods on unexposed plants; 47% fewer arthropods on wind-exposed plants.
-Effect(c("Genotype"), arth.abund.glmer) # arthropod abundance varied 4.7-fold among genotypes
-
-w.abund.GxE <- as.data.frame(Effect(c("Wind.Exposure","Genotype"), arth.abund.glmer)) %>% mutate(response = "arthropod_abund")
-
-## Calculate R2 for significant predictors
-arth.abund.up <- update(arth.abund.glmer, .~. -Wind.Exposure*Genotype*Year + Wind.Exposure + Year + (1|Genotype))
-
-(arth.abund.R2 <- var.table(arth.abund.up, experiment = "wind"))
+# WIND 2012
+hist(filter(wind.arth.df, Year == "2012")$total.abund+1)
+arth.abund.brm <- brm(total.abund ~ 
+                        Wind.Exposure + 
+                        (Wind.Exposure|Genotype) +
+                        (1|Block) + 
+                        (1|Block:Wind.Exposure),
+                      data=filter(wind.arth.df, Year == "2012"),
+                      family="negbinomial",
+                      control=list(adapt_delta=0.99)
+)
+pp_check(arth.abund.brm, nsamples=100)
+tidy(arth.abund.brm)
+bayes_R2(arth.abund.brm)
+arth.abund.var <- get_variance_wind_brms(arth.abund.brm, data = filter(wind.arth.df, Year == "2012"), RE_rows = 3:7)
+arth.abund.var$estimate[6]^2/sum(arth.abund.var$estimate^2)
 
 ## Wind: arthropod richness analysis ----
 plot(log(total.rich+1) ~ log(total.abund+1), wind.arth.df)
 
 # GLMM
-arth.rich.glmer <- glmer(total.rich ~ Wind.Exposure*Year*Genotype +
-                            (1|Block) + 
-                            (1|Block:Wind.Exposure) +
-                            #(1|X) +
-                            (1|plant_ID),
-                          data = wind.arth.df,
-                          contrasts = list(Wind.Exposure = "contr.sum",
-                                           Genotype = "contr.sum",
-                                           Year = "contr.sum"),
-                          family = "poisson",
-                          control=glmerControl(optimizer="bobyqa",
-                                               optCtrl=list(maxfun=2e5)))
-print(summary(arth.rich.glmer), correlation = TRUE)
-overdisp_fun(arth.rich.glmer) # no overdispersion
+hist(filter(wind.arth.df, Year == "2012")$total.rich)
+arth.rich.brm <- brm(total.rich ~ Wind.Exposure +
+                           (Wind.Exposure|Genotype) +
+                           (1|Block) + 
+                           (1|Block:Wind.Exposure),
+                     data=filter(wind.arth.df, Year == "2012"),
+                     family="poisson",
+                     control=list(adapt_delta=0.9))
+pp_check(arth.rich.brm, nsamples=100)
+tidy(arth.rich.brm)
+bayes_R2(arth.rich.brm)
+plot(marginal_effects(arth.rich.brm))
+pois_var <- log(1 + 1/exp(fixef(arth.rich.brm)["Intercept","Estimate"]))
+arth.rich.var <- get_variance_wind_brms(arth.rich.brm, data = filter(wind.arth.df, Year == "2012"), RE_rows = 3:6)
+arth.rich.var$estimate[1]^2/(sum(arth.rich.var$estimate^2) + pois_var)
 
 
-# Likelihood ratio tests
-(w.rich.3 <- drop1(arth.rich.glmer, test = "Chisq"))
-(w.rich.2 <- drop1(update(arth.rich.glmer, .~. -Wind.Exposure:Genotype:Year), test = "Chisq"))
-(w.rich.1 <- drop1(update(arth.rich.glmer, .~. -Wind.Exposure:Genotype:Year -Wind.Exposure:Genotype -Wind.Exposure:Year -Genotype:Year), test = "Chisq"))
-
-## Effects
-Effect("Year", arth.rich.glmer) # 1.4-fold more arthropod species in 2013 vs. 2012
-Effect("Wind.Exposure", arth.rich.glmer) # arthropod richness on exposed plants was 51% less.
-Effect("Genotype", arth.rich.glmer) # arthropod richness varied 3.1-fold among willow genotypes
-
-w.rich.GxE <- as.data.frame(Effect(c("Wind.Exposure","Genotype"), arth.rich.glmer)) %>% mutate(response = "arthropod_rich")
-
-## Calculate R2
-arth.rich.up <- update(arth.rich.glmer, .~. -Wind.Exposure*Genotype*Year + Wind.Exposure + Year + (1|Genotype))
-
-(arth.rich.R2 <- var.table(arth.rich.up, experiment = "wind"))
 
 ## Wind: rarefied arthropod richness analysis ----
 # need to filter data so that there are 2 or more individuals
 hist(filter(wind.arth.df, total.abund > 1)$total.rarerich)
 
 # GLMM
-arth.rarerich.glmer <- lmer(total.rarerich ~ Wind.Exposure*Year+ Wind.Exposure*Genotype +
-                           (1|Block) + 
-                           (1|Block:Wind.Exposure) +
-                           (1|plant_ID),
-                         data = filter(wind.arth.df, total.abund > 1),
-                         contrasts = list(Wind.Exposure = "contr.sum",
-                                          Genotype = "contr.sum",
-                                          Year = "contr.sum"))
+arth.rarerich.brm <- brm(total.rarerich ~ Wind.Exposure +
+                              (Wind.Exposure|Genotype) +
+                              (1|Block) + 
+                              (1|Block:Wind.Exposure),
+                            data = filter(wind.arth.df, total.abund>1, Year=="2012"),
+                         )
 print(summary(arth.rarerich.glmer), correlation = TRUE)
 
 ## Likelihood ratio tests
@@ -332,7 +151,7 @@ anova(update(w.12.hell.rda, .~. -Wind.Exposure:Genotype), by = "margin", permuta
 w.12.plots.hell <- betadisper(vegdist(w.12.hell.pos2, method = "euclidean"),  w.arth.12.pos2$Plot_code, bias.adjust = TRUE)
 
 w.12.plots.centr.hell <- data.frame(w.12.plots.hell$centroids, 
-                               id = rownames(w.12.plots.hell$centroids)) %>%
+                                    id = rownames(w.12.plots.hell$centroids)) %>%
   separate(col = id, into = c("Block","Wind.Exposure")) %>%
   mutate(Block = as.factor(Block),
          Wind.Exposure = as.factor(Wind.Exposure))
@@ -358,7 +177,7 @@ anova(update(w.13.hell.rda, .~. -Wind.Exposure:Genotype), by = "margin",permutat
 w.13.plots.hell <- betadisper(vegdist(w.13.hell.pos2, method = "euclidean"),  w.arth.13.pos2$Plot_code, bias.adjust = TRUE)
 
 w.13.plots.centr.hell <- data.frame(w.13.plots.hell$centroids, 
-                               id = rownames(w.13.plots.hell$centroids)) %>%
+                                    id = rownames(w.13.plots.hell$centroids)) %>%
   separate(col = id, into = c("Block","Wind.Exposure")) %>%
   mutate(Block = as.factor(Block),
          Wind.Exposure = as.factor(Wind.Exposure))
@@ -532,7 +351,7 @@ aphid.abund.glmer <- glmer(Aphididae ~ Wind.Exposure + Genotype +
                                                 optCtrl=list(maxfun=2e5)))
 summary(aphid.abund.glmer)
 overdisp_fun(aphid.abund.glmer) # sig. overdisper, model with individual-level random effect
- 
+
 
 # likelihood ratio test
 (aphid.1 <- drop1(aphid.abund.glmer, test = "Chisq")) # no wind exposure or genotype effect
@@ -679,14 +498,14 @@ var.table(update(aa.Fobs.abund.glmer, .~. +(1|plant_ID)), "ant-aphid") # need to
 
 # GLMM
 aa.arth.abund.glmer <- glmer(total.abund ~ scale(Ant.mound.dist)*Aphid.treatment*Genotype +
-                            (1|plant_ID) +
-                            (1|Block/fact.Ant.mound.dist),
-                          data = aa.arth.df,
-                          contrasts = list(Aphid.treatment = "contr.sum",
-                                           Genotype = "contr.sum"),
-                          family = "poisson",
-                          control=glmerControl(optimizer="bobyqa",
-                                               optCtrl=list(maxfun=2e5)))
+                               (1|plant_ID) +
+                               (1|Block/fact.Ant.mound.dist),
+                             data = aa.arth.df,
+                             contrasts = list(Aphid.treatment = "contr.sum",
+                                              Genotype = "contr.sum"),
+                             family = "poisson",
+                             control=glmerControl(optimizer="bobyqa",
+                                                  optCtrl=list(maxfun=2e5)))
 print(summary(aa.arth.abund.glmer), correlation = TRUE)
 overdisp_fun(aa.arth.abund.glmer) # accounted for overdispersion by modelling individual-level random effect.
 
@@ -716,14 +535,14 @@ plot(total.rich ~ total.abund, aa.arth.df)
 
 # GLMM
 aa.arth.rich.glmer <- glmer(total.rich ~ scale(Ant.mound.dist)*Aphid.treatment*Genotype +
-                           #(1|plant_ID) +
-                           (1|Block/fact.Ant.mound.dist),
-                         data = aa.arth.df,
-                         contrasts = list(Aphid.treatment = "contr.sum",
-                                          Genotype = "contr.sum"),
-                         family = "poisson",
-                         control=glmerControl(optimizer="bobyqa",
-                                              optCtrl=list(maxfun=2e5)))
+                              #(1|plant_ID) +
+                              (1|Block/fact.Ant.mound.dist),
+                            data = aa.arth.df,
+                            contrasts = list(Aphid.treatment = "contr.sum",
+                                             Genotype = "contr.sum"),
+                            family = "poisson",
+                            control=glmerControl(optimizer="bobyqa",
+                                                 optCtrl=list(maxfun=2e5)))
 print(summary(aa.arth.rich.glmer), correlation = TRUE)
 overdisp_fun(aa.arth.rich.glmer) # no overdispersion
 
@@ -749,11 +568,11 @@ hist(filter(aa.arth.df, total.abund > 1)$total.rarerich)
 
 # GLMM. Note that logit-transformation (common for proportion data) did not qualitatively affect the outcome or the residuals
 aa.arth.rarerich.glmer <- lmer(total.rarerich ~ scale(Ant.mound.dist)*Aphid.treatment*Genotype +
-                              #(1|plant_ID) +
-                              (1|Block/fact.Ant.mound.dist),
-                            data = filter(aa.arth.df, total.abund > 1),
-                            contrasts = list(Aphid.treatment = "contr.sum",
-                                             Genotype = "contr.sum"))
+                                 #(1|plant_ID) +
+                                 (1|Block/fact.Ant.mound.dist),
+                               data = filter(aa.arth.df, total.abund > 1),
+                               contrasts = list(Aphid.treatment = "contr.sum",
+                                                Genotype = "contr.sum"))
 summary(aa.arth.rarerich.glmer)
 
 ## F tests
@@ -796,7 +615,7 @@ anova(rda(aa.hell ~ Ant.mound.dist + Aphid.treatment + Genotype, data = aa.arth.
 aa.plots.hell <- betadisper(vegdist(aa.hell, method = "euclidean"), aa.arth.12.pos$Plot_code, bias.adjust = TRUE)
 
 aa.plots.hell.centr <- data.frame(aa.plots.hell$centroids, 
-                             id = rownames(aa.plots.hell$centroids)) %>%
+                                  id = rownames(aa.plots.hell$centroids)) %>%
   separate(col = id, into = c("Block","Ant.mound.dist")) %>%
   mutate(Block = as.factor(Block),
          Ant.mound.dist = as.numeric(Ant.mound.dist))
@@ -1034,16 +853,16 @@ aa.hell.GxE.df.arrows <- data.frame(x = aa.hell.GxE.df$RDA1[11:20], y = aa.hell.
 aa.hell.GxE.sites <- data.frame(scores(aa.hell.GxE.rda, display = "sites"))
 
 (aa.arth.ord.GxE <- ggplot(data = aa.hell.GxE.sites, aes(x = RDA1, y = RDA2)) +
-  geom_point(shape = 1, color = "gray") +
-  geom_segment(data = aa.hell.GxE.df.arrows, aes(x = x, xend = xend, y = y, yend = yend, linetype = GxE.sig.lab), color = "black") + #, color = Genotype
-  geom_point(data = aa.hell.GxE.df, aes(x = RDA1, y = RDA2, fill = Aphid.treatment, shape = Aphid.treatment), color = "black", size = 5) + 
-  geom_text(data = aa.hell.GxE.df, 
-            aes(x = RDA1, y = RDA2, label = Genotype), size = 3) +
-  scale_fill_manual(values = c("gray50","white"))+ #cbPal.10) +
-  scale_color_manual(values = c("gray50","white")) +# cbPal.10) +
-  scale_shape_manual(values = c(23,21)) +
-  scale_linetype_manual(values = c("dotted","solid"), guide = "none") +
-  ylab("RDA 2 (3%)") + xlab("RDA 1 (9%)") + theme(legend.position = "none"))
+    geom_point(shape = 1, color = "gray") +
+    geom_segment(data = aa.hell.GxE.df.arrows, aes(x = x, xend = xend, y = y, yend = yend, linetype = GxE.sig.lab), color = "black") + #, color = Genotype
+    geom_point(data = aa.hell.GxE.df, aes(x = RDA1, y = RDA2, fill = Aphid.treatment, shape = Aphid.treatment), color = "black", size = 5) + 
+    geom_text(data = aa.hell.GxE.df, 
+              aes(x = RDA1, y = RDA2, label = Genotype), size = 3) +
+    scale_fill_manual(values = c("gray50","white"))+ #cbPal.10) +
+    scale_color_manual(values = c("gray50","white")) +# cbPal.10) +
+    scale_shape_manual(values = c(23,21)) +
+    scale_linetype_manual(values = c("dotted","solid"), guide = "none") +
+    ylab("RDA 2 (3%)") + xlab("RDA 1 (9%)") + theme(legend.position = "none"))
 
 ## visualize non-Aphis aphids driving GxE and which genotype
 aa.Aphid.GxE <- as.data.frame(Effect(c("Aphid.treatment","Genotype"), aa.Aphids_nonAphis.glmer)) %>% mutate(sig.GxE = ifelse(Genotype == "J", "yes","no"), Aphid.treatment = ifelse(Aphid.treatment == "aphid","Aphids","None")) %>% ggplot(aes(x = Aphid.treatment, y = fit, group = Genotype, fill = Aphid.treatment, shape = Aphid.treatment)) + geom_line(aes(linetype = sig.GxE), size = 1) + geom_point(size = p.size) + xlab("Aphid treatment") + scale_fill_manual(values = c("gray50","white"), guide = "none") + scale_shape_manual(values = c(23,21), guide = "none") + geom_text(aes(label = Genotype), size = 3) + scale_linetype_manual(values = c("dotted","solid"), guid = "none") + scale_y_continuous(name = "Abundance of other aphids", breaks = c(0,1,2), limits = c(0,2)); aa.Aphid.GxE
