@@ -42,7 +42,7 @@ wind.arth.df <- read.csv('final_data/wind_arthropod_df.csv') %>%
          Year = as.factor(Year),
          Plot_code = interaction(Block, Wind.Exposure),
          GxE = C(interaction(Genotype, Wind.Exposure), contr = "contr.sum", how.many = 9))  # create a new variable for the interaction to permit testing of main effects with type 3 sum of squares. 
-contrasts(wind.arth.df$Wind.Exposure) <- "contr.sum" # important for calculating variance explained
+#contrasts(wind.arth.df$Wind.Exposure) <- "contr.sum" # important for calculating variance explained
 wind.arth.names <- colnames(select(wind.arth.df, Gracilliaridae_miner:Spider)) # for subsetting community data
 
 
@@ -87,35 +87,69 @@ species_guild_info <- data.frame(Species = names(table(wind.arth.2012$Species)),
             "Coccoidea", "Tenthredinidae_sawfly", rep("Spider",7), 
             "Pentatomidae", "Gracilliaridae_leafminer"))
 table(species_guild_info) # everything corresponds  
-species_guild_info$Key_Guilds <- c(rep("low",2), rep("Aphididae",3),
+species_guild_info$Key_Guilds <- relevel(as.factor(c(rep("low",2), rep("Aphididae",3),
                                    rep("low",16), "Tortricidae_leaftier",
                                    "Gracilliaridae_leafminer", rep("low",3),
-                                   rep("Spider", 7), "low", "Gracilliaridae_leafminer")
+                                   rep("Spider", 7), "low", "Gracilliaridae_leafminer")), ref="low")
 with(species_guild_info, table(Guild, Key_Guilds))
 
 wind.arth.2012.df <- left_join(wind.arth.2012, species_guild_info)
-contrasts(wind.arth.2012.df$Wind.Exposure) <- "contr.sum"
-relevel(as.factor(wind.arth.2012.df$Key_Guilds), ref="low")
+#contrasts(wind.arth.2012.df$Wind.Exposure) <- "contr.sum"
+#relevel(as.factor(wind.arth.2012.df$Key_Guilds), ref="low")
+sum(wind.arth.2012.df$Occurrence)/length(wind.arth.2012.df$Occurrence) # only 2% are ones...
+
+## CONSIDER MODELING GENOTYPE AND SPECIES AS FIXED-EFFECTS. THIS MAKES SENSE IF THERE
+## EFFECTS ARE NOT NORMALLY DISTRIBUTED, WHICH I CAN BASICALLY TEST FOR BY LOOKING AT
+## THE DISTRIBUTION OF COEFFICIENTS WHEN THEY ARE TREATED AS FIXED-EFFECTS.
+
+wind.arth.model.base <- brm(Occurrence ~ Wind.Exposure + (Wind.Exposure|Genotype) + (1|Species) +
+                         (1|plant_ID) + (1|Block) + (1|Block:Wind.Exposure),
+                       data=wind.arth.2012.df, family=bernoulli(link="logit"),
+                       algorithm="sampling",
+                       prior=c(prior(normal(0,2), class=b),
+                               prior(normal(0,2), class=sd)),
+                       chains=4,
+                       control=list(adapt_delta=0.99))
 
 wind.arth.model <- brm(Occurrence ~ 
-                         Wind.Exposure*Key_Guilds + (Key_Guilds + Wind.Exposure|Genotype) + (1|Species) +
+                         Wind.Exposure + (Wind.Exposure|Genotype*Species) +
                          (1|plant_ID) + (1|Block) + (1|Block:Wind.Exposure),
                        data=wind.arth.2012.df,
                        family=bernoulli(link="logit"),
                        algorithm="sampling",
+                       prior=c(prior(normal(0,2), class=b),
+                               prior(normal(0,2), class=sd)),
+                       chains=4,
+                       control=list(adapt_delta=0.99))
+tidy(wind.arth.model)
+shinystan::launch_shinystan(wind.arth.model)
+
+wind.arth.2012.df$Species <- as.factor(wind.arth.2012.df$Species)
+contrasts(wind.arth.2012.df$Species) <- "contr.sum"
+
+## VERY POOR MODEL, STICK WITH RANDOM EFFECTS AND JUST ESTIMATE THE PARAMETERS.
+wind.arth.model.FE <- brm(Occurrence ~ 
+                         (Wind.Exposure + Species + Genotype)^2 +
+                         (1|plant_ID) + (1|Block) + (1|Block:Wind.Exposure),
+                       data=wind.arth.2012.df,
+                       family=bernoulli(link="logit"),
+                       algorithm="sampling",
+                       prior=c(prior(normal(0,2), class=b),
+                               prior(normal(0,2), class=sd)),
                        chains=1,
-                       control=list(adapt_delta=0.9))
-plot(wind.arth.model)
+                       control=list(adapt_delta=0.99))
+summary(wind.arth.model.FE)
+tidy(wind.arth.model.FE)
+FE.df <- data.frame(fixef(wind.arth.model.FE))
+hist(FE.df[3:36,"Estimate"])
+#hist(FE.df[12:45,"Estimate"])
+
+LOO(wind.arth.model.base, wind.arth.model, wind.arth.model.FE)
+
+#plot(wind.arth.model)
 summary(wind.arth.model)
-plot(marginal_effects(wind.arth.model))
-ppc_bars_grouped(y=wind.arth.2012.df$Occurrence, 
-                 yrep=posterior_predict(wind.arth.model, nsamples=100),
-                 group=wind.arth.2012.df$Guild)
-
-binomial_variance <- pi^2/3
-var.comp <- get_variance_wind_brms(wind.arth.model, data=wind.arth.2012.df, RE_rows=3:9)
-var.comp$perc_var <- var.comp$estimate^2/(sum(var.comp$estimate^2)+binomial_variance)
-
+tidy(wind.arth.model)[1:15,]
+ranef(wind.arth.model)
 pps <- data.frame(t(posterior_predict(wind.arth.model, nsamples=100)))
 
 ## EXAMINE RICHNESS PREDICTIONS
@@ -125,14 +159,53 @@ rich.df <- wind.arth.2012.df_pps %>%
   group_by(Block, Wind.Exposure, Genotype, plant_ID) %>%
   summarise_at(vars(Occurrence, X1:X100), sum) %>%
   ungroup()
-
 rich.df$predict.rich <- rowMeans(select(rich.df, X1:X100))
-rich.df$MSE <- (rich.df$Occurrence - rich.df$predict.rich)^2
-ggplot(rich.df, aes(x = Occurrence, y=predict.rich)) + geom_point() + geom_abline(intercept=0, slope=1)
+rich.df$error <- rich.df$Occurrence - rich.df$predict.rich
+rich.df$MSE <- rich.df$error^2
 
-ggplot(rich.df, aes(x = Occurrence, y=MSE)) + geom_point() 
-## seems that the model overestimates richness when it is observed to be zero,
-## and underestimates richness when it is high.
+rich.df.gather <- select(rich.df, -Occurrence, -predict.rich, -error, -MSE) %>%
+  gather(key=sim, value=Occurrence.predict, X1:X100)
+
+ggplot(rich.df.gather, aes(x=Genotype, y=Occurrence.predict)) + geom_boxplot()
+
+# model appears to over predict richness when it is zero, and under predict it when it is higher
+#ggplot(rich.df, aes(x = Abundance, y=predict.rich)) + geom_point() + geom_abline(intercept=0, slope=1) + geom_smooth(method="lm") + scale_y_continuous(limits=c(0,50))
+#ggplot(rich.df, aes(x = Abundance, y=error)) + geom_point() + geom_hline(yintercept=0)
+
+rich.df.genos <- rich.df %>%
+  group_by(Genotype) %>%
+  summarise_at(vars(Occurrence, predict.rich, X1:X100), mean) %>%
+  ungroup() %>%
+  gather(key=sim, value=Occurrence.predict, X1:X100)
+ggplot(rich.df.genos, aes(x=Genotype, y=Occurrence.predict)) + 
+  stat_sum_df("mean_cl_boot") +
+  #geom_point(shape=1, color="grey") +
+  geom_point(aes(y=Occurrence))
+
+rich.df.wind <- rich.df %>%
+  group_by(Wind.Exposure) %>%
+  summarise_at(vars(Occurrence, predict.rich, X1:X100), mean) %>%
+  ungroup() %>%
+  gather(key=sim, value=Occurrence.predict, X1:X100)
+ggplot(rich.df.wind, aes(x=Wind.Exposure, y=Occurrence.predict)) + 
+  stat_sum_df("mean_cl_boot") +
+  #geom_boxplot() + 
+  geom_point(aes(y=Occurrence))
+
+rich.df.block <- rich.df %>%
+  group_by(Block) %>%
+  summarise_at(vars(Occurrence, predict.rich, X1:X100), mean) %>%
+  ungroup() %>%
+  gather(key=sim, value=Occurrence.predict, X1:X100)
+ggplot(rich.df.block, aes(x=Block, y=Occurrence.predict)) + 
+  stat_sum_df("mean_cl_boot") +
+  #geom_boxplot() + 
+  geom_point(aes(y=Occurrence))
+
+# A set of useful summary functions is provided from the Hmisc package:
+stat_sum_df <- function(fun, geom="crossbar", ...) {
+  stat_summary(fun.data = fun, colour = "red", geom = geom, width = 0.2, ...)
+}
 
 table(filter(wind.arth.2012.df, Occurrence>0)$Guild)
 table(filter(wind.arth.2012.df, Occurrence>0)$Guild)/sum(table(filter(wind.arth.2012.df, Occurrence>0)$Guild))
