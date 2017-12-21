@@ -42,8 +42,8 @@ class RScript(SessionBasedScript):
 	# get full path of the R script file
 	r_file = abspath(self.params.rscript)
 	csv_file = abspath(self.params.csv_input)
-	print r_file
-	print csv_file
+	#print r_file
+	#print csv_file
 	# append tasks to the list
 	apps_to_run.append(RApp(r_file, csv_file))
 
@@ -58,7 +58,7 @@ class RApp(Application):
 
         Application.__init__(
             self,
-            arguments=["/usr/bin/Rscript", r_script , csv_file],
+            arguments=["/usr/lib/R/bin/Rscript", r_script , csv_file],
             inputs=[rscript,csvfile],
             outputs=["results.csv"],
             output_dir = "code-results",

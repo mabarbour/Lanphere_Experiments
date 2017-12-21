@@ -1,25 +1,6 @@
 
-SAMPLING FOR MODEL 'bernoulli(logit) brms-model' NOW (CHAIN 1).
+SAMPLING FOR MODEL 'gaussian(identity) brms-model' NOW (CHAIN 2).
 
-Gradient evaluation took 0.000112 seconds
-1000 transitions using 10 leapfrog steps per transition would take 1.12 seconds.
-Adjust your expectations accordingly!
+SAMPLING FOR MODEL 'gaussian(identity) brms-model' NOW (CHAIN 3).
 
-
-Iteration:    1 / 2000 [  0%]  (Warmup)
-Iteration:  200 / 2000 [ 10%]  (Warmup)
-Iteration:  400 / 2000 [ 20%]  (Warmup)
-Iteration:  600 / 2000 [ 30%]  (Warmup)
-Iteration:  800 / 2000 [ 40%]  (Warmup)
-Iteration: 1000 / 2000 [ 50%]  (Warmup)
-Iteration: 1001 / 2000 [ 50%]  (Sampling)
-Iteration: 1200 / 2000 [ 60%]  (Sampling)
-Iteration: 1400 / 2000 [ 70%]  (Sampling)
-Iteration: 1600 / 2000 [ 80%]  (Sampling)
-Iteration: 1800 / 2000 [ 90%]  (Sampling)
-Iteration: 2000 / 2000 [100%]  (Sampling)
-
- Elapsed Time: 5.62057 seconds (Warm-up)
-               8.31992 seconds (Sampling)
-               13.9405 seconds (Total)
-
+SAMPLING FOR MODEL 'gaussian(identity) brms-model' NOW (CHAIN 4).
