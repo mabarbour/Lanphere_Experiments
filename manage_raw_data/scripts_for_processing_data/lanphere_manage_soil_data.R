@@ -143,6 +143,7 @@ biplot(props.PCA)
 summary(props.PCA) # 52% of variance explained by first 2 components
 props.PCA$loadings[ ,c(1,2)] # positive values of PC1 indicate moist soil with lots of organic matter and higher supply rates of micronutrients, but lower supply of nitrogen compounds. Variation in PC2 describes variation in ionic elements.
 
+write.csv(data.frame(props.PCA$loadings[ ,c(1,2)]), "final_data/soil_PC_analysis.csv")
 
 wind.soil.df <- wind.soil.df %>% mutate(soil.PC1 = props.PCA$scores[ ,"Comp.1"], soil.PC2 = props.PCA$scores[ ,"Comp.2"], Wind.Exposure = ifelse(Treatment == "exposed","Exposed","Unexposed")) %>% select(Block, Wind.Exposure, Plot_code, Total.N:percent.TOM, avg.moisture.vwc, nut.PC1:soil.PC2)
 

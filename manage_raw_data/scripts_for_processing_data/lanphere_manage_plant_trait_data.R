@@ -100,6 +100,8 @@ trait.PCA.12$x <- trait.PCA.12$x*-1
 biplot(trait.PCA.12) 
 trait.PCA.12$rotation # high values of PC1 indicate larger plants, high values of PC2 indicate plants with greater leaf WC and trichome density.
 
+write.csv(data.frame(trait.PCA.12$rotation), "final_data/wind.trait.PCA.2012.csv")
+
 wind.traits.2012 <- mutate(wind.traits.2012, trait.PC1 = trait.PCA.12$x[ ,"PC1"], trait.PC2 = trait.PCA.12$x[ ,"PC2"])
 
 ## plant architecture 2013 ----
@@ -247,6 +249,8 @@ summary(trait.PCA.13 ) # first 2 PCs explain 72% of the variance
 #biplot(trait.PCA) 
 trait.PCA.13$rotation # High values of PC1 indicate larger plants, but with lower leaf WC and SLA. High values of PC2 indicate higher values of leaf C:N, but lower values of SLA and and leaf WC
 
+write.csv(data.frame(trait.PCA.13$rotation), "final_data/wind.trait.PCA.2013.csv")
+
 wind.traits.2013 <- mutate(wind.traits.2013, trait.PC1 = trait.PCA.13$x[ ,"PC1"], trait.PC2 = trait.PCA.13$x[ ,"PC2"])
 
 ## bind together wind 2012 and 2013 plant trait data and save to a new file ----
@@ -353,6 +357,8 @@ aa.trait.PCA$rotation <- aa.trait.PCA$rotation*-1
 aa.trait.PCA$x <- aa.trait.PCA$x*-1
 biplot(aa.trait.PCA) 
 aa.trait.PCA$rotation # positive values of PC1 indicate larger plants (taller, more shoots, and longer shoots). Positive values of PC2 indicate plants with more shoots, but smaller in height, less leaf WC and few trichomes.
+
+write.csv(data.frame(aa.trait.PCA$rotation), "final_data/aa.trait.PCA.2012.csv")
 
 aa.traits2012 <- mutate(aa.traits2012, trait.PC1 = aa.trait.PCA$x[ ,"PC1"], trait.PC2 = aa.trait.PCA$x[ ,"PC2"])
 
