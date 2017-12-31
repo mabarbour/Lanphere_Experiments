@@ -50,7 +50,7 @@ w.soil <- read.csv('final_data/wind_soil_df.csv') %>% tbl_df() %>% mutate(Block 
 general_brm <- function(formula, family, data, ...) {
   brm(formula=formula, data=data, family=family, 
       prior=prior(normal(0,1), class=sd),
-      control=list(adapt_delta=0.999),
+      control=list(adapt_delta=0.9999, max_treedepth=20),
       chains=4)
   # all other brm parameters correspond to the defaults
 }
@@ -198,7 +198,6 @@ composition_plot(w.arth.2012.comp, term="Wind.Exposure")
 composition_plot(w.arth.2012.comp, term="Genotype")
 #composition_plot(w.arth.2012.comp, term="GxE")
 
-# RERUN 
 hist(w.arth.2012.comp$Occurrence)
 arth.comp.wind.2012.brm <- general_brm(Occurrence~(1|Genotype*Wind.Exposure*Species)+(1|Block)+(1|Plot_code)+(1|Block:Species), data=w.arth.2012.comp, family=bernoulli(link="logit"))
 summary(arth.comp.wind.2012.brm)
@@ -225,9 +224,9 @@ aa.arth.2012.comp <- select(aa.arth.df, X:LTF_Caloptilia) %>%
   gather(key=Species, value=Abundance, aphid_Aphis:LTF_Caloptilia) %>%
   mutate(Occurrence=ifelse(Abundance>0, 1, 0))
 
-# RERUN 
 hist(aa.arth.2012.comp$Occurrence)
 arth.comp.aa.2012.brm <- general_brm(Occurrence~(1|Genotype*Aphid.treatment*Ant.mound.dist*Species)+(1|Block)+(1|Plot_code)+(1|Block:Species), data=aa.arth.2012.comp, family=bernoulli(link="logit"))
+summary(arth.comp.aa.2012.brm)
 
 y_aa.arth.comp.2012 <- aa.arth.2012.comp$Occurrence
 yrep_aa.arth.comp.2012 <- posterior_predict(arth.comp.aa.2012.brm, nsamples=100)
@@ -290,7 +289,6 @@ composition_plot(w.arth.2013.comp, term="Wind.Exposure")
 composition_plot(w.arth.2013.comp, term="Genotype")
 #composition_plot(w.arth.2013.comp, term="GxE")
 
-# RERUN
 hist(w.arth.2013.comp$Occurrence)
 arth.comp.wind.2013.brm <- general_brm(Occurrence~(1|Genotype*Wind.Exposure*Species)+(1|Block)+(1|Plot_code)+(1|Block:Species), data=w.arth.2013.comp, family=bernoulli(link="logit"))
 summary(arth.comp.wind.2013.brm)
@@ -333,7 +331,7 @@ plot(marginal_effects(trait.rich.aa.2012.brm, effects = "trait.PC1"), points=T)
 plot(marginal_effects(trait.rich.aa.2012.brm, effects = "trait.PC2"), points=T)
 
 ## WIND TRAIT-ARTHROPOD 2012 ANALYSIS ----
-w.trait.arth.2012 <- left_join(w.arth.2012, select(w.trait.2012, plant_ID, trait.PC1, trait.PC2, trait.PC2.trans), by="plant_ID") 
+w.trait.arth.2012 <- left_join(w.arth.2012, select(w.trait.2012, plant_ID, trait.PC1, trait.PC2), by="plant_ID") 
 
 trait.rich.wind.2012.brm <- trait_brm(total.rich~scale(trait.PC1)+scale(trait.PC2)+(1|Block)+(1|Plot_code)+(1|plant_ID), data=w.trait.arth.2012, family=poisson(link="log"))
 summary(trait.rich.wind.2012.brm) # trait.PC1 is primary effect
@@ -355,7 +353,7 @@ plot(marginal_effects(trait.rich.wind.2013.brm, effects = "trait.PC1"), points=T
 
 ## WIND TRAIT/SOIL-FUNGAL 2013 ANALYSIS ----
 w.trait.fung.2013 <- left_join(fungal.df, select(w.trait.2013, plant_ID, trait.PC1, trait.PC2, root_CN), by="plant_ID") %>%
-  left_join(., select(w.soil, soil.PC1, soil.PC1.trans, soil.PC2, Plot_code)) %>%
+  left_join(., select(w.soil, soil.PC1, soil.PC2, Plot_code)) %>%
   mutate(log_root_CN = log(root_CN))
 
 trait.rarerich.wind.2013.brm <- trait_brm(scale(fungal.rarerich)~scale(trait.PC1)+scale(trait.PC2)+scale(soil.PC1)+scale(soil.PC2)+scale(log_root_CN)+(1|Block)+(1|Plot_code), data=w.trait.fung.2013, family=gaussian(link="identity"))
@@ -375,6 +373,8 @@ summary(bact.trait.rarerich.wind.2013.brm) # strong effect of soil.PC2
 plot(marginal_effects(bact.trait.rarerich.wind.2013.brm, effects = "soil.PC2"), points=T)
 
 ## TIDY AND SAVE OUTPUT ----
+
+## CONSIDER CHANGING BACTERIAL TO BACTERIA AND FUNGAL TO FUNGI TO SHORTEN EVERYTHING
 
 lanphere_VarComps <- bind_rows(
   mutate(get_VarComps(trait.PC1.wind.2012.brm, Distrib_Var=tidy(trait.PC1.wind.2012.brm, parameters = "sigma")$estimate^2), 
@@ -397,24 +397,20 @@ lanphere_VarComps <- bind_rows(
          Experiment="Ant-Aphid", Year="2012", Response="Trait.PC2"),
   mutate(get_VarComps(arth.rich.wind.2012.brm, Distrib_Var=log(1/exp(tidy(arth.rich.wind.2012.brm, parameters = "b_Intercept")$estimate)+1)), 
          Experiment="Wind", Year="2012", Response="Arthropod Richness"),
-  #mutate(get_VarComps(arth.comp.wind.2012.brm, Distrib_Var=pi^2/3), 
-  #       Experiment="Wind", Year="2012", Response="Arthropod Composition"),
+  mutate(get_VarComps(arth.comp.wind.2012.brm, Distrib_Var=pi^2/3), 
+         Experiment="Wind", Year="2012", Response="Arthropod Composition"),
   mutate(get_VarComps(arth.rich.wind.2013.brm, Distrib_Var=log(1/exp(tidy(arth.rich.wind.2013.brm, parameters = "b_Intercept")$estimate)+1)), 
          Experiment="Wind", Year="2013", Response="Arthropod Richness"),
-  #mutate(get_VarComps(arth.comp.wind.2013.brm, Distrib_Var=pi^2/3), 
-  #       Experiment="Wind", Year="2013", Response="Arthropod Composition"),
+  mutate(get_VarComps(arth.comp.wind.2013.brm, Distrib_Var=pi^2/3), 
+         Experiment="Wind", Year="2013", Response="Arthropod Composition"),
   mutate(get_VarComps(fungal.rarerich.wind.2013.brm, Distrib_Var=tidy(fungal.rarerich.wind.2013.brm, parameters = "sigma")$estimate^2), 
          Experiment="Wind", Year="2013", Response="Fungal Rarefied Richness"),
   mutate(get_VarComps(bacteria.rarerich.wind.2013.brm, Distrib_Var=tidy(bacteria.rarerich.wind.2013.brm, parameters = "sigma")$estimate^2), 
          Experiment="Wind", Year="2013", Response="Bacterial Rarefied Richness"),
   mutate(get_VarComps(arth.rich.aa.2012.brm, Distrib_Var=log(1/exp(tidy(arth.rich.aa.2012.brm, parameters = "b_Intercept")$estimate)+1)), 
-         Experiment="Ant-Aphid", Year="2012", Response="Arthropod Richness")#,
-  #mutate(get_VarComps(arth.comp.aa.2012.brm, Distrib_Var=pi^2/3), 
-  #       Experiment="Ant-Aphid", Year="2012", Response="Arthropod Composition"),
-  #mutate(get_VarComps(fungal.comp.wind.2013.brm, Distrib_Var=pi^2/3), 
-  #       Experiment="Wind", Year="2013", Response="Fungal Composition"),
-  #mutate(get_VarComps(bacteria.comp.wind.2013.brm, Distrib_Var=pi^2/3), 
-  #       Experiment="Wind", Year="2013", Response="Bacterial Composition")
+         Experiment="Ant-Aphid", Year="2012", Response="Arthropod Richness"),
+  mutate(get_VarComps(arth.comp.aa.2012.brm, Distrib_Var=pi^2/3), 
+         Experiment="Ant-Aphid", Year="2012", Response="Arthropod Composition")
 )
 write_csv(lanphere_VarComps, path="output_brms/lanphere_VarComps.csv")
 
