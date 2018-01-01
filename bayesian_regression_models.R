@@ -121,18 +121,18 @@ yrep_w.trait.PC1.2012 <- posterior_predict(trait.PC1.wind.2012.brm, nsamples=100
 hist(w.trait.2012$trait.PC2)
 w.trait.2012$trait.PC2.trans <- w.trait.2012$trait.PC2-min(w.trait.2012$trait.PC2)+1 # make so minimum value is 1
 hist(log(w.trait.2012$trait.PC2.trans))
-trait.PC2.wind.2012.brm <- general_brm(log(trait.PC2.trans)~(1|Genotype*Wind.Exposure)+(1|Block)+(1|Plot_code), data=w.trait.2012, family=gaussian(link="identity"))
-summary(trait.PC2.wind.2012.brm) # try increasing adapt_delta>0.99
+trait.PC2.wind.2012.brm <- general_brm(log(trait.PC2.trans)~(1|Genotype*Wind.Exposure)+(1|Block)+(1|Plot_code), data=w.trait.2012, family=gaussian(link="identity"), prior=prior(normal(0,0.5), class=sd))
+summary(trait.PC2.wind.2012.brm) # try increasing adapt_delta>0.9999
 
 y_w.trait.PC2.2012 <- log(w.trait.2012$trait.PC2.trans)
 yrep_w.trait.PC2.2012 <- posterior_predict(trait.PC2.wind.2012.brm, nsamples=100)
-#launch_shinystan(trait.PC2.wind.2012.brm)
+launch_shinystan(trait.PC2.wind.2012.brm)
 
 
 ## ANT-APHID TRAIT PC1 2012 ANALYSIS ----
 hist(aa.trait.2012$trait.PC1)
 trait.PC1.aa.2012.brm <- general_brm(trait.PC1~(1|Genotype*Aphid.treatment*Ant.mound.dist)+(1|Block)+(1|Plot_code), data=aa.trait.2012, family=gaussian(link="identity"))
-summary(trait.PC1.aa.2012.brm) # try increasing adapt_delta>0.99
+summary(trait.PC1.aa.2012.brm) 
 
 y_aa.trait.PC1.2012 <- aa.trait.2012$trait.PC1
 yrep_aa.trait.PC1.2012 <- posterior_predict(trait.PC1.aa.2012.brm, nsamples=100)
@@ -142,7 +142,7 @@ yrep_aa.trait.PC1.2012 <- posterior_predict(trait.PC1.aa.2012.brm, nsamples=100)
 ## ANT-APHID TRAIT PC2 2012 ANALYSIS ----
 hist(aa.trait.2012$trait.PC2)
 trait.PC2.aa.2012.brm <- general_brm(trait.PC2~(1|Genotype*Aphid.treatment*Ant.mound.dist)+(1|Block)+(1|Plot_code), data=aa.trait.2012, family=gaussian(link="identity"))
-summary(trait.PC2.aa.2012.brm) # try increasing adapt_delta>0.99
+summary(trait.PC2.aa.2012.brm) 
 
 y_aa.trait.PC2.2012 <- aa.trait.2012$trait.PC2
 yrep_aa.trait.PC2.2012 <- posterior_predict(trait.PC2.aa.2012.brm, nsamples=100)
@@ -162,7 +162,7 @@ yrep_w.trait.PC1.2013 <- posterior_predict(trait.PC1.wind.2013.brm, nsamples=100
 ## WIND TRAIT PC2 2013 ANALYSIS ----
 hist(w.trait.2013$trait.PC2)
 trait.PC2.wind.2013.brm <- general_brm(trait.PC2~(1|Genotype*Wind.Exposure)+(1|Block)+(1|Plot_code), data=w.trait.2013, family=gaussian(link="identity"))
-summary(trait.PC2.wind.2013.brm) # try increasing adapt_delta>0.99
+summary(trait.PC2.wind.2013.brm) 
 
 y_w.trait.PC2.2013 <- w.trait.2013$trait.PC2
 yrep_w.trait.PC2.2013 <- posterior_predict(trait.PC2.wind.2013.brm, nsamples=100)
@@ -173,7 +173,7 @@ yrep_w.trait.PC2.2013 <- posterior_predict(trait.PC2.wind.2013.brm, nsamples=100
 # note that the model improves if I exclude root_CN > 100, but the results are qualitatively the same even if I retain these data.
 hist(log(w.trait.2013$root_CN))
 root_CN.wind.2013.brm <- general_brm(log(root_CN)~(1|Genotype*Wind.Exposure)+(1|Block)+(1|Plot_code), data=filter(w.trait.2013, root_CN>0), family=gaussian(link="identity")) 
-summary(root_CN.wind.2013.brm) # try increasing adapt_delta>0.99
+summary(root_CN.wind.2013.brm) 
 
 y_root_CN.2013 <- log(filter(w.trait.2013, root_CN>0)$root_CN)
 yrep_root_CN.2013 <- posterior_predict(root_CN.wind.2013.brm, nsamples=100)
@@ -265,7 +265,7 @@ yrep_w.arth.rich.2013 <- posterior_predict(arth.rich.wind.2013.brm, nsamples=100
 ## WIND FUNGAL RAREFIED-RICHNESS 2013 ANALYSIS ----
 hist(scale(fungal.df$fungal.rarerich))
 fungal.rarerich.wind.2013.brm <- general_brm(scale(fungal.rarerich)~(1|Genotype*Wind.Exposure)+(1|Block)+(1|Plot_code), data=fungal.df, family=gaussian(link="identity"))
-summary(fungal.rarerich.wind.2013.brm) # try increasing adapt_delta>0.99
+summary(fungal.rarerich.wind.2013.brm)
 
 y_w.fungal.rarerich.2013 <- as.numeric(scale(fungal.df$fungal.rarerich))
 yrep_w.fungal.rarerich.2013 <- posterior_predict(fungal.rarerich.wind.2013.brm, nsamples=100)
@@ -302,7 +302,7 @@ hist(w.soil$soil.PC1)
 hist(log(w.soil$soil.PC1-min(w.soil$soil.PC1)+1))
 w.soil$soil.PC1.trans <- w.soil$soil.PC1-min(w.soil$soil.PC1)+1
 soil.PC1.wind.brm <- general_brm(log(soil.PC1.trans)~(1|Wind.Exposure)+(1|Block), data=w.soil, family=gaussian(link="identity"))
-summary(soil.PC1.wind.brm) # increase adapt_delta > 0.99
+summary(soil.PC1.wind.brm) 
 
 y_w.soil.PC1 <- log(w.soil$soil.PC1.trans)
 yrep_w.soil.PC1 <- posterior_predict(soil.PC1.wind.brm, nsamples=100)
@@ -378,23 +378,23 @@ plot(marginal_effects(bact.trait.rarerich.wind.2013.brm, effects = "soil.PC2"), 
 
 lanphere_VarComps <- bind_rows(
   mutate(get_VarComps(trait.PC1.wind.2012.brm, Distrib_Var=tidy(trait.PC1.wind.2012.brm, parameters = "sigma")$estimate^2), 
-         Experiment="Wind", Year="2012", Response="Trait.PC1"),
+         Experiment="Wind", Year="2012", Response="Trait PC1"),
   mutate(get_VarComps(trait.PC2.wind.2012.brm, Distrib_Var=tidy(trait.PC2.wind.2012.brm, parameters = "sigma")$estimate^2), 
-         Experiment="Wind", Year="2012", Response="Trait.PC2"),
+         Experiment="Wind", Year="2012", Response="log(Trait PC2 + min(Trait PC2) + 1)"),
   mutate(get_VarComps(trait.PC1.wind.2013.brm, Distrib_Var=tidy(trait.PC1.wind.2013.brm, parameters = "sigma")$estimate^2), 
-         Experiment="Wind", Year="2013", Response="Trait.PC1"),
+         Experiment="Wind", Year="2013", Response="Trait PC1"),
   mutate(get_VarComps(trait.PC2.wind.2013.brm, Distrib_Var=tidy(trait.PC2.wind.2013.brm, parameters = "sigma")$estimate^2), 
-         Experiment="Wind", Year="2013", Response="Trait.PC2"),
+         Experiment="Wind", Year="2013", Response="Trait PC2"),
   mutate(get_VarComps(soil.PC1.wind.brm, Distrib_Var=tidy(soil.PC1.wind.brm, parameters = "sigma")$estimate^2), 
-         Experiment="Wind", Year="2013", Response="Soil.PC1"),
+         Experiment="Wind", Year="2013", Response="log(Soil PC1 + min(Soil PC1) + 1)"),
   mutate(get_VarComps(soil.PC2.wind.brm, Distrib_Var=tidy(soil.PC2.wind.brm, parameters = "sigma")$estimate^2), 
-         Experiment="Wind", Year="2013", Response="Soil.PC2"),
+         Experiment="Wind", Year="2013", Response="Soil PC2"),
   mutate(get_VarComps(root_CN.wind.2013.brm, Distrib_Var=tidy(root_CN.wind.2013.brm, parameters = "sigma")$estimate^2), 
-         Experiment="Wind", Year="2013", Response="Root C:N"),
+         Experiment="Wind", Year="2013", Response="log(Root C:N)"),
   mutate(get_VarComps(trait.PC1.aa.2012.brm, Distrib_Var=tidy(trait.PC1.aa.2012.brm, parameters = "sigma")$estimate^2), 
-         Experiment="Ant-Aphid", Year="2012", Response="Trait.PC1"),
+         Experiment="Ant-Aphid", Year="2012", Response="Trait PC1"),
   mutate(get_VarComps(trait.PC2.aa.2012.brm, Distrib_Var=tidy(trait.PC2.aa.2012.brm, parameters = "sigma")$estimate^2), 
-         Experiment="Ant-Aphid", Year="2012", Response="Trait.PC2"),
+         Experiment="Ant-Aphid", Year="2012", Response="Trait PC2"),
   mutate(get_VarComps(arth.rich.wind.2012.brm, Distrib_Var=log(1/exp(tidy(arth.rich.wind.2012.brm, parameters = "b_Intercept")$estimate)+1)), 
          Experiment="Wind", Year="2012", Response="Arthropod Richness"),
   mutate(get_VarComps(arth.comp.wind.2012.brm, Distrib_Var=pi^2/3), 
@@ -404,9 +404,9 @@ lanphere_VarComps <- bind_rows(
   mutate(get_VarComps(arth.comp.wind.2013.brm, Distrib_Var=pi^2/3), 
          Experiment="Wind", Year="2013", Response="Arthropod Composition"),
   mutate(get_VarComps(fungal.rarerich.wind.2013.brm, Distrib_Var=tidy(fungal.rarerich.wind.2013.brm, parameters = "sigma")$estimate^2), 
-         Experiment="Wind", Year="2013", Response="Fungal Rarefied Richness"),
+         Experiment="Wind", Year="2013", Response="scale(Fungi Rarefied Richness)"),
   mutate(get_VarComps(bacteria.rarerich.wind.2013.brm, Distrib_Var=tidy(bacteria.rarerich.wind.2013.brm, parameters = "sigma")$estimate^2), 
-         Experiment="Wind", Year="2013", Response="Bacterial Rarefied Richness"),
+         Experiment="Wind", Year="2013", Response="scale(Bacteria Rarefied Richness)"),
   mutate(get_VarComps(arth.rich.aa.2012.brm, Distrib_Var=log(1/exp(tidy(arth.rich.aa.2012.brm, parameters = "b_Intercept")$estimate)+1)), 
          Experiment="Ant-Aphid", Year="2012", Response="Arthropod Richness"),
   mutate(get_VarComps(arth.comp.aa.2012.brm, Distrib_Var=pi^2/3), 
@@ -418,16 +418,37 @@ lanphere_trait_regs <- bind_rows(
   mutate(get_FixedEffects(trait.rich.aa.2012.brm), Experiment="Ant-Aphid", Year="2012", Response="Arthropod Richness"),
   mutate(get_FixedEffects(trait.rich.wind.2012.brm), Experiment="Wind", Year="2012", Response="Arthropod Richness"),
   mutate(get_FixedEffects(trait.rich.wind.2013.brm), Experiment="Wind", Year="2013", Response="Arthropod Richness"),
-  mutate(get_FixedEffects(trait.rarerich.wind.2013.brm), Experiment="Wind", Year="2013", Response="Fungal Rarefied Richness"),
-  mutate(get_FixedEffects(bact.trait.rarerich.wind.2013.brm), Experiment="Wind", Year="2013", Response="Bacteria Rarefied Richness")
+  mutate(get_FixedEffects(trait.rarerich.wind.2013.brm), Experiment="Wind", Year="2013", Response="scale(Fungi Rarefied Richness)"),
+  mutate(get_FixedEffects(bact.trait.rarerich.wind.2013.brm), Experiment="Wind", Year="2013", Response="scale(Bacteria Rarefied Richness)")
 )
 write_csv(lanphere_trait_regs, path="output_brms/lanphere_trait_regs.csv")
 
 ## MAY BE USEFUL... ----
-lanphere_trait_BLUPs_2012 <- bind_rows(
+lanphere_BLUPs <- bind_rows(
   mutate(get_BLUPs(trait.PC1.wind.2012.brm), Experiment="Wind", Year="2012", Trait="Trait.PC1"),
   mutate(get_BLUPs(trait.PC2.wind.2012.brm), Experiment="Wind", Year="2012", Trait="Trait.PC2"),
   mutate(get_BLUPs(trait.PC1.aa.2012.brm), Experiment="Ant-Aphid", Year="2012", Trait="Trait.PC1"),
   mutate(get_BLUPs(trait.PC2.aa.2012.brm), Experiment="Ant-Aphid", Year="2012", Trait="Trait.PC2")
 )
-write_csv(lanphere_trait_BLUPs_2012, path="output_brms/lanphere_trait_BLUPs_2012.csv")
+write_csv(lanphere_BLUPs, path="output_brms/lanphere_BLUPs.csv")
+
+lanphere_BLUPs <- bind_rows(
+  mutate(get_BLUPs(trait.PC1.wind.2012.brm), Experiment="Wind", Year="2012", Response="Trait PC1"),
+  mutate(get_BLUPs(trait.PC2.wind.2012.brm), Experiment="Wind", Year="2012", Response="log(Trait PC2 + min(Trait PC2) + 1)"),
+  mutate(get_BLUPs(trait.PC1.wind.2013.brm), Experiment="Wind", Year="2013", Response="Trait PC1"),
+  mutate(get_BLUPs(trait.PC2.wind.2013.brm), Experiment="Wind", Year="2013", Response="Trait PC2"),
+  mutate(get_BLUPs(soil.PC1.wind.brm), Experiment="Wind", Year="2013", Response="log(Soil PC1 + min(Soil PC1) + 1)"),
+  mutate(get_BLUPs(soil.PC2.wind.brm), Experiment="Wind", Year="2013", Response="Soil PC2"),
+  mutate(get_BLUPs(root_CN.wind.2013.brm), Experiment="Wind", Year="2013", Response="log(Root C:N)"),
+  mutate(get_BLUPs(trait.PC1.aa.2012.brm), Experiment="Ant-Aphid", Year="2012", Response="Trait PC1"),
+  mutate(get_BLUPs(trait.PC2.aa.2012.brm), Experiment="Ant-Aphid", Year="2012", Response="Trait PC2"),
+  mutate(get_BLUPs(arth.rich.wind.2012.brm), Experiment="Wind", Year="2012", Response="Arthropod Richness"),
+  mutate(get_BLUPs(arth.comp.wind.2012.brm), Experiment="Wind", Year="2012", Response="Arthropod Composition"),
+  mutate(get_BLUPs(arth.rich.wind.2013.brm), Experiment="Wind", Year="2013", Response="Arthropod Richness"),
+  mutate(get_BLUPs(arth.comp.wind.2013.brm), Experiment="Wind", Year="2013", Response="Arthropod Composition"),
+  mutate(get_BLUPs(fungal.rarerich.wind.2013.brm), Experiment="Wind", Year="2013", Response="scale(Fungi Rarefied Richness)"),
+  mutate(get_BLUPs(bacteria.rarerich.wind.2013.brm), Experiment="Wind", Year="2013", Response="scale(Bacteria Rarefied Richness)"),
+  mutate(get_BLUPs(arth.rich.aa.2012.brm), Experiment="Ant-Aphid", Year="2012", Response="Arthropod Richness"),
+  mutate(get_BLUPs(arth.comp.aa.2012.brm), Experiment="Ant-Aphid", Year="2012", Response="Arthropod Composition")
+)
+write_csv(lanphere_BLUPs, path="output_brms/lanphere_BLUPs.csv")
