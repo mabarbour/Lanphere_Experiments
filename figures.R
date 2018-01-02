@@ -11,6 +11,7 @@ aa.trait.PCA.2012 <- read_csv('final_data/aa.trait.PCA.2012.csv') %>% select(Tra
 wind.trait.PCA.2012 <- read_csv('final_data/wind.trait.PCA.2012.csv') %>% select(Trait=X1, PC1, PC2)
 wind.trait.PCA.2013 <- read_csv('final_data/wind.trait.PCA.2013.csv') %>% select(Trait=X1, PC1, PC2)
 wind.soil.PCA <- read_csv('final_data/soil_PC_analysis.csv') %>% select(Soil_Property=X1, PC1=Comp.1, PC2=Comp.2)
+blups <- read_csv('output_brms/lanphere_BLUPs.csv')
 
 ## FILL IN TERM GROUPS AND ORDER THEM
 varcomp.df$term_group[which(varcomp.df$term=="sd_Genotype__Intercept")] <- "Genotype (G)"
@@ -42,6 +43,34 @@ levels(varcomp.df$term_group)
 varcomp.df$term_group_ord <- factor(varcomp.df$term_group, levels=c("Plot","Block x Sp","Block", "G x Aphid x Ant x Sp","G x Aphid x Ant", "G x Ant x Sp","G x Ant", "G x Aphid x Sp", "G x Aphid", "G x Wind x Sp","G x Wind","Aphid x Ant x Sp",  "Aphid x Ant", "Ant x Sp","Ant", "Aphid x Sp", "Aphid", "Wind x Sp","Wind", "G x Sp", "Genotype (G)","Species (Sp)"))
 levels(varcomp.df$term_group_ord)
 
+## BLUPs FIGURES ----
+
+blups_plot <- function(Exp, Resp, Yr) {
+  get_order <- blups %>%
+    filter(Experiment==Exp, Response==Resp, Year==Year, group != "plant_ID") %>%
+    droplevels(.) %>%
+    arrange(desc(BLUP)) %>%
+    unite(level, group, col=level_group, remove=F)
+  get_order$level.order <- factor(get_order$level_group, levels=get_order$level_group)
+  
+  ggplot(get_order, aes(x=level.order, y=BLUP)) +
+    geom_point(size=3) + 
+    geom_linerange(aes(ymin=lower_95, ymax=upper_95), color="grey", size=0.5, position=position_dodge(width=0.75)) +
+    geom_linerange(aes(ymin=lower_50, ymax=upper_50), color="black", size=2, position=position_dodge(width=0.75)) +
+    geom_hline(yintercept=0, linetype="dotted") +
+    facet_wrap(~group, scales = "free_y", ncol=1) +
+    scale_x_discrete(labels = abbreviate) +
+    coord_flip()
+}
+
+blups_plot(Exp = "Ant-Aphid", Resp = "Arthropod Richness", Yr = "2012")
+  
+filter(blups, Experiment=="Wind", Response=="Arthropod Richness", Year==2012, group == "Wind.Exposure") %>%
+  summarise_at(vars(BLUP), sd)
+filter(blups, Experiment=="Wind", Response=="Arthropod Richness", Year==2012, group == "Genotype") %>%
+  summarise_at(vars(BLUP), sd)
+
+
 ## FIGURE 1: COMMUNITY RICHNESS ----
 plot_richness <- filter(varcomp.df, Response%in%c("Arthropod Richness", "Fungal Rarefied Richness", "Bacterial Rarefied Richness"), term != "sd_plant_ID__Intercept") %>% 
   droplevels() %>% 
@@ -62,6 +91,7 @@ richness_gg <- ggplot(plot_richness, aes(x=term_group_ord, y=SD_mean, shape=Resp
   scale_shape_manual(values=c(21,22,23), name="Community response") +
   xlab("") +
   facet_wrap(~Experiment_Year, ncol=1, scales="free_y") 
+richness_gg
 
 ## COMMUNITY COMPOSITION ----
 plot_composition <- filter(varcomp.df, Response%in%c("Arthropod Composition"), term != "sd_plant_ID__Intercept") %>% #, "Fungal Composition", "Bacterial Composition"

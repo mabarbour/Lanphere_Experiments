@@ -188,6 +188,14 @@ y_w.arth.rich.2012 <- w.arth.2012$total.rich
 yrep_w.arth.rich.2012 <- posterior_predict(arth.rich.wind.2012.brm, nsamples=100)
 #launch_shinystan(arth.rich.wind.2012.brm)
 
+get_BLUPs(arth.rich.wind.2012.brm) %>%
+  filter(group == "Wind.Exposure") %>%
+  summarise_at(vars(BLUP), sd)
+
+get_BLUPs(arth.rich.wind.2012.brm) %>%
+  filter(group == "Genotype") %>%
+  summarise_at(vars(BLUP), sd)
+
 
 ## WIND ARTHROPOD COMPOSITION 2012 ANALYSIS ----
 w.arth.2012.comp <- select(w.arth.2012, X:spider_Larionoides, Plot_code) %>% #, GxE
