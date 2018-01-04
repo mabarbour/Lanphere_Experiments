@@ -38,7 +38,11 @@ summary(re.lm)
 re.lm <- lmer(y ~ x + (0+x|unit), data = test.df) 
 summary(re.lm)
 
+str(ranef(re.lm))
+
 coef(re.lm)
+
+re.beta <- coef(re.lm)$unit[,"x"]
 
 par(mfrow = c(1,1))
 plot(re.beta ~ beta.hat, xlim = c(2.4, 3.6), ylim = c(2.4,3.6), 
