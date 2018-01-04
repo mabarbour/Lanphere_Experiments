@@ -49,7 +49,8 @@ w.soil <- read.csv('final_data/wind_soil_df.csv') %>% tbl_df() %>% mutate(Block 
 
 general_brm <- function(formula, family, data, ...) {
   brm(formula=formula, data=data, family=family, 
-      prior=prior(normal(0,1), class=sd),
+      prior=c(prior(normal(0,1), class=sd),
+              prior(normal(0,1), class=b)),
       control=list(adapt_delta=0.9999, max_treedepth=20),
       chains=4)
   # all other brm parameters correspond to the defaults
@@ -123,6 +124,35 @@ w.trait.2012$trait.PC2.trans <- w.trait.2012$trait.PC2-min(w.trait.2012$trait.PC
 hist(log(w.trait.2012$trait.PC2.trans))
 trait.PC2.wind.2012.brm <- general_brm(log(trait.PC2.trans)~(1|Genotype*Wind.Exposure)+(1|Block)+(1|Plot_code), data=w.trait.2012, family=gaussian(link="identity"), prior=prior(normal(0,0.5), class=sd))
 summary(trait.PC2.wind.2012.brm) # try increasing adapt_delta>0.9999
+
+# wow, no issues with model convergence. I should go with this fixed effects structure...
+trait.PC2.wind.2012.brm <- general_brm(log(trait.PC2.trans)~Wind.Exposure+(Wind.Exposure|Genotype)+(1|Block)+(1|Plot_code), data=w.trait.2012, family=gaussian(link="identity"))
+summary(trait.PC2.wind.2012.brm) 
+
+ps_fe <- posterior_samples(trait.PC2.wind.2012.brm, pars = "^b") 
+as.matrix(ps_fe[1, ]) %*% t(get_model.matrix)
+
+get_sd <- numeric(dim(ps_fe)[1])
+for(i in 1:dim(ps_fe)[1]){
+  get_sd[i] <- sd(as.matrix(ps_fe[i, ]) %*% t(get_model.matrix))
+}
+#install.packages(c("coda","mvtnorm","devtools","loo"))
+#library(devtools)
+#devtools::install_github("rmcelreath/rethinking")
+
+library(coda)
+HPDinterval(as.mcmc(trait.PC2.wind.2012.brm, combine_chains = TRUE))
+HPDinterval(as.mcmc(get_sd), prob = 0.5)
+mean(get_sd)
+HPDI(get_sd)
+get_model.matrix <- data.frame(model.matrix(~Wind.Exposure, w.trait.2012)) %>% rename(b_Intercept=X.Intercept., b_Wind.ExposureUnexposed=Wind.ExposureUnexposed)
+
+library(lme4)
+test <- lmer(log(trait.PC2.trans)~Wind.Exposure+(Wind.Exposure|Genotype)+(1|Block)+(1|Plot_code), data=w.trait.2012)
+fixef(test)
+t(model.matrix(test))
+
+ 
 
 y_w.trait.PC2.2012 <- log(w.trait.2012$trait.PC2.trans)
 yrep_w.trait.PC2.2012 <- posterior_predict(trait.PC2.wind.2012.brm, nsamples=100)
