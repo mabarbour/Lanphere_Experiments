@@ -122,12 +122,21 @@ yrep_w.trait.PC1.2012 <- posterior_predict(trait.PC1.wind.2012.brm, nsamples=100
 hist(w.trait.2012$trait.PC2)
 w.trait.2012$trait.PC2.trans <- w.trait.2012$trait.PC2-min(w.trait.2012$trait.PC2)+1 # make so minimum value is 1
 hist(log(w.trait.2012$trait.PC2.trans))
-trait.PC2.wind.2012.brm <- general_brm(log(trait.PC2.trans)~(1|Genotype*Wind.Exposure)+(1|Block)+(1|Plot_code), data=w.trait.2012, family=gaussian(link="identity"), prior=prior(normal(0,0.5), class=sd))
+trait.PC2.wind.2012.brm <- brm(log(trait.PC2.trans)~(1|Genotype*Wind.Exposure)+(1|Block)+(1|Plot_code), data=w.trait.2012, family=gaussian(link="identity"), prior=prior(normal(0,0.5), class=sd))
 summary(trait.PC2.wind.2012.brm) # try increasing adapt_delta>0.9999
 
 # wow, no issues with model convergence. I should go with this fixed effects structure...
 trait.PC2.wind.2012.brm <- general_brm(log(trait.PC2.trans)~Wind.Exposure+(Wind.Exposure|Genotype)+(1|Block)+(1|Plot_code), data=w.trait.2012, family=gaussian(link="identity"))
-summary(trait.PC2.wind.2012.brm) 
+summary(trait.PC2.wind.2012.brm)
+p1 <- data.frame(predict(trait.PC2.wind.2012.brm))$Estimate
+
+trait.PC2.wind.2012.brmALT <- general_brm(log(trait.PC2.trans)~Wind.Exposure+(1|Genotype)+(1|Genotype:Wind.Exposure)+(1|Block)+(1|Plot_code), data=w.trait.2012, family=gaussian(link="identity"))
+summary(trait.PC2.wind.2012.brmALT)
+p2 <- data.frame(predict(trait.PC2.wind.2012.brmALT))$Estimate
+plot(p1~p2)
+cor.test(p1, p2)
+
+LOO(trait.PC2.wind.2012.brm, trait.PC2.wind.2012.brmALT)
 
 ps_fe <- posterior_samples(trait.PC2.wind.2012.brm, pars = "^b") 
 as.matrix(ps_fe[1, ]) %*% t(get_model.matrix)

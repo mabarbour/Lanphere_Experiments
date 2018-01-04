@@ -94,9 +94,9 @@
 # First we need the design matrix (X), the number of observations (n)
 # and the fixed effect estimates (Beta)
 
-  X <- model.matrix(re.lm)#model.matrix(orangemod.rs)
+  X <- model.matrix(orangemod.rs)
   n <- nrow(X)
-  Beta <- fixef(re.lm)#fixef(orangemod.rs)
+  Beta <- fixef(orangemod.rs)
 
 # First the fixed effects variance (eqn 27 of Nakagawa & Schielzeth): 
 
@@ -106,7 +106,7 @@
 # Here the list has only a single element because there is only
 # one level of random effects.
 
-  (Sigma.list <- VarCorr(re.lm))#VarCorr(orangemod.rs))
+  (Sigma.list <- VarCorr(orangemod.rs))
 
 # Use equation 11 in the paper to estimate the random effects variance 
 # component.
@@ -114,15 +114,15 @@
 # random effects (i.e. where length(Sigma.list) > 1)
 
   Sl <- 
-    sum(
+    
       sapply(Sigma.list,
         function(Sigma)
         {
           Z <-X[,rownames(Sigma)]
           diags <- diag(Z %*% Sigma %*% t(Z)) # MAB MODIFICATION
           sum(diags)/n
-          #browser()
-        }))
+        })
+
 
 # As this model is an LMM, the additive dispersion variance, Se, is
 # equivalent to the residual variance. The residual standard deviation
