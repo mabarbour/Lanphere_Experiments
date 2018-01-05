@@ -49,9 +49,9 @@ w.soil <- read.csv('final_data/wind_soil_df.csv') %>% tbl_df() %>% mutate(Block 
 
 general_brm <- function(formula, family, data, ...) {
   brm(formula=formula, data=data, family=family, 
-      prior=c(prior(normal(0,1), class=sd),
-              prior(normal(0,1), class=b)),
-      control=list(adapt_delta=0.9999, max_treedepth=20),
+      #prior=c(prior(normal(0,1), class=sd),
+      #        prior(normal(0,1), class=b)),
+      control=list(adapt_delta=0.999, max_treedepth=20),
       chains=4)
   # all other brm parameters correspond to the defaults
 }
@@ -130,13 +130,18 @@ trait.PC2.wind.2012.brm <- general_brm(log(trait.PC2.trans)~Wind.Exposure+(Wind.
 summary(trait.PC2.wind.2012.brm)
 p1 <- data.frame(predict(trait.PC2.wind.2012.brm))$Estimate
 
-trait.PC2.wind.2012.brmALT <- general_brm(log(trait.PC2.trans)~Wind.Exposure+(1|Genotype)+(1|Genotype:Wind.Exposure)+(1|Block)+(1|Plot_code), data=w.trait.2012, family=gaussian(link="identity"))
+trait.PC2.wind.2012.brmALT <- general_brm(log(trait.PC2.trans)~Wind.Exposure+(0+Wind.Exposure|Genotype)+(1|Block)+(1|Plot_code), data=w.trait.2012, family=gaussian(link="identity"))
 summary(trait.PC2.wind.2012.brmALT)
 p2 <- data.frame(predict(trait.PC2.wind.2012.brmALT))$Estimate
 plot(p1~p2)
 cor.test(p1, p2)
 
 LOO(trait.PC2.wind.2012.brm, trait.PC2.wind.2012.brmALT)
+
+## THIS IS WHAT I NEED TO CALCULATE FIXED-EFFECT VARIANCE, PLUS THE INDEPENDENT CONTRIBUTIONS OF ALL OTHER EFFECTS. 
+posterior_samples(trait.PC2.wind.2012.brmALT, pars = "^b") 
+posterior_samples(trait.PC2.wind.2012.brmALT, pars = "^sd")
+posterior_samples(trait.PC2.wind.2012.brmALT, pars = "^cor")
 
 ps_fe <- posterior_samples(trait.PC2.wind.2012.brm, pars = "^b") 
 as.matrix(ps_fe[1, ]) %*% t(get_model.matrix)
@@ -169,9 +174,38 @@ launch_shinystan(trait.PC2.wind.2012.brm)
 
 
 ## ANT-APHID TRAIT PC1 2012 ANALYSIS ----
+
+aa.trait.2012$Aphid.treatment <- relevel(aa.trait.2012$Aphid.treatment, "none")
+#aa.trait.2012$Ant.mound.dist <- C(aa.trait.2012$Ant.mound.dist, "contr.sum")
+
 hist(aa.trait.2012$trait.PC1)
-trait.PC1.aa.2012.brm <- general_brm(trait.PC1~(1|Genotype*Aphid.treatment*Ant.mound.dist)+(1|Block)+(1|Plot_code), data=aa.trait.2012, family=gaussian(link="identity"))
+trait.PC1.aa.2012.brm <- general_brm(trait.PC1~(1|Genotype*Aphid.treatment*Ant.mound.dist)+(1|Block)+(1|Plot_code), data=aa.trait.2012, family=gaussian(link="identity"), prior=prior(normal(0,1), class="sd"))
 summary(trait.PC1.aa.2012.brm) 
+
+trait.PC1.aa.2012.brmALT <- general_brm(trait.PC1 ~ Aphid.treatment*Ant.mound.dist + (0+Aphid.treatment*Ant.mound.dist|Genotype)+(1|Block)+(1|Plot_code), data=aa.trait.2012, family=gaussian(link="identity"), prior=c(prior(normal(0,1), class="sd"), prior(normal(0,1), class="b")))
+summary(trait.PC1.aa.2012.brmALT)
+
+trait.PC1.aa.2012.brmALT2 <- general_brm(trait.PC1 ~ Aphid.treatment + Ant.mound.dist + (0+Aphid.treatment+Ant.mound.dist|Genotype)+(1|Block)+(1|Plot_code), data=aa.trait.2012, family=gaussian(link="identity"), prior=c(prior(normal(0,1), class="sd"), prior(normal(0,1), class="b")))
+summary(trait.PC1.aa.2012.brmALT2)
+
+trait.PC1.aa.2012.brmALT3 <- general_brm(trait.PC1 ~ Aphid.treatment + Ant.mound.dist + (0+Aphid.treatment|Genotype)+(1|Block)+(1|Plot_code), data=aa.trait.2012, family=gaussian(link="identity"), prior=c(prior(normal(0,1), class="sd"), prior(normal(0,1), class="b")))
+summary(trait.PC1.aa.2012.brmALT3)
+
+trait.PC1.aa.2012.brmALT4 <- general_brm(trait.PC1 ~ (1|Genotype)+(1|Block)+(1|Plot_code), data=aa.trait.2012, family=gaussian(link="identity"), prior=c(prior(normal(0,1), class="sd"), prior(normal(0,1), class="b")))
+summary(trait.PC1.aa.2012.brmALT4)
+
+trait.PC1.aa.2012.brmALT5 <- general_brm(trait.PC1 ~ (1|Block)+(1|Plot_code), data=aa.trait.2012, family=gaussian(link="identity"), prior=c(prior(normal(0,1), class="sd"), prior(normal(0,1), class="b")))
+summary(trait.PC1.aa.2012.brmALT5)
+
+trait.PC1.aa.2012.brmALT6 <- general_brm(trait.PC1 ~ 1, data=aa.trait.2012, family=gaussian(link="identity"), prior=c(prior(normal(0,1), class="sd"), prior(normal(0,1), class="b")))
+summary(trait.PC1.aa.2012.brmALT6)
+
+LOO(trait.PC1.aa.2012.brm, trait.PC1.aa.2012.brmALT, trait.PC1.aa.2012.brmALT2,  trait.PC1.aa.2012.brmALT3, trait.PC1.aa.2012.brmALT4, trait.PC1.aa.2012.brmALT5, trait.PC1.aa.2012.brmALT6)
+
+p1 <- data.frame(predict(trait.PC1.aa.2012.brmALT4))$Estimate
+p2 <- data.frame(predict(trait.PC1.aa.2012.brmALT))$Estimate
+plot(p1~p2)
+cor.test(p1, p2)
 
 y_aa.trait.PC1.2012 <- aa.trait.2012$trait.PC1
 yrep_aa.trait.PC1.2012 <- posterior_predict(trait.PC1.aa.2012.brm, nsamples=100)
