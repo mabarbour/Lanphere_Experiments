@@ -112,6 +112,9 @@ hist(w.trait.2012$trait.PC1)
 trait.PC1.wind.2012.brm <- general_brm(trait.PC1~(1|Genotype*Wind.Exposure)+(1|Block)+(1|Plot_code), data=w.trait.2012, family=gaussian(link="identity"))
 summary(trait.PC1.wind.2012.brm)
 
+trait.PC1.wind.2012.brm <- general_brm(trait.PC1~Wind.Exposure+(0+Wind.Exposure|Genotype)+(1|Block)+(1|Plot_code), data=w.trait.2012, family=gaussian(link="identity"))
+summary(trait.PC1.wind.2012.brm)
+
 y_w.trait.PC1.2012 <- w.trait.2012$trait.PC1
 yrep_w.trait.PC1.2012 <- posterior_predict(trait.PC1.wind.2012.brm, nsamples=100)
 #launch_shinystan(trait.PC1.wind.2012.brm)
