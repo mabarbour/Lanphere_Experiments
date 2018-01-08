@@ -276,9 +276,14 @@ hist(aa.arth.df$total.rich)
 arth.rich.aa.2012.brm <- general_brm(total.rich~Aphid.treatment*c.Ant.mound.dist+(1+Aphid.treatment*c.Ant.mound.dist|Genotype)+(1|Block)+(1|Plot_code)+(1|plant_ID), data=aa.arth.df, family=poisson(link="log"))
 summary(arth.rich.aa.2012.brm)
 
+arth.rich.aa.2012.brm.NO_OLRE <- general_brm(total.rich~Aphid.treatment*c.Ant.mound.dist+(1+Aphid.treatment*c.Ant.mound.dist|Genotype)+(1|Block)+(1|Plot_code), data=aa.arth.df, family=poisson(link="log"))
+summary(arth.rich.aa.2012.brm.NO_OLRE)
+
 y_aa.arth.rich.2012 <- aa.arth.df$total.rich
 yrep_aa.arth.rich.2012 <- posterior_predict(arth.rich.aa.2012.brm, nsamples=100)
 #launch_shinystan(arth.rich.aa.2012.brm)
+
+LOO(arth.rich.aa.2012.brm, arth.rich.aa.2012.brm.NO_OLRE)
 
 
 ## ANT-APHID ARTHROPOD COMPOSITION 2012 ANALYSIS ----
