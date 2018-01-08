@@ -77,31 +77,31 @@ general_brm <- function(formula, family, data, ...) {
   # all other brm parameters correspond to the defaults
 }
 
-get_BLUPs <- function(brm_model){
-  BLUP_50_interval <- tidy(brm_model, par_type="varying", prob=0.5) %>%
-    rename(BLUP=estimate, SD=std.error, lower_50=lower, upper_50=upper)
-  BLUP_95_interval <- tidy(brm_model, par_type="varying", prob=0.95) %>%
-    rename(BLUP=estimate, SD=std.error, lower_95=lower, upper_95=upper)
-  BLUP_df <- left_join(BLUP_50_interval, BLUP_95_interval)
-  return(BLUP_df)
-}
+#get_BLUPs <- function(brm_model){
+#  BLUP_50_interval <- tidy(brm_model, par_type="varying", prob=0.5) %>%
+#    rename(BLUP=estimate, SD=std.error, lower_50=lower, upper_50=upper)
+#  BLUP_95_interval <- tidy(brm_model, par_type="varying", prob=0.95) %>%
+#    rename(BLUP=estimate, SD=std.error, lower_95=lower, upper_95=upper)
+#  BLUP_df <- left_join(BLUP_50_interval, BLUP_95_interval)
+#  return(BLUP_df)
+#}
 
-get_VarComps <- function(brm_model, Distrib_Var){
-  VarComp_50_interval <- tidy(brm_model, par_type="hierarchical", prob=0.5, robust=F) %>%
-    rename(SD_mean=estimate, SD_SD=std.error, lower_50=lower, upper_50=upper)
-  VarComp_95_interval <- tidy(brm_model, par_type="hierarchical", prob=0.95, robust=F) %>%
-    rename(SD_mean=estimate, SD_SD=std.error, lower_95=lower, upper_95=upper)
-  VarComp_df <- left_join(VarComp_50_interval, VarComp_95_interval) %>%
-    mutate(VarComp_mean=SD_mean^2/(sum(SD_mean^2)+Distrib_Var))
-  return(VarComp_df)
-}
+#get_VarComps <- function(brm_model, Distrib_Var){
+#  VarComp_50_interval <- tidy(brm_model, par_type="hierarchical", prob=0.5, robust=F) %>%
+#    rename(SD_mean=estimate, SD_SD=std.error, lower_50=lower, upper_50=upper)
+#  VarComp_95_interval <- tidy(brm_model, par_type="hierarchical", prob=0.95, robust=F) %>%
+#    rename(SD_mean=estimate, SD_SD=std.error, lower_95=lower, upper_95=upper)
+#  VarComp_df <- left_join(VarComp_50_interval, VarComp_95_interval) %>%
+#    mutate(VarComp_mean=SD_mean^2/(sum(SD_mean^2)+Distrib_Var))
+#  return(VarComp_df)
+#}
 
-get_FixedEffects <- function(brm_model){
-  FE_50_interval <- tidy(brm_model, par_type = "non-varying", prob=0.5, robust=F) %>% rename(lower_50=lower, upper_50=upper)
-  FE_95_interval <- tidy(brm_model, par_type = "non-varying", prob=0.95, robust=F) %>% rename(lower_95=lower, upper_95=upper)
-  FE_df <- left_join(FE_50_interval, select(FE_95_interval, term, lower_95, upper_95))
-  return(FE_df)
-}
+#get_FixedEffects <- function(brm_model){
+#  FE_50_interval <- tidy(brm_model, par_type = "non-varying", prob=0.5, robust=F) %>% rename(lower_50=lower, upper_50=upper)
+#  FE_95_interval <- tidy(brm_model, par_type = "non-varying", prob=0.95, robust=F) %>% rename(lower_95=lower, upper_95=upper)
+#  FE_df <- left_join(FE_50_interval, select(FE_95_interval, term, lower_95, upper_95))
+#  return(FE_df)
+#}
 
 composition_plot <- function(composition_data, term){
   require(cowplot)
@@ -119,6 +119,51 @@ composition_plot <- function(composition_data, term){
   ggplot(get.comp, aes(x=Species, y=Abundance)) + geom_bar(stat = "identity") + facet_wrap(as.formula(paste("~", term))) + coord_flip()
 }
 
+wind_posterior_SDs <- function(brm_model, df, FE_formula="~Wind.Exposure"){
+  Fixed_Effects <- posterior_samples(brm_model, pars = "^b")
+  sample_size <- dim(Fixed_Effects)[1]
+  
+  get_model_matrix <- model.matrix(as.formula(FE_formula), data=df)
+  
+  model_size <- dim(get_model_matrix)[2]
+  
+  FE_SD_list <- list()
+  for(i in 1:model_size){
+    FE_SD_vector <- c()
+    for(j in 1:sample_size){
+      FE_SD_vector[j] <- sd(as.vector(Fixed_Effects[j,i] * t(get_model_matrix)[i, ]))
+    }
+    FE_SD_list[[i]] <- FE_SD_vector
+  }
+  SD_df <- data.frame(sd_Wind.Exposure=FE_SD_list[[2]],                # fixed effects
+                      posterior_samples(brm_model, pars = "^sd")) %>%  # random effects
+    gather(key=term, value=posterior_SD) 
+  return(SD_df)
+}
+
+ant.aphid_posterior_SDs <- function(brm_model, df, FE_formula="~Aphid.treatment*c.Ant.mound.dist"){
+  Fixed_Effects <- posterior_samples(brm_model, pars = "^b")
+  sample_size <- dim(Fixed_Effects)[1]
+  
+  get_model_matrix <- model.matrix(as.formula(FE_formula), data=df)
+  
+  model_size <- dim(get_model_matrix)[2]
+  
+  FE_SD_list <- list()
+  for(i in 1:model_size){
+    FE_SD_vector <- c()
+    for(j in 1:sample_size){
+      FE_SD_vector[j] <- sd(as.vector(Fixed_Effects[j,i] * t(get_model_matrix)[i, ]))
+    }
+    FE_SD_list[[i]] <- FE_SD_vector
+  }
+  SD_df <- data.frame(sd_Aphid.treatment=FE_SD_list[[2]], sd_c.Ant.mound.dist=FE_SD_list[[3]], sd_Aphid.x.Ant=FE_SD_list[[4]], # fixed effects
+                      posterior_samples(brm_model, pars = "^sd")) %>%                                                          # random effects
+    gather(key=term, value=posterior_SD)
+  return(SD_df)
+}
+
+# still thinking about using coda package to calculate intervals
 
 ## WIND TRAIT PC1 2012 ANALYSIS ----
 hist(w.trait.2012$trait.PC1)
@@ -134,34 +179,8 @@ yrep_w.trait.PC1.2012 <- posterior_predict(trait.PC1.wind.2012.brm, nsamples=100
 hist(w.trait.2012$trait.PC2)
 w.trait.2012$trait.PC2.trans <- w.trait.2012$trait.PC2-min(w.trait.2012$trait.PC2)+1 # make so minimum value is 1
 hist(log(w.trait.2012$trait.PC2.trans))
-trait.PC2.wind.2012.brm <- brm(log(trait.PC2.trans)~Wind.Exposure+(1+Wind.Exposure|Genotype)+(1|Block)+(1|Plot_code), data=w.trait.2012, family=gaussian(link="identity"), prior=prior(normal(0,0.5), class=sd))
+trait.PC2.wind.2012.brm <- brm(log(trait.PC2.trans)~Wind.Exposure+(1+Wind.Exposure|Genotype)+(1|Block)+(1|Plot_code), data=w.trait.2012, family=gaussian(link="identity"))
 summary(trait.PC2.wind.2012.brm) 
-
-
-## THIS IS WHAT I NEED TO CALCULATE FIXED-EFFECT VARIANCE, PLUS THE INDEPENDENT CONTRIBUTIONS OF ALL OTHER EFFECTS. 
-posterior_samples(trait.PC2.wind.2012.brmALT, pars = "^b") 
-posterior_samples(trait.PC2.wind.2012.brmALT, pars = "^sd")
-posterior_samples(trait.PC2.wind.2012.brmALT, pars = "^cor")
-
-ps_fe <- posterior_samples(trait.PC2.wind.2012.brm, pars = "^b") 
-as.matrix(ps_fe[1, ]) %*% t(get_model.matrix)
-
-get_sd <- numeric(dim(ps_fe)[1])
-for(i in 1:dim(ps_fe)[1]){
-  get_sd[i] <- sd(as.matrix(ps_fe[i, ]) %*% t(get_model.matrix))
-}
-#install.packages(c("coda","mvtnorm","devtools","loo"))
-#library(devtools)
-#devtools::install_github("rmcelreath/rethinking")
-
-library(coda)
-HPDinterval(as.mcmc(trait.PC2.wind.2012.brm, combine_chains = TRUE))
-HPDinterval(as.mcmc(get_sd), prob = 0.5)
-mean(get_sd)
-HPDI(get_sd)
-get_model.matrix <- data.frame(model.matrix(~Wind.Exposure, w.trait.2012)) %>% rename(b_Intercept=X.Intercept., b_Wind.ExposureUnexposed=Wind.ExposureUnexposed)
-
- 
 
 y_w.trait.PC2.2012 <- log(w.trait.2012$trait.PC2.trans)
 yrep_w.trait.PC2.2012 <- posterior_predict(trait.PC2.wind.2012.brm, nsamples=100)
@@ -221,34 +240,32 @@ yrep_root_CN.2013 <- posterior_predict(root_CN.wind.2013.brm, nsamples=100)
 
 ## WIND ARTHROPOD RICHNESS 2012 ANALYSIS ----
 
-## DO I NEED PLANT_ID? ONLY IF IT PROVIDES A BETTER MODEL FIT (I.E ACCOUNTS FOR OVERDISPERSION), OTHERWISE, IT'S NOT HELPFUL FOR r2 CALC BECAUSE I'M NOT DOING THAT...
 hist(w.arth.2012$total.rich)
-arth.rich.wind.2012.brm <- general_brm(total.rich~Wind.Exposure+(1+Wind.Exposure|Genotype)+(1|Block)+(1|Plot_code)+(1|plant_ID), data=w.arth.2012, family=poisson(link="log"))
+arth.rich.wind.2012.brm <- general_brm(total.rich~Wind.Exposure+(1+Wind.Exposure|Genotype)+(1|Block)+(1|Plot_code), data=w.arth.2012, family=poisson(link="log"))
 summary(arth.rich.wind.2012.brm)
 
 y_w.arth.rich.2012 <- w.arth.2012$total.rich
 yrep_w.arth.rich.2012 <- posterior_predict(arth.rich.wind.2012.brm, nsamples=100)
 #launch_shinystan(arth.rich.wind.2012.brm)
 
-
 ## WIND ARTHROPOD COMPOSITION 2012 ANALYSIS ----
 
 ## RETHINKING THIS BASED ON MULTIVARIATE ANALYSIS, SHOULD BE ABLE TO KEEP IN SAME FORMAT
 
-w.arth.2012.comp <- select(w.arth.2012, X:spider_Larionoides, Plot_code) %>% #, GxE
-  gather(key=Species, value=Abundance, ant_F_obscuripes:spider_Larionoides) %>%
-  mutate(Occurrence=ifelse(Abundance>0, 1, 0))
+#w.arth.2012.comp <- select(w.arth.2012, X:spider_Larionoides, Plot_code) %>% #, GxE
+#  gather(key=Species, value=Abundance, ant_F_obscuripes:spider_Larionoides) %>%
+#  mutate(Occurrence=ifelse(Abundance>0, 1, 0))
 
-composition_plot(w.arth.2012.comp, term="Wind.Exposure")
-composition_plot(w.arth.2012.comp, term="Genotype")
+#composition_plot(w.arth.2012.comp, term="Wind.Exposure")
+#composition_plot(w.arth.2012.comp, term="Genotype")
 #composition_plot(w.arth.2012.comp, term="GxE")
 
-hist(w.arth.2012.comp$Occurrence)
-arth.comp.wind.2012.brm <- general_brm(Occurrence~Wind.Exposure+(1+Wind.Exposure|Genotype)+(1|Block)+(1|Plot_code), data=w.arth.2012, family=bernoulli(link="logit"))
-summary(arth.comp.wind.2012.brm)
+#hist(w.arth.2012.comp$Occurrence)
+#arth.comp.wind.2012.brm <- general_brm(Occurrence~Wind.Exposure+(1+Wind.Exposure|Genotype)+(1|Block)+(1|Plot_code), data=w.arth.2012, family=bernoulli(link="logit"))
+#summary(arth.comp.wind.2012.brm)
 
-y_w.arth.comp.2012 <- w.arth.2012.comp$Occurrence
-yrep_w.arth.comp.2012 <- posterior_predict(arth.comp.wind.2012.brm, nsamples=100)
+#y_w.arth.comp.2012 <- w.arth.2012.comp$Occurrence
+#yrep_w.arth.comp.2012 <- posterior_predict(arth.comp.wind.2012.brm, nsamples=100)
 #launch_shinystan(arth.comp.wind.2012.brm)
 
 
@@ -271,32 +288,32 @@ yrep_aa.arth.rich.2012 <- posterior_predict(arth.rich.aa.2012.brm, nsamples=100)
 
 ## EVALUATE WHETHER CBIND FUNCTION WILL WORK BEST
 
-hist(aa.arth.2012.comp$Occurrence)
-arth.comp.aa.2012.brm <- general_brm(Occurrence~Aphid.treatment*c.Ant.mound.dist+(1+Aphid.treatment*c.Ant.mound.dist|Genotype)+(1|Block)+(1|Plot_code), data=aa.arth.2012, family=bernoulli(link="logit"))
-summary(arth.comp.aa.2012.brm)
+#hist(aa.arth.2012.comp$Occurrence)
+#arth.comp.aa.2012.brm <- general_brm(Occurrence~Aphid.treatment*c.Ant.mound.dist+(1+Aphid.treatment*c.Ant.mound.dist|Genotype)+(1|Block)+(1|Plot_code), data=aa.arth.2012, family=bernoulli(link="logit"))
+#summary(arth.comp.aa.2012.brm)
 
-y_aa.arth.comp.2012 <- aa.arth.2012.comp$Occurrence
-yrep_aa.arth.comp.2012 <- posterior_predict(arth.comp.aa.2012.brm, nsamples=100)
+#y_aa.arth.comp.2012 <- aa.arth.2012.comp$Occurrence
+#yrep_aa.arth.comp.2012 <- posterior_predict(arth.comp.aa.2012.brm, nsamples=100)
 #launch_shinystan(arth.comp.aa.2012.brm)
 
 # Aphis farinosa ## CONSIDER A HURDLE POISSON MODEL, THAT WAY I CAN CHECK ESTIMATE PROBABILITY OF THERE BEING AN APHID AND THEN THE EFFECT ON ABUNDANCE
 
 # RERUN 
-hist(filter(aa.arth.2012.comp, Species=="aphid_Aphis", Aphid.treatment=="aphid")$Abundance)
-arth.Aphis.aa.2012.brm <- general_brm(Abundance~c.Ant.mound.dist+(1+c.Ant.mound.dist|Genotype)+(1|Block)+(1|Plot_code), data=filter(aa.arth.2012.comp, Species=="aphid_Aphis", Aphid.treatment=="aphid"), family=poisson(link="log"))
+#hist(filter(aa.arth.2012.comp, Species=="aphid_Aphis", Aphid.treatment=="aphid")$Abundance)
+#arth.Aphis.aa.2012.brm <- general_brm(Abundance~c.Ant.mound.dist+(1+c.Ant.mound.dist|Genotype)+(1|Block)+(1|Plot_code), data=filter(aa.arth.2012.comp, Species=="aphid_Aphis", Aphid.treatment=="aphid"), family=poisson(link="log"))
 
-y_aa.arth.Aphis.2012 <- filter(aa.arth.2012.comp, Species=="aphid_Aphis", Aphid.treatment=="aphid")$Abundance
-yrep_aa.arth.Aphis.2012 <- posterior_predict(arth.Aphis.aa.2012.brm, nsamples=100)
+#y_aa.arth.Aphis.2012 <- filter(aa.arth.2012.comp, Species=="aphid_Aphis", Aphid.treatment=="aphid")$Abundance
+#yrep_aa.arth.Aphis.2012 <- posterior_predict(arth.Aphis.aa.2012.brm, nsamples=100)
 #launch_shinystan(arth.Aphis.aa.2012.brm)
 
 # Formica obscuripes
 
 # RERUN 
-hist(filter(aa.arth.2012.comp, Species=="ant_F_obscuripes")$Abundance)
-arth.Fobscuripes.aa.2012.brm <- general_brm(Abundance~Aphid.treatment*c.Ant.mound.dist+(1+Aphid.treatment*c.Ant.mound.dist|Genotype)+(1|Block)+(1|Plot_code), data=filter(aa.arth.2012.comp, Species=="ant_F_obscuripes"), family=poisson(link="log"))
+#hist(filter(aa.arth.2012.comp, Species=="ant_F_obscuripes")$Abundance)
+#arth.Fobscuripes.aa.2012.brm <- general_brm(Abundance~Aphid.treatment*c.Ant.mound.dist+(1+Aphid.treatment*c.Ant.mound.dist|Genotype)+(1|Block)+(1|Plot_code), data=filter(aa.arth.2012.comp, Species=="ant_F_obscuripes"), family=poisson(link="log"))
 
-y_aa.arth.Fobscuripes.2012 <- filter(aa.arth.2012.comp, Species=="ant_F_obscuripes")$Abundance
-yrep_aa.arth.Fobscuripes.2012 <- posterior_predict(arth.Fobscuripes.aa.2012.brm, nsamples=100)
+#y_aa.arth.Fobscuripes.2012 <- filter(aa.arth.2012.comp, Species=="ant_F_obscuripes")$Abundance
+#yrep_aa.arth.Fobscuripes.2012 <- posterior_predict(arth.Fobscuripes.aa.2012.brm, nsamples=100)
 #launch_shinystan(arth.Fobscuripes.aa.2012.brm)
 
 ## WIND ARTHROPOD RICHNESS 2013 ANALYSIS ----
@@ -332,21 +349,21 @@ yrep_w.bacteria.rarerich.2013 <- posterior_predict(bacteria.rarerich.wind.2013.b
 #launch_shinystan(bacteria.rarerich.wind.2013.brm)
 
 ## WIND ARTHROPOD COMPOSITION 2013 ANALYSIS ----
-w.arth.2013.comp <- select(w.arth.2013, X:spider_Larionoides, Plot_code) %>% # , GxE
-  gather(key=Species, value=Abundance, ant_F_obscuripes:spider_Larionoides) %>%
-  mutate(Occurrence=ifelse(Abundance>0, 1, 0))
+#w.arth.2013.comp <- select(w.arth.2013, X:spider_Larionoides, Plot_code) %>% # , GxE
+#  gather(key=Species, value=Abundance, ant_F_obscuripes:spider_Larionoides) %>%
+#  mutate(Occurrence=ifelse(Abundance>0, 1, 0))
 
-composition_plot(w.arth.2013.comp, term="Wind.Exposure")
-composition_plot(w.arth.2013.comp, term="Genotype")
+#composition_plot(w.arth.2013.comp, term="Wind.Exposure")
+#composition_plot(w.arth.2013.comp, term="Genotype")
 #composition_plot(w.arth.2013.comp, term="GxE")
 
 ## RETHINK WHETHER LONG DATA FORMAT IS NEEDED. SHOULDN'T NEED IT.
-hist(w.arth.2013.comp$Occurrence)
-arth.comp.wind.2013.brm <- general_brm(Occurrence~(1|Genotype*Wind.Exposure*Species)+(1|Block)+(1|Plot_code)+(1|Block:Species), data=w.arth.2013.comp, family=bernoulli(link="logit"))
-summary(arth.comp.wind.2013.brm)
+#hist(w.arth.2013.comp$Occurrence)
+#arth.comp.wind.2013.brm <- general_brm(Occurrence~(1|Genotype*Wind.Exposure*Species)+(1|Block)+(1|Plot_code)+(1|Block:Species), data=w.arth.2013.comp, family=bernoulli(link="logit"))
+#summary(arth.comp.wind.2013.brm)
 
-y_w.arth.comp.2013 <- w.arth.2013.comp$Occurrence
-yrep_w.arth.comp.2013 <- posterior_predict(arth.comp.wind.2013.brm, nsamples=100)
+#y_w.arth.comp.2013 <- w.arth.2013.comp$Occurrence
+#yrep_w.arth.comp.2013 <- posterior_predict(arth.comp.wind.2013.brm, nsamples=100)
 #launch_shinystan(arth.comp.wind.2013.brm)
 
 ## WIND SOIL PC1 ANALYSIS ----
@@ -428,45 +445,66 @@ plot(marginal_effects(bact.trait.rarerich.wind.2013.brm, effects = "soil.PC2"), 
 
 ## TIDY AND SAVE OUTPUT ----
 
+lanphere_SDs <- bind_rows(
+  mutate(wind_posterior_SDs(trait.PC1.wind.2012.brm, df=w.trait.2012), Experiment="Wind", Year="2012", Response="Trait PC1"),
+  mutate(wind_posterior_SDs(trait.PC2.wind.2012.brm, df=w.trait.2012), Experiment="Wind", Year="2012", Response="log(Trait PC2 + min(Trait PC2) + 1)"),
+  mutate(wind_posterior_SDs(trait.PC1.wind.2013.brm, df=w.trait.2013), Experiment="Wind", Year="2013", Response="Trait PC1"),
+  mutate(wind_posterior_SDs(trait.PC2.wind.2013.brm, df=w.trait.2013), Experiment="Wind", Year="2013", Response="Trait PC2"),
+  mutate(wind_posterior_SDs(soil.PC1.wind.brm, df=w.soil), Experiment="Wind", Year="2013", Response="log(Soil PC1 + min(Soil PC1) + 1)"),
+  mutate(wind_posterior_SDs(soil.PC2.wind.brm, df=w.soil), Experiment="Wind", Year="2013", Response="Soil PC2"),
+  mutate(wind_posterior_SDs(root_CN.wind.2013.brm, df=w.trait.2013), Experiment="Wind", Year="2013", Response="log(Root C:N)"),
+  mutate(ant.aphid_posterior_SDs(trait.PC1.aa.2012.brm, df=aa.trait.2012), Experiment="Ant-Aphid", Year="2012", Response="Trait PC1"),
+  mutate(ant.aphid_posterior_SDs(trait.PC2.aa.2012.brm, df=aa.trait.2012), Experiment="Ant-Aphid", Year="2012", Response="Trait PC2"),
+  mutate(wind_posterior_SDs(arth.rich.wind.2012.brm, df=w.arth.2012), Experiment="Wind", Year="2012", Response="Arthropod Richness"),
+  #mutate(wind_posterior_SDs(arth.comp.wind.2012.brm), Experiment="Wind", Year="2012", Response="Arthropod Composition"),
+  mutate(wind_posterior_SDs(arth.rich.wind.2013.brm, df=w.arth.2013), Experiment="Wind", Year="2013", Response="Arthropod Richness"),
+  #mutate(wind_posterior_SDs(arth.comp.wind.2013.brm), Experiment="Wind", Year="2013", Response="Arthropod Composition"),
+  mutate(wind_posterior_SDs(fungal.rarerich.wind.2013.brm, df=fungal.df), Experiment="Wind", Year="2013", Response="scale(Fungi Rarefied Richness)"),
+  mutate(wind_posterior_SDs(bacteria.rarerich.wind.2013.brm, df=bacteria.df), Experiment="Wind", Year="2013", Response="scale(Bacteria Rarefied Richness)"),
+  mutate(ant.aphid_posterior_SDs(arth.rich.aa.2012.brm, df=aa.arth.df), Experiment="Ant-Aphid", Year="2012", Response="Arthropod Richness")#,
+  #mutate(ant.aphid_posterior_SDs(arth.comp.aa.2012.brm), Experiment="Ant-Aphid", Year="2012", Response="Arthropod Composition")
+)
+write_csv(lanphere_SDs, path="output_brms/lanphere_SDs.csv")
+
 ## CONSIDER CHANGING BACTERIAL TO BACTERIA AND FUNGAL TO FUNGI TO SHORTEN EVERYTHING
 
-lanphere_VarComps <- bind_rows(
-  mutate(get_VarComps(trait.PC1.wind.2012.brm, Distrib_Var=tidy(trait.PC1.wind.2012.brm, parameters = "sigma")$estimate^2), 
-         Experiment="Wind", Year="2012", Response="Trait PC1"),
-  mutate(get_VarComps(trait.PC2.wind.2012.brm, Distrib_Var=tidy(trait.PC2.wind.2012.brm, parameters = "sigma")$estimate^2), 
-         Experiment="Wind", Year="2012", Response="log(Trait PC2 + min(Trait PC2) + 1)"),
-  mutate(get_VarComps(trait.PC1.wind.2013.brm, Distrib_Var=tidy(trait.PC1.wind.2013.brm, parameters = "sigma")$estimate^2), 
-         Experiment="Wind", Year="2013", Response="Trait PC1"),
-  mutate(get_VarComps(trait.PC2.wind.2013.brm, Distrib_Var=tidy(trait.PC2.wind.2013.brm, parameters = "sigma")$estimate^2), 
-         Experiment="Wind", Year="2013", Response="Trait PC2"),
-  mutate(get_VarComps(soil.PC1.wind.brm, Distrib_Var=tidy(soil.PC1.wind.brm, parameters = "sigma")$estimate^2), 
-         Experiment="Wind", Year="2013", Response="log(Soil PC1 + min(Soil PC1) + 1)"),
-  mutate(get_VarComps(soil.PC2.wind.brm, Distrib_Var=tidy(soil.PC2.wind.brm, parameters = "sigma")$estimate^2), 
-         Experiment="Wind", Year="2013", Response="Soil PC2"),
-  mutate(get_VarComps(root_CN.wind.2013.brm, Distrib_Var=tidy(root_CN.wind.2013.brm, parameters = "sigma")$estimate^2), 
-         Experiment="Wind", Year="2013", Response="log(Root C:N)"),
-  mutate(get_VarComps(trait.PC1.aa.2012.brm, Distrib_Var=tidy(trait.PC1.aa.2012.brm, parameters = "sigma")$estimate^2), 
-         Experiment="Ant-Aphid", Year="2012", Response="Trait PC1"),
-  mutate(get_VarComps(trait.PC2.aa.2012.brm, Distrib_Var=tidy(trait.PC2.aa.2012.brm, parameters = "sigma")$estimate^2), 
-         Experiment="Ant-Aphid", Year="2012", Response="Trait PC2"),
-  mutate(get_VarComps(arth.rich.wind.2012.brm, Distrib_Var=log(1/exp(tidy(arth.rich.wind.2012.brm, parameters = "b_Intercept")$estimate)+1)), 
-         Experiment="Wind", Year="2012", Response="Arthropod Richness"),
-  mutate(get_VarComps(arth.comp.wind.2012.brm, Distrib_Var=pi^2/3), 
-         Experiment="Wind", Year="2012", Response="Arthropod Composition"),
-  mutate(get_VarComps(arth.rich.wind.2013.brm, Distrib_Var=log(1/exp(tidy(arth.rich.wind.2013.brm, parameters = "b_Intercept")$estimate)+1)), 
-         Experiment="Wind", Year="2013", Response="Arthropod Richness"),
-  mutate(get_VarComps(arth.comp.wind.2013.brm, Distrib_Var=pi^2/3), 
-         Experiment="Wind", Year="2013", Response="Arthropod Composition"),
-  mutate(get_VarComps(fungal.rarerich.wind.2013.brm, Distrib_Var=tidy(fungal.rarerich.wind.2013.brm, parameters = "sigma")$estimate^2), 
-         Experiment="Wind", Year="2013", Response="scale(Fungi Rarefied Richness)"),
-  mutate(get_VarComps(bacteria.rarerich.wind.2013.brm, Distrib_Var=tidy(bacteria.rarerich.wind.2013.brm, parameters = "sigma")$estimate^2), 
-         Experiment="Wind", Year="2013", Response="scale(Bacteria Rarefied Richness)"),
-  mutate(get_VarComps(arth.rich.aa.2012.brm, Distrib_Var=log(1/exp(tidy(arth.rich.aa.2012.brm, parameters = "b_Intercept")$estimate)+1)), 
-         Experiment="Ant-Aphid", Year="2012", Response="Arthropod Richness"),
-  mutate(get_VarComps(arth.comp.aa.2012.brm, Distrib_Var=pi^2/3), 
-         Experiment="Ant-Aphid", Year="2012", Response="Arthropod Composition")
-)
-write_csv(lanphere_VarComps, path="output_brms/lanphere_VarComps.csv")
+#lanphere_VarComps <- bind_rows(
+#  mutate(get_VarComps(trait.PC1.wind.2012.brm, Distrib_Var=tidy(trait.PC1.wind.2012.brm, parameters = "sigma")$estimate^2), 
+#         Experiment="Wind", Year="2012", Response="Trait PC1"),
+#  mutate(get_VarComps(trait.PC2.wind.2012.brm, Distrib_Var=tidy(trait.PC2.wind.2012.brm, parameters = "sigma")$estimate^2), 
+#         Experiment="Wind", Year="2012", Response="log(Trait PC2 + min(Trait PC2) + 1)"),
+#  mutate(get_VarComps(trait.PC1.wind.2013.brm, Distrib_Var=tidy(trait.PC1.wind.2013.brm, parameters = "sigma")$estimate^2), 
+#         Experiment="Wind", Year="2013", Response="Trait PC1"),
+#  mutate(get_VarComps(trait.PC2.wind.2013.brm, Distrib_Var=tidy(trait.PC2.wind.2013.brm, parameters = "sigma")$estimate^2), 
+#         Experiment="Wind", Year="2013", Response="Trait PC2"),
+#  mutate(get_VarComps(soil.PC1.wind.brm, Distrib_Var=tidy(soil.PC1.wind.brm, parameters = "sigma")$estimate^2), 
+#         Experiment="Wind", Year="2013", Response="log(Soil PC1 + min(Soil PC1) + 1)"),
+#  mutate(get_VarComps(soil.PC2.wind.brm, Distrib_Var=tidy(soil.PC2.wind.brm, parameters = "sigma")$estimate^2), 
+#         Experiment="Wind", Year="2013", Response="Soil PC2"),
+#  mutate(get_VarComps(root_CN.wind.2013.brm, Distrib_Var=tidy(root_CN.wind.2013.brm, parameters = "sigma")$estimate^2), 
+#         Experiment="Wind", Year="2013", Response="log(Root C:N)"),
+#  mutate(get_VarComps(trait.PC1.aa.2012.brm, Distrib_Var=tidy(trait.PC1.aa.2012.brm, parameters = "sigma")$estimate^2), 
+#         Experiment="Ant-Aphid", Year="2012", Response="Trait PC1"),
+#  mutate(get_VarComps(trait.PC2.aa.2012.brm, Distrib_Var=tidy(trait.PC2.aa.2012.brm, parameters = "sigma")$estimate^2), 
+#         Experiment="Ant-Aphid", Year="2012", Response="Trait PC2"),
+#  mutate(get_VarComps(arth.rich.wind.2012.brm, Distrib_Var=log(1/exp(tidy(arth.rich.wind.2012.brm, parameters = "b_Intercept")$estimate)+1)), 
+#         Experiment="Wind", Year="2012", Response="Arthropod Richness"),
+#  mutate(get_VarComps(arth.comp.wind.2012.brm, Distrib_Var=pi^2/3), 
+#         Experiment="Wind", Year="2012", Response="Arthropod Composition"),
+# mutate(get_VarComps(arth.rich.wind.2013.brm, Distrib_Var=log(1/exp(tidy(arth.rich.wind.2013.brm, parameters = "b_Intercept")$estimate)+1)), 
+#         Experiment="Wind", Year="2013", Response="Arthropod Richness"),
+#  mutate(get_VarComps(arth.comp.wind.2013.brm, Distrib_Var=pi^2/3), 
+#         Experiment="Wind", Year="2013", Response="Arthropod Composition"),
+#  mutate(get_VarComps(fungal.rarerich.wind.2013.brm, Distrib_Var=tidy(fungal.rarerich.wind.2013.brm, parameters = "sigma")$estimate^2), 
+#         Experiment="Wind", Year="2013", Response="scale(Fungi Rarefied Richness)"),
+#  mutate(get_VarComps(bacteria.rarerich.wind.2013.brm, Distrib_Var=tidy(bacteria.rarerich.wind.2013.brm, parameters = "sigma")$estimate^2), 
+#         Experiment="Wind", Year="2013", Response="scale(Bacteria Rarefied Richness)"),
+#  mutate(get_VarComps(arth.rich.aa.2012.brm, Distrib_Var=log(1/exp(tidy(arth.rich.aa.2012.brm, parameters = "b_Intercept")$estimate)+1)), 
+#         Experiment="Ant-Aphid", Year="2012", Response="Arthropod Richness"),
+#  mutate(get_VarComps(arth.comp.aa.2012.brm, Distrib_Var=pi^2/3), 
+#         Experiment="Ant-Aphid", Year="2012", Response="Arthropod Composition")
+#)
+#write_csv(lanphere_VarComps, path="output_brms/lanphere_VarComps.csv")
 
 lanphere_trait_regs <- bind_rows(
   mutate(get_FixedEffects(trait.rich.aa.2012.brm), Experiment="Ant-Aphid", Year="2012", Response="Arthropod Richness"),
