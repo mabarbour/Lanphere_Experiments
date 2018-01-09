@@ -239,7 +239,7 @@ yrep_root_CN.2013 <- posterior_predict(root_CN.wind.2013.brm, nsamples=100)
 #launch_shinystan(root_CN.wind.2013.brm)
 
 ## WIND ARTHROPOD RICHNESS 2012 ANALYSIS ----
-
+get_prior(total.rich~Wind.Exposure+(1+Wind.Exposure|Genotype)+(1|Block)+(1|Plot_code), data=w.arth.2012, family=poisson(link="log"))
 hist(w.arth.2012$total.rich)
 arth.rich.wind.2012.brm <- general_brm(total.rich~Wind.Exposure+(1+Wind.Exposure|Genotype)+(1|Block)+(1|Plot_code), data=w.arth.2012, family=poisson(link="log"))
 summary(arth.rich.wind.2012.brm)
@@ -252,17 +252,33 @@ yrep_w.arth.rich.2012 <- posterior_predict(arth.rich.wind.2012.brm, nsamples=100
 
 ## RETHINKING THIS BASED ON MULTIVARIATE ANALYSIS, SHOULD BE ABLE TO KEEP IN SAME FORMAT
 
-#w.arth.2012.comp <- select(w.arth.2012, X:spider_Larionoides, Plot_code) %>% #, GxE
-#  gather(key=Species, value=Abundance, ant_F_obscuripes:spider_Larionoides) %>%
-#  mutate(Occurrence=ifelse(Abundance>0, 1, 0))
+w.arth.2012.comp <- select(w.arth.2012, X:spider_Larionoides, Plot_code) %>% #, GxE
+  gather(key=Species, value=Abundance, ant_F_obscuripes:spider_Larionoides) %>%
+  mutate(Occurrence=ifelse(Abundance>0, 1, 0)) %>%
+  select(-Abundance) %>%
+  spread(Species, Occurrence)
 
 #composition_plot(w.arth.2012.comp, term="Wind.Exposure")
 #composition_plot(w.arth.2012.comp, term="Genotype")
 #composition_plot(w.arth.2012.comp, term="GxE")
 
+get_prior(cbind(ant_black, ant_F_obscuripes)~Wind.Exposure+(1+Wind.Exposure|Genotype)+(1|Block)+(1|Plot_code), data=w.arth.2012.comp, family=bernoulli(link="logit"))
+
+wind.community <- cbind(ant_black, ant_F_obscuripes, aphid_Aphis, aphid_LG, aphid_Tuberolachnus, caterpillar_LB,
+                        caterpillar_looper, caterpillar_unk, gall_Aculus, gall_Iteomyia, gall_Pontania, gall_R_rigidae,
+                        gall_R_salicisbattatus, gall_R_salicisbrassicoides, grasshopper, leafhopper_camo, leafhopper_C_reductus,
+                        leafhopper_green, leafhopper_nymph_unk, leafhopper_unk, leafhopper_YK, leaftier_Tortricid, 
+                        LTF_Caloptilia, psyllid, red_scale, sawfly_larva, spider_BY, spider_CS, spider_Larionoides, 
+                        spider_NW, spider_Tetragnathid, spider_Theridion, spider_unk, stinkbug, tentmine_Phyllonorycter)
 #hist(w.arth.2012.comp$Occurrence)
-#arth.comp.wind.2012.brm <- general_brm(Occurrence~Wind.Exposure+(1+Wind.Exposure|Genotype)+(1|Block)+(1|Plot_code), data=w.arth.2012, family=bernoulli(link="logit"))
-#summary(arth.comp.wind.2012.brm)
+arth.comp.wind.2012.brm <- brm(cbind(ant_black, ant_F_obscuripes, aphid_Aphis, aphid_LG, aphid_Tuberolachnus, caterpillar_LB,
+                                     caterpillar_looper, caterpillar_unk, gall_Aculus, gall_Iteomyia, gall_Pontania, gall_R_rigidae,
+                                     gall_R_salicisbattatus, gall_R_salicisbrassicoides, grasshopper, leafhopper_camo, leafhopper_C_reductus,
+                                     leafhopper_green, leafhopper_nymph_unk, leafhopper_unk, leafhopper_YK, leaftier_Tortricid, 
+                                     LTF_Caloptilia, psyllid, red_scale, sawfly_larva, spider_BY, spider_CS, spider_Larionoides, 
+                                     spider_NW, spider_Tetragnathid, spider_Theridion, spider_unk, stinkbug, tentmine_Phyllonorycter)
+                               ~Wind.Exposure+(1+Wind.Exposure|Genotype)+(1|Block)+(1|Plot_code), data=w.arth.2012.comp, family=bernoulli(link="logit"), control=list(adapt_delta=0.95, max_treedepth=20))
+summary(arth.comp.wind.2012.brm)
 
 #y_w.arth.comp.2012 <- w.arth.2012.comp$Occurrence
 #yrep_w.arth.comp.2012 <- posterior_predict(arth.comp.wind.2012.brm, nsamples=100)
@@ -271,19 +287,14 @@ yrep_w.arth.rich.2012 <- posterior_predict(arth.rich.wind.2012.brm, nsamples=100
 
 ## ANT-APHID ARTHROPOD RICHNESS 2012 ANALYSIS ----
 
-# EVALUATE WHETHER I DO NEED OBSERVATION-LEVEL RANDOM EFFECT
+# unable to fit the most complex random effects structure to the model
 hist(aa.arth.df$total.rich)
-arth.rich.aa.2012.brm <- general_brm(total.rich~Aphid.treatment*c.Ant.mound.dist+(1+Aphid.treatment*c.Ant.mound.dist|Genotype)+(1|Block)+(1|Plot_code)+(1|plant_ID), data=aa.arth.df, family=poisson(link="log"))
+arth.rich.aa.2012.brm <- general_brm(total.rich~Aphid.treatment*c.Ant.mound.dist+(1+Aphid.treatment|Genotype)+(1|Block)+(1|Plot_code), data=aa.arth.df, family=poisson(link="log"))
 summary(arth.rich.aa.2012.brm)
-
-arth.rich.aa.2012.brm.NO_OLRE <- general_brm(total.rich~Aphid.treatment*c.Ant.mound.dist+(1+Aphid.treatment*c.Ant.mound.dist|Genotype)+(1|Block)+(1|Plot_code), data=aa.arth.df, family=poisson(link="log"))
-summary(arth.rich.aa.2012.brm.NO_OLRE)
 
 y_aa.arth.rich.2012 <- aa.arth.df$total.rich
 yrep_aa.arth.rich.2012 <- posterior_predict(arth.rich.aa.2012.brm, nsamples=100)
 #launch_shinystan(arth.rich.aa.2012.brm)
-
-LOO(arth.rich.aa.2012.brm, arth.rich.aa.2012.brm.NO_OLRE)
 
 
 ## ANT-APHID ARTHROPOD COMPOSITION 2012 ANALYSIS ----
