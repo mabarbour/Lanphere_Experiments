@@ -4,6 +4,12 @@ library(tidyverse)
 library(cowplot)
 
 ## GET DATA ----
+sd.df <- read_csv('output_brms/lanphere_SDs.csv')
+sd.df$term_ord <- factor(sd.df$term)
+levels(sd.df$term_ord)
+sd.df$term_ord <- factor(varcomp.df$term_group, levels=c("Plot","Block x Sp","Block", "G x Aphid x Ant x Sp","G x Aphid x Ant", "G x Ant x Sp","G x Ant", "G x Aphid x Sp", "G x Aphid", "G x Wind x Sp","G x Wind","Aphid x Ant x Sp",  "Aphid x Ant", "Ant x Sp","Ant", "Aphid x Sp", "Aphid", "Wind x Sp","Wind", "G x Sp", "Genotype (G)","Species (Sp)"))
+levels(sd.df$term_ord)
+
 # testing for composition
 #varcomp.df <- read_csv('output_brms/lanphere_arthropods_VarComps_2012.csv') %>% mutate(term_group="", term_order="") %>% as.data.frame() %>% rename(Response=Trait)
 varcomp.df <- read_csv('output_brms/lanphere_VarComps.csv') %>% mutate(term_group="", term_order="") %>% as.data.frame()

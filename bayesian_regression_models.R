@@ -35,6 +35,7 @@ aa.arth.df <- read.csv('final_data/ant_aphid_arthropod_df.csv') %>% tbl_df() %>%
          Aphid.treatment=C(Aphid.treatment, "contr.sum"),        # set sum to zero contrasts
          c.Ant.mound.dist=Ant.mound.dist - mean(Ant.mound.dist)) # center 
 
+mean.aa.rich.2012 <- mean(aa.arth.df$total.rich)
 
 ## WIND ARTHROPOD COMMUNITY DATA ----
 # (dead plants have already been removed)
@@ -45,6 +46,8 @@ wind.arth.df <- read.csv('final_data/wind_arthropod_df.csv') %>% tbl_df() %>%
 w.arth.2012 <- wind.arth.df %>% filter(Year == "2012")
 w.arth.2013 <- wind.arth.df %>% filter(Year == "2013")
 
+mean.w.rich.2012 <- mean(w.arth.2012$total.rich)
+mean.w.rich.2013 <- mean(w.arth.2013$total.rich)
 
 ## WIND FUNGAL COMMUNITY DATA ----
 fungal.df <- read.csv("final_data/fungal.df.csv") %>% tbl_df() %>% 
@@ -72,7 +75,7 @@ general_brm <- function(formula, family, data, ...) {
   brm(formula=formula, data=data, family=family, 
       prior=c(prior(normal(0,1), class=b),
               prior(normal(0,1), class=sd)),
-      control=list(adapt_delta=0.999, max_treedepth=20),
+      control=list(adapt_delta=0.99, max_treedepth=20),
       chains=4)
   # all other brm parameters correspond to the defaults
 }
@@ -97,10 +100,10 @@ general_brm <- function(formula, family, data, ...) {
 #}
 
 #get_FixedEffects <- function(brm_model){
-#  FE_50_interval <- tidy(brm_model, par_type = "non-varying", prob=0.5, robust=F) %>% rename(lower_50=lower, upper_50=upper)
-#  FE_95_interval <- tidy(brm_model, par_type = "non-varying", prob=0.95, robust=F) %>% rename(lower_95=lower, upper_95=upper)
-#  FE_df <- left_join(FE_50_interval, select(FE_95_interval, term, lower_95, upper_95))
-#  return(FE_df)
+  #FE_50_interval <- tidy(brm_model, par_type = "non-varying", prob=0.5, robust=F) %>% rename(lower_50=lower, upper_50=upper)
+  #FE_95_interval <- tidy(brm_model, par_type = "non-varying", prob=0.95, robust=F) %>% rename(lower_95=lower, upper_95=upper)
+  #FE_df <- left_join(FE_50_interval, select(FE_95_interval, term, lower_95, upper_95))
+  #return(FE_df)
 #}
 
 composition_plot <- function(composition_data, term){
@@ -184,7 +187,7 @@ summary(trait.PC2.wind.2012.brm)
 
 y_w.trait.PC2.2012 <- log(w.trait.2012$trait.PC2.trans)
 yrep_w.trait.PC2.2012 <- posterior_predict(trait.PC2.wind.2012.brm, nsamples=100)
-launch_shinystan(trait.PC2.wind.2012.brm)
+#launch_shinystan(trait.PC2.wind.2012.brm)
 
 
 ## ANT-APHID TRAIT PC1 2012 ANALYSIS ----
@@ -252,33 +255,35 @@ yrep_w.arth.rich.2012 <- posterior_predict(arth.rich.wind.2012.brm, nsamples=100
 
 ## RETHINKING THIS BASED ON MULTIVARIATE ANALYSIS, SHOULD BE ABLE TO KEEP IN SAME FORMAT
 
-w.arth.2012.comp <- select(w.arth.2012, X:spider_Larionoides, Plot_code) %>% #, GxE
-  gather(key=Species, value=Abundance, ant_F_obscuripes:spider_Larionoides) %>%
-  mutate(Occurrence=ifelse(Abundance>0, 1, 0)) %>%
-  select(-Abundance) %>%
-  spread(Species, Occurrence)
+#w.arth.2012.comp <- select(w.arth.2012, X:spider_Larionoides, Plot_code) %>% #, GxE
+#  gather(key=Species, value=Abundance, ant_F_obscuripes:spider_Larionoides) %>%
+#  mutate(Occurrence=ifelse(Abundance>0, 1, 0)) %>%
+#  select(-Abundance) %>%
+#  spread(Species, Occurrence)
 
 #composition_plot(w.arth.2012.comp, term="Wind.Exposure")
 #composition_plot(w.arth.2012.comp, term="Genotype")
 #composition_plot(w.arth.2012.comp, term="GxE")
 
-get_prior(cbind(ant_black, ant_F_obscuripes)~Wind.Exposure+(1+Wind.Exposure|Genotype)+(1|Block)+(1|Plot_code), data=w.arth.2012.comp, family=bernoulli(link="logit"))
+#get_prior(cbind(ant_black, ant_F_obscuripes)~Wind.Exposure+(1+Wind.Exposure|Genotype)+(1|Block)+(1|Plot_code), data=w.arth.2012.comp, family=bernoulli(link="logit"))
 
-wind.community <- cbind(ant_black, ant_F_obscuripes, aphid_Aphis, aphid_LG, aphid_Tuberolachnus, caterpillar_LB,
-                        caterpillar_looper, caterpillar_unk, gall_Aculus, gall_Iteomyia, gall_Pontania, gall_R_rigidae,
-                        gall_R_salicisbattatus, gall_R_salicisbrassicoides, grasshopper, leafhopper_camo, leafhopper_C_reductus,
-                        leafhopper_green, leafhopper_nymph_unk, leafhopper_unk, leafhopper_YK, leaftier_Tortricid, 
-                        LTF_Caloptilia, psyllid, red_scale, sawfly_larva, spider_BY, spider_CS, spider_Larionoides, 
-                        spider_NW, spider_Tetragnathid, spider_Theridion, spider_unk, stinkbug, tentmine_Phyllonorycter)
+#wind.community <- cbind(ant_black, ant_F_obscuripes, aphid_Aphis, aphid_LG, aphid_Tuberolachnus, caterpillar_LB,
+#                        caterpillar_looper, caterpillar_unk, gall_Aculus, gall_Iteomyia, gall_Pontania, gall_R_rigidae,
+#                        gall_R_salicisbattatus, gall_R_salicisbrassicoides, grasshopper, leafhopper_camo, leafhopper_C_reductus,
+#                        leafhopper_green, leafhopper_nymph_unk, leafhopper_unk, leafhopper_YK, leaftier_Tortricid, 
+#                        LTF_Caloptilia, psyllid, red_scale, sawfly_larva, spider_BY, spider_CS, spider_Larionoides, 
+#                        spider_NW, spider_Tetragnathid, spider_Theridion, spider_unk, stinkbug, tentmine_Phyllonorycter)
 #hist(w.arth.2012.comp$Occurrence)
-arth.comp.wind.2012.brm <- brm(cbind(ant_black, ant_F_obscuripes, aphid_Aphis, aphid_LG, aphid_Tuberolachnus, caterpillar_LB,
-                                     caterpillar_looper, caterpillar_unk, gall_Aculus, gall_Iteomyia, gall_Pontania, gall_R_rigidae,
-                                     gall_R_salicisbattatus, gall_R_salicisbrassicoides, grasshopper, leafhopper_camo, leafhopper_C_reductus,
-                                     leafhopper_green, leafhopper_nymph_unk, leafhopper_unk, leafhopper_YK, leaftier_Tortricid, 
-                                     LTF_Caloptilia, psyllid, red_scale, sawfly_larva, spider_BY, spider_CS, spider_Larionoides, 
-                                     spider_NW, spider_Tetragnathid, spider_Theridion, spider_unk, stinkbug, tentmine_Phyllonorycter)
-                               ~Wind.Exposure+(1+Wind.Exposure|Genotype)+(1|Block)+(1|Plot_code), data=w.arth.2012.comp, family=bernoulli(link="logit"), control=list(adapt_delta=0.95, max_treedepth=20))
-summary(arth.comp.wind.2012.brm)
+#arth.comp.wind.2012.brm <- brm(cbind(ant_black, ant_F_obscuripes, aphid_Aphis, aphid_LG, aphid_Tuberolachnus, caterpillar_LB,
+#                                     caterpillar_looper, caterpillar_unk, gall_Aculus, gall_Iteomyia, gall_Pontania, gall_R_rigidae,
+#                                     gall_R_salicisbattatus, gall_R_salicisbrassicoides, grasshopper, leafhopper_camo, leafhopper_C_reductus,
+#                                     leafhopper_green, leafhopper_nymph_unk, leafhopper_unk, leafhopper_YK, leaftier_Tortricid, 
+#                                     LTF_Caloptilia, psyllid, red_scale, sawfly_larva, spider_BY, spider_CS, spider_Larionoides, 
+#                                     spider_NW, spider_Tetragnathid, spider_Theridion, spider_unk, stinkbug, tentmine_Phyllonorycter)
+#                               ~Wind.Exposure+(1+Wind.Exposure|Genotype)+(1|Block)+(1|Plot_code), data=w.arth.2012.comp, family=bernoulli(link="logit"), control=list(adapt_delta=0.95, max_treedepth=20))
+#summary(arth.comp.wind.2012.brm)
+#round(fixef(arth.comp.wind.2012.brm),1)
+#tidy(arth.comp.wind.2012.brm, par_type = "hierarchical")
 
 #y_w.arth.comp.2012 <- w.arth.2012.comp$Occurrence
 #yrep_w.arth.comp.2012 <- posterior_predict(arth.comp.wind.2012.brm, nsamples=100)
@@ -334,9 +339,8 @@ yrep_aa.arth.rich.2012 <- posterior_predict(arth.rich.aa.2012.brm, nsamples=100)
 
 ## WIND ARTHROPOD RICHNESS 2013 ANALYSIS ----
 
-# EVALUATE WHETHER RANDOM EFFECT IN PLANT-ID IS NEEDED.
 hist(w.arth.2013$total.rich)
-arth.rich.wind.2013.brm <- general_brm(total.rich~Wind.Exposure+(1+Wind.Exposure|Genotype)+(1|Block)+(1|Plot_code)+(1|plant_ID), data=w.arth.2013, family=poisson(link="log"))
+arth.rich.wind.2013.brm <- general_brm(total.rich~Wind.Exposure+(1+Wind.Exposure|Genotype)+(1|Block)+(1|Plot_code), data=w.arth.2013, family=poisson(link="log"))
 summary(arth.rich.wind.2013.brm)
 
 y_w.arth.rich.2013 <- w.arth.2013$total.rich
@@ -346,8 +350,9 @@ yrep_w.arth.rich.2013 <- posterior_predict(arth.rich.wind.2013.brm, nsamples=100
 
 ## WIND FUNGAL RAREFIED-RICHNESS 2013 ANALYSIS ----
 
-## RETHINK SCALING FUNCTION
+# note that scaling the response variable makes my general priors (normal(mean=0, sd=1)) appropriate.
 hist(scale(fungal.df$fungal.rarerich))
+
 fungal.rarerich.wind.2013.brm <- general_brm(scale(fungal.rarerich)~Wind.Exposure+(1+Wind.Exposure|Genotype)+(1|Block)+(1|Plot_code), data=fungal.df, family=gaussian(link="identity"))
 summary(fungal.rarerich.wind.2013.brm)
 
@@ -405,7 +410,7 @@ yrep_w.soil.PC2 <- posterior_predict(soil.PC2.wind.brm, nsamples=100)
 ## ANT-APHID TRAIT-ARTHROPOD 2012 ANALYSIS ----
 aa.trait.arth.2012 <- left_join(aa.arth.df, select(aa.trait.2012, plant_ID, trait.PC1, trait.PC2), by="plant_ID") 
 
-trait.rich.aa.2012.brm <- general_brm(total.rich~scale(trait.PC1)+scale(trait.PC2)+(1|Block)+(1|Plot_code)+(1|plant_ID), data=aa.trait.arth.2012, family=poisson(link="log"))
+trait.rich.aa.2012.brm <- general_brm(total.rich~scale(trait.PC1)+scale(trait.PC2)+(1|Block)+(1|Plot_code), data=aa.trait.arth.2012, family=poisson(link="log"))
 summary(trait.rich.aa.2012.brm) # trait.PC1 is key driver, but there is also a weak effect of trait.PC2
 
 y_aa.trait.rich.2012 <- aa.trait.arth.2012$total.rich
@@ -418,8 +423,7 @@ plot(marginal_effects(trait.rich.aa.2012.brm, effects = "trait.PC2"), points=T)
 ## WIND TRAIT-ARTHROPOD 2012 ANALYSIS ----
 w.trait.arth.2012 <- left_join(w.arth.2012, select(w.trait.2012, plant_ID, trait.PC1, trait.PC2), by="plant_ID") 
 
-## INDIVIDUAL-LEVEL RANDOM EFFECT NEEDED?
-trait.rich.wind.2012.brm <- general_brm(total.rich~scale(trait.PC1)+scale(trait.PC2)+(1|Block)+(1|Plot_code)+(1|plant_ID), data=w.trait.arth.2012, family=poisson(link="log"))
+trait.rich.wind.2012.brm <- general_brm(total.rich~scale(trait.PC1)+scale(trait.PC2)+(1|Block)+(1|Plot_code), data=w.trait.arth.2012, family=poisson(link="log"))
 summary(trait.rich.wind.2012.brm) # trait.PC1 is primary effect
 
 y_w.trait.rich.2012 <- w.trait.arth.2012$total.rich
@@ -432,8 +436,7 @@ plot(marginal_effects(trait.rich.wind.2012.brm, effects = "trait.PC1"), points=T
 ## WIND TRAIT-ARTHROPOD 2013 ANALYSIS ----
 w.trait.arth.2013 <- left_join(w.arth.2013, select(w.trait.2013, plant_ID, trait.PC1, trait.PC2), by="plant_ID") 
 
-## INDIVIDUAL-LEVEL RANDOM EFFECT NEEDED?
-trait.rich.wind.2013.brm <- general_brm(total.rich~scale(trait.PC1)+scale(trait.PC2)+(1|Block)+(1|Plot_code)+(1|plant_ID), data=w.trait.arth.2013, family=poisson(link="log"))
+trait.rich.wind.2013.brm <- general_brm(total.rich~scale(trait.PC1)+scale(trait.PC2)+(1|Block)+(1|Plot_code), data=w.trait.arth.2013, family=poisson(link="log"))
 summary(trait.rich.wind.2013.brm) # trait.PC1 is the primary effect
 
 plot(marginal_effects(trait.rich.wind.2013.brm, effects = "trait.PC1"), points=T)
@@ -523,11 +526,11 @@ write_csv(lanphere_SDs, path="output_brms/lanphere_SDs.csv")
 #write_csv(lanphere_VarComps, path="output_brms/lanphere_VarComps.csv")
 
 lanphere_trait_regs <- bind_rows(
-  mutate(get_FixedEffects(trait.rich.aa.2012.brm), Experiment="Ant-Aphid", Year="2012", Response="Arthropod Richness"),
-  mutate(get_FixedEffects(trait.rich.wind.2012.brm), Experiment="Wind", Year="2012", Response="Arthropod Richness"),
-  mutate(get_FixedEffects(trait.rich.wind.2013.brm), Experiment="Wind", Year="2013", Response="Arthropod Richness"),
-  mutate(get_FixedEffects(trait.rarerich.wind.2013.brm), Experiment="Wind", Year="2013", Response="scale(Fungi Rarefied Richness)"),
-  mutate(get_FixedEffects(bact.trait.rarerich.wind.2013.brm), Experiment="Wind", Year="2013", Response="scale(Bacteria Rarefied Richness)")
+  mutate(posterior_samples(trait.rich.aa.2012.brm, pars = "^b"), Experiment="Ant-Aphid", Year="2012", Response="Arthropod Richness"),
+  mutate(posterior_samples(trait.rich.wind.2012.brm, pars = "^b"), Experiment="Wind", Year="2012", Response="Arthropod Richness"),
+  mutate(posterior_samples(trait.rich.wind.2013.brm, pars = "^b"), Experiment="Wind", Year="2013", Response="Arthropod Richness"),
+  mutate(posterior_samples(trait.rarerich.wind.2013.brm, pars = "^b"), Experiment="Wind", Year="2013", Response="scale(Fungi Rarefied Richness)"),
+  mutate(posterior_samples(bact.trait.rarerich.wind.2013.brm, pars = "^b"), Experiment="Wind", Year="2013", Response="scale(Bacteria Rarefied Richness)")
 )
 write_csv(lanphere_trait_regs, path="output_brms/lanphere_trait_regs.csv")
 
