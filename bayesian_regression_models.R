@@ -242,14 +242,19 @@ yrep_root_CN.2013 <- posterior_predict(root_CN.wind.2013.brm, nsamples=100)
 #launch_shinystan(root_CN.wind.2013.brm)
 
 ## WIND ARTHROPOD RICHNESS 2012 ANALYSIS ----
-get_prior(total.rich~Wind.Exposure+(1+Wind.Exposure|Genotype)+(1|Block)+(1|Plot_code), data=w.arth.2012, family=poisson(link="log"))
+
+## FOR THE OBSERVANT FOLKS, I COULD REPEAT THE ANALYSIS WITHOUT SCALING AND LOG-TRANSFORMING TO DEMONSTRATE THAT THE QUALITATIVE EFFECTS REMAIN THE SAME. JUST HIGHLIGHT THE RANK ORDER OF G E GXE BLOCK AND PLOT IS THE SAME IN BOTH SCENARIOS...
+
 hist(w.arth.2012$total.rich)
-arth.rich.wind.2012.brm <- general_brm(total.rich~Wind.Exposure+(1+Wind.Exposure|Genotype)+(1|Block)+(1|Plot_code), data=w.arth.2012, family=poisson(link="log"))
+hist(scale(w.arth.2012$total.rich))
+arth.rich.wind.2012.brm <- general_brm(scale(log(total.rich+1))~Wind.Exposure+(1+Wind.Exposure|Genotype)+(1|Block)+(1|Plot_code), data=w.arth.2012, family=gaussian(link="identity"))#family=poisson(link="log"))
 summary(arth.rich.wind.2012.brm)
 
-y_w.arth.rich.2012 <- w.arth.2012$total.rich
+tidy(arth.rich.wind.2012.brm, robust = T)[1:8, ]
+
+y_w.arth.rich.2012 <- as.numeric(scale(log(w.arth.2012$total.rich+1)))
 yrep_w.arth.rich.2012 <- posterior_predict(arth.rich.wind.2012.brm, nsamples=100)
-#launch_shinystan(arth.rich.wind.2012.brm)
+launch_shinystan(arth.rich.wind.2012.brm)
 
 ## WIND ARTHROPOD COMPOSITION 2012 ANALYSIS ----
 
