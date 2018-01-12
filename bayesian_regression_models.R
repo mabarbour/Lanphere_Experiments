@@ -12,67 +12,79 @@ rstan_options(auto_write = TRUE)
 options(mc.cores = parallel::detectCores())
 
 ## WIND TRAIT DATA ----
-w.trait.df <- read.csv('final_data/wind_trait_df.csv') %>% tbl_df() %>% 
-  mutate(Block = as.factor(Block), 
-         Wind.Exposure = C(as.factor(Wind.Exposure), "contr.sum"),
-         Plot_code=paste(Block, Wind.Exposure, sep="_"))
-w.trait.2012 <- filter(w.trait.df, Year=="2012")
-w.trait.2013 <- filter(w.trait.df, Year=="2013")
+w.trait.df <- read.csv('final_data/wind_trait_df.csv') %>% tbl_df() %>% mutate(Block = as.factor(Block), Plot_code = paste(Block, Wind.Exposure, sep="_"))
+
+w.trait.2012 <- filter(w.trait.df, Year=="2012") %>%
+  mutate(sc.Wind.Exposure = scale(as.numeric(Wind.Exposure)),
+         sc.Trait.PC1 = scale(trait.PC1),
+         trans.trait.PC2 = trait.PC2-min(trait.PC2)+1,          # make positive to enable log-transformation
+         sc.log.trans.trait.PC2 = scale(log(trans.trait.PC2)))  # log-transform to normalize prior to scaling
+
+w.trait.2013 <- filter(w.trait.df, Year=="2013") %>%
+  mutate(sc.Wind.Exposure = scale(as.numeric(Wind.Exposure)),
+         sc.Trait.PC1 = scale(trait.PC1),
+         sc.Trait.PC2 = scale(trait.PC2),
+         sc.log.Root.CN = scale(log(root_CN)))                  # log-transform to normalize prior to scaling
 
 
 ## ANT-APHID TRAIT DATA ----
-aa.trait.df <- read.csv('final_data/ant_aphid_trait_df.csv') %>% tbl_df() %>% 
-  mutate(Block=as.factor(Block), 
-         Aphid.treatment=C(Aphid.treatment, "contr.sum"),        # set sum to zero contrasts
-         c.Ant.mound.dist=Ant.mound.dist - mean(Ant.mound.dist), # center
-         Plot_code=paste(Block, Ant.mound.dist, sep="_"))
-aa.trait.2012 <- filter(aa.trait.df, Year=="2012")
+aa.trait.df <- read.csv('final_data/ant_aphid_trait_df.csv') %>% tbl_df() %>% mutate(Block=as.factor(Block), Plot_code=paste(Block, Ant.mound.dist, sep="_"))
+
+aa.trait.2012 <- filter(aa.trait.df, Year=="2012") %>%
+  mutate(sc.Aphid.treatment = scale(as.numeric(Aphid.treatment)),
+         sc.Ant.mound.dist=scale(Ant.mound.dist),
+         sc.Trait.PC1 = scale(Trait.PC1),
+         sc.Trait.PC2 = scale(Trait.PC2))
 
 
 ## ANT-APHID ARTHROPOD COMMUNITY DATA ----
 aa.arth.df <- read.csv('final_data/ant_aphid_arthropod_df.csv') %>% tbl_df() %>% 
   mutate(Block = as.factor(Block), 
-         Aphid.treatment=C(Aphid.treatment, "contr.sum"),        # set sum to zero contrasts
-         c.Ant.mound.dist=Ant.mound.dist - mean(Ant.mound.dist)) # center 
+         sc.Aphid.treatment=scale(as.numeric(Aphid.treatment)),
+         sc.Ant.mound.dist=scale(Ant.mound.dist),
+         sc.log1.total.rich = scale(log(total.rich+1)))          # log(x+1) to normalize prior to scaling
 
-mean.aa.rich.2012 <- mean(aa.arth.df$total.rich)
 
 ## WIND ARTHROPOD COMMUNITY DATA ----
 # (dead plants have already been removed)
-wind.arth.df <- read.csv('final_data/wind_arthropod_df.csv') %>% tbl_df() %>% 
-  mutate(Block = as.factor(Block),
-         Wind.Exposure = C(as.factor(Wind.Exposure), "contr.sum"),
-         Plot_code = interaction(Block, Wind.Exposure)) 
-w.arth.2012 <- wind.arth.df %>% filter(Year == "2012")
-w.arth.2013 <- wind.arth.df %>% filter(Year == "2013")
+wind.arth.df <- read.csv('final_data/wind_arthropod_df.csv') %>% tbl_df() %>% mutate(Block = as.factor(Block), Plot_code = interaction(Block, Wind.Exposure))          
 
-mean.w.rich.2012 <- mean(w.arth.2012$total.rich)
-mean.w.rich.2013 <- mean(w.arth.2013$total.rich)
+w.arth.2012 <- wind.arth.df %>% filter(Year == "2012") %>%
+  mutate(sc.Wind.Exposure = scale(as.numeric(Wind.Exposure)),
+         sc.log1.total.rich = scale(log(total.rich+1)))         # log(x+1) to normalize prior to scaling
+
+w.arth.2013 <- wind.arth.df %>% filter(Year == "2013") %>%
+  mutate(sc.Wind.Exposure = scale(as.numeric(Wind.Exposure)),
+         sc.log1.total.rich = scale(log(total.rich+1)))         # log(x+1) to normalize prior to scaling
+
 
 ## WIND FUNGAL COMMUNITY DATA ----
 fungal.df <- read.csv("final_data/fungal.df.csv") %>% tbl_df() %>% 
   mutate(Block = as.factor(Block),
-         Wind.Exposure = C(as.factor(Wind.Exposure), "contr.sum"),
-         X = as.factor(X))
+         sc.Wind.Exposure = scale(as.numeric(Wind.Exposure)),
+         sc.Fungi.Rarerich = scale(fungal.rarerich))
 
 
 ## WIND BACTERIA COMMUNITY DATA ----
 bacteria.df <- read.csv("final_data/bacteria.df.csv") %>% tbl_df() %>% 
   mutate(Block = as.factor(Block), 
-         Wind.Exposure = C(as.factor(Wind.Exposure), "contr.sum"),
-         X = as.factor(X))
+         sc.Wind.Exposure = scale(as.numeric(Wind.Exposure)),
+         sc.Bacteria.Rarerich = scale(bacteria.rarerich))
 
 
 ## WIND SOIL DATA ----
 w.soil <- read.csv('final_data/wind_soil_df.csv') %>% tbl_df() %>% 
   mutate(Block = as.factor(Block),
-         Wind.Exposure = C(as.factor(Wind.Exposure), "contr.sum")) 
+         sc.Wind.Exposure = scale(as.numeric(Wind.Exposure)),
+         soil.PC1.trans = soil.PC1-min(soil.PC1)+1,             # make positive to enable log-transformation
+         sc.log.trans.Soil.PC1 = scale(log(soil.PC1.trans)),
+         sc.Soil.PC2 = scale(soil.PC2)) 
 
 
 ## FUNCTIONS FOR ANALYSIS ----
 
 general_brm <- function(formula, family, data, ...) {
-  brm(formula=formula, data=data, family=family, 
+  brm(formula=formula, data=data, family=gaussian(link="identity"), 
       prior=c(prior(normal(0,1), class=b),
               prior(normal(0,1), class=sd)),
       control=list(adapt_delta=0.99, max_treedepth=20),
@@ -122,7 +134,7 @@ composition_plot <- function(composition_data, term){
   ggplot(get.comp, aes(x=Species, y=Abundance)) + geom_bar(stat = "identity") + facet_wrap(as.formula(paste("~", term))) + coord_flip()
 }
 
-wind_posterior_SDs <- function(brm_model, df, FE_formula="~Wind.Exposure"){
+wind_posterior_SDs <- function(brm_model, df, FE_formula="~sc.Wind.Exposure"){
   Fixed_Effects <- posterior_samples(brm_model, pars = "^b")
   sample_size <- dim(Fixed_Effects)[1]
   
@@ -144,7 +156,7 @@ wind_posterior_SDs <- function(brm_model, df, FE_formula="~Wind.Exposure"){
   return(SD_df)
 }
 
-ant.aphid_posterior_SDs <- function(brm_model, df, FE_formula="~Aphid.treatment*c.Ant.mound.dist"){
+ant.aphid_posterior_SDs <- function(brm_model, df, FE_formula="~sc.Aphid.treatment*sc.Ant.mound.dist"){
   Fixed_Effects <- posterior_samples(brm_model, pars = "^b")
   sample_size <- dim(Fixed_Effects)[1]
   
@@ -160,7 +172,7 @@ ant.aphid_posterior_SDs <- function(brm_model, df, FE_formula="~Aphid.treatment*
     }
     FE_SD_list[[i]] <- FE_SD_vector
   }
-  SD_df <- data.frame(sd_Aphid.treatment=FE_SD_list[[2]], sd_c.Ant.mound.dist=FE_SD_list[[3]], sd_Aphid.x.Ant=FE_SD_list[[4]], # fixed effects
+  SD_df <- data.frame(sd_sc.Aphid.treatment=FE_SD_list[[2]], sd_sc.Ant.mound.dist=FE_SD_list[[3]], sd_sc.Aphid.x.sc.Ant=FE_SD_list[[4]], # fixed effects
                       posterior_samples(brm_model, pars = "^sd")) %>%                                                          # random effects
     gather(key=term, value=posterior_SD)
   return(SD_df)
@@ -169,72 +181,74 @@ ant.aphid_posterior_SDs <- function(brm_model, df, FE_formula="~Aphid.treatment*
 # still thinking about using coda package to calculate intervals
 
 ## WIND TRAIT PC1 2012 ANALYSIS ----
-hist(w.trait.2012$trait.PC1)
-trait.PC1.wind.2012.brm <- general_brm(trait.PC1~Wind.Exposure+(1+Wind.Exposure|Genotype)+(1|Block)+(1|Plot_code), data=w.trait.2012, family=gaussian(link="identity"))
+hist(w.trait.2012$sc.Trait.PC1)
+
+trait.PC1.wind.2012.brm <- general_brm(sc.Trait.PC1~sc.Wind.Exposure+(1+sc.Wind.Exposure|Genotype)+(1|Block)+(1|Plot_code), data=w.trait.2012)
 summary(trait.PC1.wind.2012.brm)
 
-y_w.trait.PC1.2012 <- w.trait.2012$trait.PC1
+y_w.trait.PC1.2012 <- w.trait.2012$sc.trait.PC1
 yrep_w.trait.PC1.2012 <- posterior_predict(trait.PC1.wind.2012.brm, nsamples=100)
 #launch_shinystan(trait.PC1.wind.2012.brm)
 
 
 ## WIND TRAIT PC2 2012 ANALYSIS ----
-hist(w.trait.2012$trait.PC2)
-w.trait.2012$trait.PC2.trans <- w.trait.2012$trait.PC2-min(w.trait.2012$trait.PC2)+1 # make so minimum value is 1
-hist(log(w.trait.2012$trait.PC2.trans))
-trait.PC2.wind.2012.brm <- brm(log(trait.PC2.trans)~Wind.Exposure+(1+Wind.Exposure|Genotype)+(1|Block)+(1|Plot_code), data=w.trait.2012, family=gaussian(link="identity"))
+hist(w.trait.2012$sc.log.trans.Trait.PC2)
+
+trait.PC2.wind.2012.brm <- brm(sc.log.trans.Trait.PC2~sc.Wind.Exposure+(1+sc.Wind.Exposure|Genotype)+(1|Block)+(1|Plot_code), data=w.trait.2012)
 summary(trait.PC2.wind.2012.brm) 
 
-y_w.trait.PC2.2012 <- log(w.trait.2012$trait.PC2.trans)
+y_w.trait.PC2.2012 <- w.trait.2012$sc.log.trans.Trait.PC2
 yrep_w.trait.PC2.2012 <- posterior_predict(trait.PC2.wind.2012.brm, nsamples=100)
 #launch_shinystan(trait.PC2.wind.2012.brm)
 
 
 ## ANT-APHID TRAIT PC1 2012 ANALYSIS ----
+hist(aa.trait.2012$sc.Trait.PC1)
 
-hist(aa.trait.2012$trait.PC1)
-trait.PC1.aa.2012.brm <- general_brm(trait.PC1~Aphid.treatment*c.Ant.mound.dist+(1+Aphid.treatment*c.Ant.mound.dist|Genotype)+(1|Block)+(1|Plot_code), data=aa.trait.2012, family=gaussian(link="identity"))
+trait.PC1.aa.2012.brm <- general_brm(sc.Trait.PC1~sc.Aphid.treatment*sc.Ant.mound.dist+(1+sc.Aphid.treatment*sc.Ant.mound.dist|Genotype)+(1|Block)+(1|Plot_code), data=aa.trait.2012)
 summary(trait.PC1.aa.2012.brm) 
 
-y_aa.trait.PC1.2012 <- aa.trait.2012$trait.PC1
+y_aa.trait.PC1.2012 <- aa.trait.2012$sc.Trait.PC1
 yrep_aa.trait.PC1.2012 <- posterior_predict(trait.PC1.aa.2012.brm, nsamples=100)
 #launch_shinystan(trait.PC1.aa.2012.brm)
 
 
 ## ANT-APHID TRAIT PC2 2012 ANALYSIS ----
-hist(aa.trait.2012$trait.PC2)
-trait.PC2.aa.2012.brm <- general_brm(trait.PC2~Aphid.treatment*c.Ant.mound.dist+(1+Aphid.treatment*c.Ant.mound.dist|Genotype)+(1|Block)+(1|Plot_code), data=aa.trait.2012, family=gaussian(link="identity"))
+hist(aa.trait.2012$sc.Trait.PC2)
+
+trait.PC2.aa.2012.brm <- general_brm(sc.Trait.PC2~sc.Aphid.treatment*sc.Ant.mound.dist+(1+sc.Aphid.treatment*sc.Ant.mound.dist|Genotype)+(1|Block)+(1|Plot_code), data=aa.trait.2012)
 summary(trait.PC2.aa.2012.brm) 
 
-y_aa.trait.PC2.2012 <- aa.trait.2012$trait.PC2
+y_aa.trait.PC2.2012 <- aa.trait.2012$sc.Trait.PC2
 yrep_aa.trait.PC2.2012 <- posterior_predict(trait.PC2.aa.2012.brm, nsamples=100)
 #launch_shinystan(trait.PC2.aa.2012.brm)
 
 
 ## WIND TRAIT PC1 2013 ANALYSIS ----
-hist(w.trait.2013$trait.PC1)
-trait.PC1.wind.2013.brm <- general_brm(trait.PC1~Wind.Exposure+(1+Wind.Exposure|Genotype)+(1|Block)+(1|Plot_code), data=w.trait.2013, family=gaussian(link="identity"))
+hist(w.trait.2013$sc.Trait.PC1)
+
+trait.PC1.wind.2013.brm <- general_brm(sc.Trait.PC1~sc.Wind.Exposure+(1+sc.Wind.Exposure|Genotype)+(1|Block)+(1|Plot_code), data=w.trait.2013)
 summary(trait.PC1.wind.2013.brm)
 
-y_w.trait.PC1.2013 <- w.trait.2013$trait.PC1
+y_w.trait.PC1.2013 <- w.trait.2013$sc.Trait.PC1
 yrep_w.trait.PC1.2013 <- posterior_predict(trait.PC1.wind.2013.brm, nsamples=100)
 #launch_shinystan(trait.PC1.wind.2013.brm)
 
 
 ## WIND TRAIT PC2 2013 ANALYSIS ----
-hist(w.trait.2013$trait.PC2)
-trait.PC2.wind.2013.brm <- general_brm(trait.PC2~Wind.Exposure+(1+Wind.Exposure|Genotype)+(1|Block)+(1|Plot_code), data=w.trait.2013, family=gaussian(link="identity"))
+hist(w.trait.2013$sc.Trait.PC2)
+
+trait.PC2.wind.2013.brm <- general_brm(sc.Trait.PC2~sc.Wind.Exposure+(1+sc.Wind.Exposure|Genotype)+(1|Block)+(1|Plot_code), data=w.trait.2013)
 summary(trait.PC2.wind.2013.brm) 
 
-y_w.trait.PC2.2013 <- w.trait.2013$trait.PC2
+y_w.trait.PC2.2013 <- w.trait.2013$sc.Trait.PC2
 yrep_w.trait.PC2.2013 <- posterior_predict(trait.PC2.wind.2013.brm, nsamples=100)
 #launch_shinystan(trait.PC2.wind.2013.brm)
 
 ## WIND ROOT C:N 2013 ANALYSIS ----
+hist(w.trait.2013$sc.log.Root.CN)
 
-# note that the model improves if I exclude root_CN > 100, but the results are qualitatively the same even if I retain these data.
-hist(log(w.trait.2013$root_CN))
-root_CN.wind.2013.brm <- general_brm(log(root_CN)~Wind.Exposure+(1+Wind.Exposure|Genotype)+(1|Block)+(1|Plot_code), data=filter(w.trait.2013, root_CN>0), family=gaussian(link="identity")) 
+root_CN.wind.2013.brm <- general_brm(log(root_CN)~sc.Wind.Exposure+(1+sc.Wind.Exposure|Genotype)+(1|Block)+(1|Plot_code), data=filter(w.trait.2013, root_CN>0), family=gaussian(link="identity")) 
 summary(root_CN.wind.2013.brm) 
 
 y_root_CN.2013 <- log(filter(w.trait.2013, root_CN>0)$root_CN)
@@ -247,7 +261,7 @@ yrep_root_CN.2013 <- posterior_predict(root_CN.wind.2013.brm, nsamples=100)
 
 hist(w.arth.2012$total.rich)
 hist(scale(w.arth.2012$total.rich))
-arth.rich.wind.2012.brm <- general_brm(scale(log(total.rich+1))~Wind.Exposure+(1+Wind.Exposure|Genotype)+(1|Block)+(1|Plot_code), data=w.arth.2012, family=gaussian(link="identity"))#family=poisson(link="log"))
+arth.rich.wind.2012.brm <- general_brm(scale(log(total.rich+1))~sc.Wind.Exposure+(1+sc.Wind.Exposure|Genotype)+(1|Block)+(1|Plot_code), data=w.arth.2012, family=gaussian(link="identity"))#family=poisson(link="log"))
 summary(arth.rich.wind.2012.brm)
 
 tidy(arth.rich.wind.2012.brm, robust = T)[1:8, ]
@@ -299,7 +313,7 @@ launch_shinystan(arth.rich.wind.2012.brm)
 
 # unable to fit the most complex random effects structure to the model
 hist(aa.arth.df$total.rich)
-arth.rich.aa.2012.brm <- general_brm(total.rich~Aphid.treatment*c.Ant.mound.dist+(1+Aphid.treatment|Genotype)+(1|Block)+(1|Plot_code), data=aa.arth.df, family=poisson(link="log"))
+arth.rich.aa.2012.brm <- general_brm(total.rich~sc.Aphid.treatment*c.Ant.mound.dist+(1+sc.Aphid.treatment|Genotype)+(1|Block)+(1|Plot_code), data=aa.arth.df, family=poisson(link="log"))
 summary(arth.rich.aa.2012.brm)
 
 y_aa.arth.rich.2012 <- aa.arth.df$total.rich
@@ -345,7 +359,7 @@ yrep_aa.arth.rich.2012 <- posterior_predict(arth.rich.aa.2012.brm, nsamples=100)
 ## WIND ARTHROPOD RICHNESS 2013 ANALYSIS ----
 
 hist(w.arth.2013$total.rich)
-arth.rich.wind.2013.brm <- general_brm(total.rich~Wind.Exposure+(1+Wind.Exposure|Genotype)+(1|Block)+(1|Plot_code), data=w.arth.2013, family=poisson(link="log"))
+arth.rich.wind.2013.brm <- general_brm(total.rich~sc.Wind.Exposure+(1+sc.Wind.Exposure|Genotype)+(1|Block)+(1|Plot_code), data=w.arth.2013, family=poisson(link="log"))
 summary(arth.rich.wind.2013.brm)
 
 y_w.arth.rich.2013 <- w.arth.2013$total.rich
@@ -358,7 +372,7 @@ yrep_w.arth.rich.2013 <- posterior_predict(arth.rich.wind.2013.brm, nsamples=100
 # note that scaling the response variable makes my general priors (normal(mean=0, sd=1)) appropriate.
 hist(scale(fungal.df$fungal.rarerich))
 
-fungal.rarerich.wind.2013.brm <- general_brm(scale(fungal.rarerich)~Wind.Exposure+(1+Wind.Exposure|Genotype)+(1|Block)+(1|Plot_code), data=fungal.df, family=gaussian(link="identity"))
+fungal.rarerich.wind.2013.brm <- general_brm(scale(fungal.rarerich)~sc.Wind.Exposure+(1+sc.Wind.Exposure|Genotype)+(1|Block)+(1|Plot_code), data=fungal.df, family=gaussian(link="identity"))
 summary(fungal.rarerich.wind.2013.brm)
 
 y_w.fungal.rarerich.2013 <- as.numeric(scale(fungal.df$fungal.rarerich))
@@ -367,7 +381,7 @@ yrep_w.fungal.rarerich.2013 <- posterior_predict(fungal.rarerich.wind.2013.brm, 
 
 ## WIND BACTERIAL RAREFIED-RICHNESS 2013 ANALYSIS ----
 hist(scale(bacteria.df$bacteria.rarerich))
-bacteria.rarerich.wind.2013.brm <- general_brm(scale(bacteria.rarerich)~Wind.Exposure+(1+Wind.Exposure|Genotype)+(1|Block)+(1|Plot_code), data=bacteria.df, family=gaussian(link="identity"))
+bacteria.rarerich.wind.2013.brm <- general_brm(scale(bacteria.rarerich)~sc.Wind.Exposure+(1+sc.Wind.Exposure|Genotype)+(1|Block)+(1|Plot_code), data=bacteria.df, family=gaussian(link="identity"))
 summary(bacteria.rarerich.wind.2013.brm)
 
 y_w.bacteria.rarerich.2013 <- scale(bacteria.df$bacteria.rarerich)
@@ -396,7 +410,7 @@ yrep_w.bacteria.rarerich.2013 <- posterior_predict(bacteria.rarerich.wind.2013.b
 hist(w.soil$soil.PC1)
 hist(log(w.soil$soil.PC1-min(w.soil$soil.PC1)+1))
 w.soil$soil.PC1.trans <- w.soil$soil.PC1-min(w.soil$soil.PC1)+1
-soil.PC1.wind.brm <- general_brm(log(soil.PC1.trans)~Wind.Exposure+(1|Block), data=w.soil, family=gaussian(link="identity"))
+soil.PC1.wind.brm <- general_brm(log(soil.PC1.trans)~sc.Wind.Exposure+(1|Block), data=w.soil, family=gaussian(link="identity"))
 summary(soil.PC1.wind.brm) 
 
 y_w.soil.PC1 <- log(w.soil$soil.PC1.trans)
@@ -405,7 +419,7 @@ yrep_w.soil.PC1 <- posterior_predict(soil.PC1.wind.brm, nsamples=100)
 
 ## WIND SOIL PC2 ANALYSIS ----
 hist(w.soil$soil.PC2)
-soil.PC2.wind.brm <- general_brm(soil.PC2~Wind.Exposure+(1|Block), data=w.soil, family=gaussian(link="identity"))
+soil.PC2.wind.brm <- general_brm(soil.PC2~sc.Wind.Exposure+(1|Block), data=w.soil, family=gaussian(link="identity"))
 summary(soil.PC2.wind.brm)
 
 y_w.soil.PC2 <- w.soil$soil.PC2
