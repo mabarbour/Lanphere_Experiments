@@ -54,8 +54,16 @@ plot_richness <- filter(var.df, Response%in%c("scale(log(Arthropod Richness + 1)
   droplevels()# %>% 
   #mutate(Experiment_Year=paste(Experiment, Year, " "))
 
+summary_richness <- plot_richness %>%
+  group_by(Experiment, Year, Response, term, term_ord) %>%
+  summarise(median = median(percent.variance), 
+            HPDI_lower_50 = coda::HPDinterval(as.mcmc(percent.variance), prob=0.5)[ ,1],
+            HPDI_upper_50 = coda::HPDinterval(as.mcmc(percent.variance), prob=0.5)[ ,2],
+            HPDI_lower_95 = coda::HPDinterval(as.mcmc(percent.variance), prob=0.95)[ ,1],
+            HPDI_upper_95 = coda::HPDinterval(as.mcmc(percent.variance), prob=0.95)[ ,2])
+
 richness_gg <- ggplot(plot_richness, aes(x=term_ord, y=percent.variance*100, fill=Response)) +
-  geom_violin(outlier.shape = NA) +
+  geom_boxplot(outlier.shape = NA) +
   coord_flip() +
   ylab("Variance Explained (%)") +
   scale_y_continuous(limits=c(0,40))+
@@ -63,6 +71,19 @@ richness_gg <- ggplot(plot_richness, aes(x=term_ord, y=percent.variance*100, fil
   facet_wrap(Year~Experiment, ncol=1, scales="free_y") 
 richness_gg
 
+ggplot(filter(plot_richness, Experiment=="Wind", Year=="2012", Response=="scale(log(Arthropod Richness + 1))"),
+       aes(y=percent.variance, x=term)) +
+  geom_boxplot()
+
+richness_gg <- ggplot(summary_richness, aes(x=term_ord, y=mean, shape=Response)) +
+  geom_linerange(aes(ymin=HPDI_lower_95, ymax=HPDI_upper_95), color="grey", size=0.5, position=position_dodge(width=0.75)) +
+  geom_linerange(aes(ymin=HPDI_lower_50, ymax=HPDI_upper_50), color="black", size=2, position=position_dodge(width=0.75)) +
+  geom_point(size=1, color="black", fill="grey", position=position_dodge(width=0.75)) +
+  coord_flip() +
+  ylab("Variance Explained (%)") +
+  xlab("") +
+  facet_wrap(Year~Experiment, ncol=1, scales="free_y") 
+richness_gg
 
 ## SUPP MAT 1 ----
 
