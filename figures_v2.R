@@ -4,37 +4,61 @@ library(tidyverse)
 library(cowplot)
 
 ## GET DATA ----
-sd.df <- read_csv('output_brms/lanphere_SDs.csv') %>% mutate(term_group="") %>% as.data.frame()
+wind.var.df <- read.csv('output_brms/wind_SDs.csv') %>% 
+  transmute("Genotype (G)" = sd_Genotype__Intercept^2 /        (sd_Genotype__Intercept^2 + sd_sc.Wind.Exposure^2 + sd_Genotype__sc.Wind.Exposure^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
+            Wind =       sd_sc.Wind.Exposure^2 /           (sd_Genotype__Intercept^2 + sd_sc.Wind.Exposure^2 + sd_Genotype__sc.Wind.Exposure^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
+            "G x Wind" =     sd_Genotype__sc.Wind.Exposure^2 / (sd_Genotype__Intercept^2 + sd_sc.Wind.Exposure^2 + sd_Genotype__sc.Wind.Exposure^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
+            Block =    sd_Block__Intercept^2 /           (sd_Genotype__Intercept^2 + sd_sc.Wind.Exposure^2 + sd_Genotype__sc.Wind.Exposure^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
+            Plot =     sd_Plot_code__Intercept^2 /       (sd_Genotype__Intercept^2 + sd_sc.Wind.Exposure^2 + sd_Genotype__sc.Wind.Exposure^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
+            sample = sample, Experiment = Experiment, Year = Year, Response = Response) %>%
+  gather(key = term, value = percent.variance, -(sample:Response))
+
+aa.var.df <- read.csv('output_brms/ant.aphid_SDs.csv') %>% 
+  transmute("Genotype (G)" =    sd_Genotype__Intercept^2 /                            (sd_Genotype__Intercept^2 + sd_sc.Aphid.treatment^2 + sd_sc.Ant.mound.dist^2 + sd_sc.Aphid.x.sc.Ant^2 + sd_Genotype__sc.Aphid.treatment^2 + sd_Genotype__sc.Ant.mound.dist^2 + sd_Genotype__sc.Aphid.treatment.sc.Ant.mound.dist^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
+            Aphid =             sd_sc.Aphid.treatment^2 /                             (sd_Genotype__Intercept^2 + sd_sc.Aphid.treatment^2 + sd_sc.Ant.mound.dist^2 + sd_sc.Aphid.x.sc.Ant^2 + sd_Genotype__sc.Aphid.treatment^2 + sd_Genotype__sc.Ant.mound.dist^2 + sd_Genotype__sc.Aphid.treatment.sc.Ant.mound.dist^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
+            Ant =               sd_sc.Ant.mound.dist^2 /                              (sd_Genotype__Intercept^2 + sd_sc.Aphid.treatment^2 + sd_sc.Ant.mound.dist^2 + sd_sc.Aphid.x.sc.Ant^2 + sd_Genotype__sc.Aphid.treatment^2 + sd_Genotype__sc.Ant.mound.dist^2 + sd_Genotype__sc.Aphid.treatment.sc.Ant.mound.dist^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
+            "Aphid x Ant" =     sd_sc.Aphid.x.sc.Ant^2 /                              (sd_Genotype__Intercept^2 + sd_sc.Aphid.treatment^2 + sd_sc.Ant.mound.dist^2 + sd_sc.Aphid.x.sc.Ant^2 + sd_Genotype__sc.Aphid.treatment^2 + sd_Genotype__sc.Ant.mound.dist^2 + sd_Genotype__sc.Aphid.treatment.sc.Ant.mound.dist^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
+            "G x Aphid" =       sd_Genotype__sc.Aphid.treatment^2 /                   (sd_Genotype__Intercept^2 + sd_sc.Aphid.treatment^2 + sd_sc.Ant.mound.dist^2 + sd_sc.Aphid.x.sc.Ant^2 + sd_Genotype__sc.Aphid.treatment^2 + sd_Genotype__sc.Ant.mound.dist^2 + sd_Genotype__sc.Aphid.treatment.sc.Ant.mound.dist^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
+            "G x Ant" =         sd_Genotype__sc.Ant.mound.dist^2 /                    (sd_Genotype__Intercept^2 + sd_sc.Aphid.treatment^2 + sd_sc.Ant.mound.dist^2 + sd_sc.Aphid.x.sc.Ant^2 + sd_Genotype__sc.Aphid.treatment^2 + sd_Genotype__sc.Ant.mound.dist^2 + sd_Genotype__sc.Aphid.treatment.sc.Ant.mound.dist^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
+            "G x Aphid x Ant" = sd_Genotype__sc.Aphid.treatment.sc.Ant.mound.dist^2 / (sd_Genotype__Intercept^2 + sd_sc.Aphid.treatment^2 + sd_sc.Ant.mound.dist^2 + sd_sc.Aphid.x.sc.Ant^2 + sd_Genotype__sc.Aphid.treatment^2 + sd_Genotype__sc.Ant.mound.dist^2 + sd_Genotype__sc.Aphid.treatment.sc.Ant.mound.dist^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
+            Block =             sd_Block__Intercept^2 /                               (sd_Genotype__Intercept^2 + sd_sc.Aphid.treatment^2 + sd_sc.Ant.mound.dist^2 + sd_sc.Aphid.x.sc.Ant^2 + sd_Genotype__sc.Aphid.treatment^2 + sd_Genotype__sc.Ant.mound.dist^2 + sd_Genotype__sc.Aphid.treatment.sc.Ant.mound.dist^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
+            Plot =              sd_Plot_code__Intercept^2 /                           (sd_Genotype__Intercept^2 + sd_sc.Aphid.treatment^2 + sd_sc.Ant.mound.dist^2 + sd_sc.Aphid.x.sc.Ant^2 + sd_Genotype__sc.Aphid.treatment^2 + sd_Genotype__sc.Ant.mound.dist^2 + sd_Genotype__sc.Aphid.treatment.sc.Ant.mound.dist^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
+            sample = sample, Experiment = Experiment, Year = Year, Response = Response) %>%
+  gather(key = term, value = percent.variance, -(sample:Response))
+
+var.df <- bind_rows(wind.var.df, aa.var.df)
 
 ## FILL IN TERM GROUPS AND ORDER THEM
-sd.df$term_group[which(sd.df$term=="sd_Genotype__Intercept")] <- "Genotype (G)"
-sd.df$term_group[which(sd.df$term=="sd_Wind.Exposure")] <- "Wind"
-sd.df$term_group[which(sd.df$term=="sd_Aphid.treatment")] <- "Aphid"
-sd.df$term_group[which(sd.df$term=="sd_c.Ant.mound.dist")] <- "Ant"
-sd.df$term_group[which(sd.df$term=="sd_Aphid.x.Ant")] <- "Aphid x Ant"
-sd.df$term_group[which(sd.df$term=="sd_Block__Intercept")] <- "Block"
-sd.df$term_group[which(sd.df$term=="sd_Plot_code__Intercept")] <- "Plot"
-sd.df$term_group[which(sd.df$term=="sd_plant_ID__Intercept")] <- "Individual"
-sd.df$term_group[which(sd.df$term=="sd_Genotype__Wind.Exposure1")] <- "G x Wind"
-sd.df$term_group[which(sd.df$term=="sd_Genotype__Aphid.treatment1")] <- "G x Aphid"
-sd.df$term_group[which(sd.df$term=="sd_Genotype__c.Ant.mound.dist")] <- "G x Ant"
-sd.df$term_group[which(sd.df$term=="sd_Genotype__Aphid.treatment1.c.Ant.mound.dist")] <- "G x Aphid x Ant"
+#sd.df$term_group[which(sd.df$term=="sd_Genotype__Intercept")] <- "Genotype (G)"
+#sd.df$term_group[which(sd.df$term=="sd_sc.Wind.Exposure")] <- "Wind"
+#sd.df$term_group[which(sd.df$term=="sd_sc.Aphid.treatment")] <- "Aphid"
+#sd.df$term_group[which(sd.df$term=="sd_sc.Ant.mound.dist")] <- "Ant"
+#sd.df$term_group[which(sd.df$term=="sd_sc.Aphid.x.sc.Ant")] <- "Aphid x Ant"
+#sd.df$term_group[which(sd.df$term=="sd_Block__Intercept")] <- "Block"
+#sd.df$term_group[which(sd.df$term=="sd_Plot_code__Intercept")] <- "Plot"
+#sd.df$term_group[which(sd.df$term=="sigma")] <- "sigma"
+#sd.df$term_group[which(sd.df$term=="sd_Genotype__sc.Wind.Exposure")] <- "G x Wind"
+#sd.df$term_group[which(sd.df$term=="sd_Genotype__sc.Aphid.treatment")] <- "G x Aphid"
+#sd.df$term_group[which(sd.df$term=="sd_Genotype__sc.Ant.mound.dist")] <- "G x Ant"
+#sd.df$term_group[which(sd.df$term=="sd_Genotype__sc.Aphid.treatment.sc.Ant.mound.dist")] <- "G x Aphid x Ant"
 
-sd.df$term_group <- factor(sd.df$term_group)
-levels(sd.df$term_group)
-sd.df$term_group_ord <- factor(sd.df$term_group, levels=c("Plot","Block","G x Aphid x Ant","G x Ant","G x Aphid","G x Wind","Aphid x Ant","Ant","Aphid","Wind","Genotype (G)"))
-levels(sd.df$term_group_ord)
+var.df$term <- factor(var.df$term)
+levels(var.df$term)
+var.df$term_ord <- factor(var.df$term, levels=c("Plot","Block","G x Aphid x Ant","G x Ant","G x Aphid","G x Wind","Aphid x Ant","Ant","Aphid","Wind","Genotype (G)"))
+levels(var.df$term_ord)
 
 
 ## FIGURE 1: COMMUNITY RICHNESS ----
-plot_richness <- filter(sd.df, Response%in%c("Arthropod Richness", "scale(Fungi Rarefied Richness)", "scale(Bacteria Rarefied Richness)")) %>% 
-  droplevels() %>% 
-  mutate(Experiment_Year=paste(Experiment, Year, " "))
+plot_richness <- filter(var.df, Response%in%c("scale(log(Arthropod Richness + 1))", "scale(Fungi Rarefied Richness)", "scale(Bacteria Rarefied Richness)")) %>% 
+  #filter(term_group != "sigma") %>%
+  droplevels()# %>% 
+  #mutate(Experiment_Year=paste(Experiment, Year, " "))
 
-richness_gg <- ggplot(plot_richness, aes(x=term_group_ord, y=posterior_SD, fill=Response)) +
-  geom_boxplot(outlier.shape = 1) +
+richness_gg <- ggplot(plot_richness, aes(x=term_ord, y=percent.variance*100, fill=Response)) +
+  geom_violin(outlier.shape = NA) +
   coord_flip() +
-  ylab("Effect size (SD)") +
+  ylab("Variance Explained (%)") +
+  scale_y_continuous(limits=c(0,40))+
   xlab("") +
   facet_wrap(Year~Experiment, ncol=1, scales="free_y") 
 richness_gg
