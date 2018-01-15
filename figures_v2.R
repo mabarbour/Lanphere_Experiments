@@ -2,6 +2,7 @@
 ## LOAD REQUIRED LIBRARIES ----
 library(tidyverse)
 library(cowplot)
+library(coda)
 
 ## GET DATA ----
 wind.var.df <- read.csv('output_brms/wind_SDs.csv') %>% 
@@ -26,22 +27,8 @@ aa.var.df <- read.csv('output_brms/ant.aphid_SDs.csv') %>%
             sample = sample, Experiment = Experiment, Year = Year, Response = Response) %>%
   gather(key = term, value = percent.variance, -(sample:Response))
 
-var.df <- bind_rows(wind.var.df, aa.var.df)
-
-## FILL IN TERM GROUPS AND ORDER THEM
-#sd.df$term_group[which(sd.df$term=="sd_Genotype__Intercept")] <- "Genotype (G)"
-#sd.df$term_group[which(sd.df$term=="sd_sc.Wind.Exposure")] <- "Wind"
-#sd.df$term_group[which(sd.df$term=="sd_sc.Aphid.treatment")] <- "Aphid"
-#sd.df$term_group[which(sd.df$term=="sd_sc.Ant.mound.dist")] <- "Ant"
-#sd.df$term_group[which(sd.df$term=="sd_sc.Aphid.x.sc.Ant")] <- "Aphid x Ant"
-#sd.df$term_group[which(sd.df$term=="sd_Block__Intercept")] <- "Block"
-#sd.df$term_group[which(sd.df$term=="sd_Plot_code__Intercept")] <- "Plot"
-#sd.df$term_group[which(sd.df$term=="sigma")] <- "sigma"
-#sd.df$term_group[which(sd.df$term=="sd_Genotype__sc.Wind.Exposure")] <- "G x Wind"
-#sd.df$term_group[which(sd.df$term=="sd_Genotype__sc.Aphid.treatment")] <- "G x Aphid"
-#sd.df$term_group[which(sd.df$term=="sd_Genotype__sc.Ant.mound.dist")] <- "G x Ant"
-#sd.df$term_group[which(sd.df$term=="sd_Genotype__sc.Aphid.treatment.sc.Ant.mound.dist")] <- "G x Aphid x Ant"
-
+var.df <- bind_rows(wind.var.df, aa.var.df) %>%
+  unite(Experiment_Year, Experiment, Year, sep = " ", remove = F)
 var.df$term <- factor(var.df$term)
 levels(var.df$term)
 var.df$term_ord <- factor(var.df$term, levels=c("Plot","Block","G x Aphid x Ant","G x Ant","G x Aphid","G x Wind","Aphid x Ant","Ant","Aphid","Wind","Genotype (G)"))
@@ -49,40 +36,41 @@ levels(var.df$term_ord)
 
 
 ## FIGURE 1: COMMUNITY RICHNESS ----
-plot_richness <- filter(var.df, Response%in%c("scale(log(Arthropod Richness + 1))", "scale(Fungi Rarefied Richness)", "scale(Bacteria Rarefied Richness)")) %>% 
-  #filter(term_group != "sigma") %>%
-  droplevels()# %>% 
-  #mutate(Experiment_Year=paste(Experiment, Year, " "))
-
-summary_richness <- plot_richness %>%
-  group_by(Experiment, Year, Response, term, term_ord) %>%
-  summarise(median = median(percent.variance), 
-            HPDI_lower_50 = coda::HPDinterval(as.mcmc(percent.variance), prob=0.5)[ ,1],
-            HPDI_upper_50 = coda::HPDinterval(as.mcmc(percent.variance), prob=0.5)[ ,2],
-            HPDI_lower_95 = coda::HPDinterval(as.mcmc(percent.variance), prob=0.95)[ ,1],
-            HPDI_upper_95 = coda::HPDinterval(as.mcmc(percent.variance), prob=0.95)[ ,2])
+plot_richness <- filter(var.df, Response%in%c("scale(log(Arthropod Richness + 1))", "scale(Fungi Rarefied Richness)", "scale(Bacteria Rarefied Richness)"))
 
 richness_gg <- ggplot(plot_richness, aes(x=term_ord, y=percent.variance*100, fill=Response)) +
-  geom_boxplot(outlier.shape = NA) +
+  geom_boxplot() +
   coord_flip() +
   ylab("Variance Explained (%)") +
-  scale_y_continuous(limits=c(0,40))+
+  #scale_y_continuous(limits=c(0,40))+
   xlab("") +
   facet_wrap(Year~Experiment, ncol=1, scales="free_y") 
 richness_gg
 
-ggplot(filter(plot_richness, Experiment=="Wind", Year=="2012", Response=="scale(log(Arthropod Richness + 1))"),
-       aes(y=percent.variance, x=term)) +
-  geom_boxplot()
+Mode <- function(x) {
+  ux <- unique(x)
+  ux[which.max(tabulate(match(x, ux)))]
+}
 
-richness_gg <- ggplot(summary_richness, aes(x=term_ord, y=mean, shape=Response)) +
+summary_richness <- plot_richness %>%
+  group_by(Experiment_Year, Response, term, term_ord) %>%
+  summarise(mode = Mode(round(percent.variance,2)), 
+            HPDI_lower_50 = HPDinterval(as.mcmc(percent.variance), prob=0.5)[ ,1],
+            HPDI_upper_50 = HPDinterval(as.mcmc(percent.variance), prob=0.5)[ ,2],
+            HPDI_lower_95 = HPDinterval(as.mcmc(percent.variance), prob=0.95)[ ,1],
+            HPDI_upper_95 = HPDinterval(as.mcmc(percent.variance), prob=0.95)[ ,2])
+summary_richness$Response_ord <- factor(summary_richness$Response, levels = c("scale(log(Arthropod Richness + 1))","scale(Fungi Rarefied Richness)", "scale(Bacteria Rarefied Richness)"))
+
+richness_gg <- ggplot(summary_richness, aes(x=term_ord, y=mode, shape=Response_ord)) +
   geom_linerange(aes(ymin=HPDI_lower_95, ymax=HPDI_upper_95), color="grey", size=0.5, position=position_dodge(width=0.75)) +
   geom_linerange(aes(ymin=HPDI_lower_50, ymax=HPDI_upper_50), color="black", size=2, position=position_dodge(width=0.75)) +
-  geom_point(size=1, color="black", fill="grey", position=position_dodge(width=0.75)) +
+  geom_point(size=3, color="black", fill="grey", position=position_dodge(width=0.75)) +
   coord_flip() +
   ylab("Variance Explained (%)") +
   xlab("") +
-  facet_wrap(Year~Experiment, ncol=1, scales="free_y") 
+  scale_y_continuous(breaks = c(0, 0.1, 0.2, 0.3), labels=c(0, 10, 20, 30)) +
+  scale_shape_manual(values = c(21,22,23), name="Community response", labels=c("Arthropod richness","Fungi rarefied richness","Bacteria rarefied richness")) +
+  facet_wrap(~Experiment_Year, ncol=1, scales="free_y") 
 richness_gg
 
 ## SUPP MAT 1 ----
