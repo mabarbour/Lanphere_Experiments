@@ -12,7 +12,16 @@ wind.var.df <- read.csv('output_brms/wind_SDs.csv') %>%
             Block =    sd_Block__Intercept^2 /           (sd_Genotype__Intercept^2 + sd_sc.Wind.Exposure^2 + sd_Genotype__sc.Wind.Exposure^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
             Plot =     sd_Plot_code__Intercept^2 /       (sd_Genotype__Intercept^2 + sd_sc.Wind.Exposure^2 + sd_Genotype__sc.Wind.Exposure^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
             sample = sample, Experiment = Experiment, Year = Year, Response = Response) %>%
-  gather(key = term, value = percent.variance, -(sample:Response))
+  gather(key = term, value = percent.variance, -(sample:Response)) %>%
+  mutate(Model = "experimental_design")
+
+wind.var.soil <- read.csv('output_brms/wind_SDs.csv') %>% 
+  filter(Response%in%c("scale(log(Soil PC1 + min(Soil PC1) + 1))", "scale(Soil PC2)")) %>%
+  transmute(Wind =       sd_sc.Wind.Exposure^2 /           (sd_sc.Wind.Exposure^2 + sd_Block__Intercept^2 + sigma),
+            Block =      sd_Block__Intercept^2 /           (sd_sc.Wind.Exposure^2 + sd_Block__Intercept^2 + sigma),
+            sample = sample, Experiment = Experiment, Year = Year, Response = Response) %>%
+  gather(key = term, value = percent.variance, -(sample:Response)) %>%
+  mutate(Model = "experimental_design")
 
 aa.var.df <- read.csv('output_brms/ant.aphid_SDs.csv') %>% 
   transmute("Genotype (G)" =    sd_Genotype__Intercept^2 /                            (sd_Genotype__Intercept^2 + sd_sc.Aphid.treatment^2 + sd_sc.Ant.mound.dist^2 + sd_sc.Aphid.x.sc.Ant^2 + sd_Genotype__sc.Aphid.treatment^2 + sd_Genotype__sc.Ant.mound.dist^2 + sd_Genotype__sc.Aphid.treatment.sc.Ant.mound.dist^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
@@ -25,27 +34,72 @@ aa.var.df <- read.csv('output_brms/ant.aphid_SDs.csv') %>%
             Block =             sd_Block__Intercept^2 /                               (sd_Genotype__Intercept^2 + sd_sc.Aphid.treatment^2 + sd_sc.Ant.mound.dist^2 + sd_sc.Aphid.x.sc.Ant^2 + sd_Genotype__sc.Aphid.treatment^2 + sd_Genotype__sc.Ant.mound.dist^2 + sd_Genotype__sc.Aphid.treatment.sc.Ant.mound.dist^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
             Plot =              sd_Plot_code__Intercept^2 /                           (sd_Genotype__Intercept^2 + sd_sc.Aphid.treatment^2 + sd_sc.Ant.mound.dist^2 + sd_sc.Aphid.x.sc.Ant^2 + sd_Genotype__sc.Aphid.treatment^2 + sd_Genotype__sc.Ant.mound.dist^2 + sd_Genotype__sc.Aphid.treatment.sc.Ant.mound.dist^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
             sample = sample, Experiment = Experiment, Year = Year, Response = Response) %>%
-  gather(key = term, value = percent.variance, -(sample:Response))
+  gather(key = term, value = percent.variance, -(sample:Response)) %>%
+  mutate(Model = "experimental_design")
 
-var.df <- bind_rows(wind.var.df, aa.var.df) %>%
+aa.arth.trait.var <- read.csv("output_brms/lanphere_trait_regs.csv") %>%
+  filter(Experiment == "Ant-Aphid") %>%
+  transmute("Trait PC1" =       sd_sc.Trait.PC1^2 /                                   (sd_sc.Trait.PC1^2 + sd_sc.Trait.PC2^2 + sd_Genotype__Intercept^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
+            "Trait PC2" =       sd_sc.Trait.PC2^2 /                                   (sd_sc.Trait.PC1^2 + sd_sc.Trait.PC2^2 + sd_Genotype__Intercept^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
+            "Genotype (G)" =    sd_Genotype__Intercept^2 /                            (sd_sc.Trait.PC1^2 + sd_sc.Trait.PC2^2 + sd_Genotype__Intercept^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
+            Block =             sd_Block__Intercept^2 /                               (sd_sc.Trait.PC1^2 + sd_sc.Trait.PC2^2 + sd_Genotype__Intercept^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
+            Plot =              sd_Plot_code__Intercept^2 /                           (sd_sc.Trait.PC1^2 + sd_sc.Trait.PC2^2 + sd_Genotype__Intercept^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
+            sample = sample, Experiment = Experiment, Year = Year, Response = Response) %>%
+  gather(key = term, value = percent.variance, -(sample:Response)) %>%
+  mutate(Model = "trait_reg")
+
+w.arth.trait.var.2012 <- read.csv("output_brms/lanphere_trait_regs.csv") %>%
+  filter(Experiment == "Wind", Year == "2012") %>%
+  transmute("Trait PC1" =       sd_sc.Trait.PC1^2 /                                   (sd_sc.Trait.PC1^2 + sd_sc.log.trans.Trait.PC2^2 + sd_Genotype__Intercept^2 + sd_sc.Wind.Exposure^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
+            "Trait PC2" =       sd_sc.log.trans.Trait.PC2^2 /                         (sd_sc.Trait.PC1^2 + sd_sc.log.trans.Trait.PC2^2 + sd_Genotype__Intercept^2 + sd_sc.Wind.Exposure^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
+            "Genotype (G)" =    sd_Genotype__Intercept^2 /                            (sd_sc.Trait.PC1^2 + sd_sc.log.trans.Trait.PC2^2 + sd_Genotype__Intercept^2 + sd_sc.Wind.Exposure^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
+            Wind =              sd_sc.Wind.Exposure^2/                                (sd_sc.Trait.PC1^2 + sd_sc.log.trans.Trait.PC2^2 + sd_Genotype__Intercept^2 + sd_sc.Wind.Exposure^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
+            Block =             sd_Block__Intercept^2 /                               (sd_sc.Trait.PC1^2 + sd_sc.log.trans.Trait.PC2^2 + sd_Genotype__Intercept^2 + sd_sc.Wind.Exposure^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
+            Plot =              sd_Plot_code__Intercept^2 /                           (sd_sc.Trait.PC1^2 + sd_sc.log.trans.Trait.PC2^2 + sd_Genotype__Intercept^2 + sd_sc.Wind.Exposure^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
+            sample = sample, Experiment = Experiment, Year = Year, Response = Response) %>%
+  gather(key = term, value = percent.variance, -(sample:Response)) %>%
+  mutate(Model = "trait_reg") 
+
+w.arth.trait.var.2013 <- read.csv("output_brms/lanphere_trait_regs.csv") %>%
+  filter(Experiment == "Wind", Year == "2013", Response == "scale(log(Arthropod Richness + 1))") %>%
+  transmute("Trait PC1" =       sd_sc.Trait.PC1^2 /                                   (sd_sc.Trait.PC1^2 + sd_sc.Trait.PC2^2 + sd_Genotype__Intercept^2 + sd_sc.Wind.Exposure^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
+            "Trait PC2" =       sd_sc.Trait.PC2^2 /                                   (sd_sc.Trait.PC1^2 + sd_sc.Trait.PC2^2 + sd_Genotype__Intercept^2 + sd_sc.Wind.Exposure^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
+            "Genotype (G)" =    sd_Genotype__Intercept^2 /                            (sd_sc.Trait.PC1^2 + sd_sc.Trait.PC2^2 + sd_Genotype__Intercept^2 + sd_sc.Wind.Exposure^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
+            Wind =              sd_sc.Wind.Exposure^2/                                (sd_sc.Trait.PC1^2 + sd_sc.Trait.PC2^2 + sd_Genotype__Intercept^2 + sd_sc.Wind.Exposure^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
+            Block =             sd_Block__Intercept^2 /                               (sd_sc.Trait.PC1^2 + sd_sc.Trait.PC2^2 + sd_Genotype__Intercept^2 + sd_sc.Wind.Exposure^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
+            Plot =              sd_Plot_code__Intercept^2 /                           (sd_sc.Trait.PC1^2 + sd_sc.Trait.PC2^2 + sd_Genotype__Intercept^2 + sd_sc.Wind.Exposure^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
+            sample = sample, Experiment = Experiment, Year = Year, Response = Response) %>%
+  gather(key = term, value = percent.variance, -(sample:Response)) %>%
+  mutate(Model = "trait_reg") 
+
+w.microbe.trait.soil.var <- read.csv("output_brms/lanphere_trait_regs.csv") %>%
+  filter(Experiment == "Wind", Year == "2013", Response != "scale(log(Arthropod Richness + 1))") %>%
+  transmute("Soil PC1" =        sd_sc.log.trans.Soil.PC1^2 /                          (sd_sc.log.trans.Soil.PC1^2 + sd_sc.Soil.PC2^2 + sd_sc.log.Root.CN^2 + sd_sc.Wind.Exposure^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
+            "Soil PC2" =        sd_sc.Soil.PC2^2 /                                    (sd_sc.log.trans.Soil.PC1^2 + sd_sc.Soil.PC2^2 + sd_sc.log.Root.CN^2 + sd_sc.Wind.Exposure^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
+            "Root C:N" =        sd_sc.log.Root.CN^2/                                  (sd_sc.log.trans.Soil.PC1^2 + sd_sc.Soil.PC2^2 + sd_sc.log.Root.CN^2 + sd_sc.Wind.Exposure^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
+            Wind =              sd_sc.Wind.Exposure^2/                                (sd_sc.log.trans.Soil.PC1^2 + sd_sc.Soil.PC2^2 + sd_sc.log.Root.CN^2 + sd_sc.Wind.Exposure^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
+            Block =             sd_Block__Intercept^2 /                               (sd_sc.log.trans.Soil.PC1^2 + sd_sc.Soil.PC2^2 + sd_sc.log.Root.CN^2 + sd_sc.Wind.Exposure^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
+            Plot =              sd_Plot_code__Intercept^2 /                           (sd_sc.log.trans.Soil.PC1^2 + sd_sc.Soil.PC2^2 + sd_sc.log.Root.CN^2 + sd_sc.Wind.Exposure^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
+            sample = sample, Experiment = Experiment, Year = Year, Response = Response) %>%
+  gather(key = term, value = percent.variance, -(sample:Response)) %>%
+  mutate(Model = "trait_reg")
+
+var.df <- bind_rows(wind.var.df, aa.var.df, aa.arth.trait.var, w.arth.trait.var.2012, w.arth.trait.var.2013, w.microbe.trait.soil.var) %>%
   unite(Experiment_Year, Experiment, Year, sep = " ", remove = F)
 var.df$term <- factor(var.df$term)
 levels(var.df$term)
-var.df$term_ord <- factor(var.df$term, levels=c("Plot","Block","G x Aphid x Ant","G x Ant","G x Aphid","G x Wind","Aphid x Ant","Ant","Aphid","Wind","Genotype (G)"))
+var.df$term_ord <- factor(var.df$term, levels=c("Plot","Block","Soil PC2","Soil PC1","Root C:N","Trait PC2","Trait PC1","G x Aphid x Ant","G x Ant","G x Aphid","G x Wind","Aphid x Ant","Ant","Aphid","Wind","Genotype (G)"))
 levels(var.df$term_ord)
 
+# something weird is going on when I try to use wind.var.soil in above var.df. It keeps Genotype and G x Wind and reports NA
+var.soil <- unite(wind.var.soil, Experiment_Year, Experiment, Year, sep = " ", remove = F)
+var.soil$term <- factor(var.soil$term)
+levels(var.soil$term)
+var.soil$term_ord <- factor(var.soil$term, levels=c("Block","Wind"))
+levels(var.soil$term_ord)
 
 ## FIGURE 1: COMMUNITY RICHNESS ----
-plot_richness <- filter(var.df, Response%in%c("scale(log(Arthropod Richness + 1))", "scale(Fungi Rarefied Richness)", "scale(Bacteria Rarefied Richness)"))
-
-richness_gg <- ggplot(plot_richness, aes(x=term_ord, y=percent.variance*100, fill=Response)) +
-  geom_boxplot() +
-  coord_flip() +
-  ylab("Variance Explained (%)") +
-  #scale_y_continuous(limits=c(0,40))+
-  xlab("") +
-  facet_wrap(Year~Experiment, ncol=1, scales="free_y") 
-richness_gg
+plot_richness <- filter(var.df, Model%in%"experimental_design", Response%in%c("scale(log(Arthropod Richness + 1))", "scale(Fungi Rarefied Richness)", "scale(Bacteria Rarefied Richness)"))
 
 Mode <- function(x) {
   ux <- unique(x)
@@ -76,41 +130,130 @@ richness_gg
 ## SUPP MAT 1 ----
 
 # Color-blind friendly palette:
-cbPalette <- c("#000000", "#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+#cbPalette <- c("#000000", "#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
 
-plot_traits <- filter(varcomp.df, Response%in%c("Trait.PC1", "Trait.PC2", "Root C:N"), term != "sd_plant_ID__Intercept") %>% 
-  droplevels() %>% 
-  mutate(Experiment_Year=paste(Experiment, Year, " "))
+plot_traits <- filter(var.df, Model%in%"experimental_design", Response%in%c("scale(Trait PC1)", "scale(log(Trait PC2 + min(Trait PC2) + 1))", "scale(Trait PC2)", "scale(log(Root C:N))"))
+plot_traits$Response[which(plot_traits$Response == "scale(log(Trait PC2 + min(Trait PC2) + 1))")] <- "scale(Trait PC2)" # for labeling purposes
+unique(plot_traits$Response)
 
-traits_gg <- ggplot(plot_traits, aes(x=term_group_ord, y=SD_mean, fill=Response)) +
-  geom_linerange(aes(ymin=lower_95, ymax=upper_95, color=Response), size=0.5, position=position_dodge(width=0.75)) +
-  geom_linerange(aes(ymin=lower_50, ymax=upper_50, color=Response), size=2, position=position_dodge(width=0.75)) +
-  geom_point(size=4, color="black", shape=21, position=position_dodge(width=0.75)) +
+summary_traits <- plot_traits %>%
+  group_by(Experiment_Year, Response, term, term_ord) %>%
+  summarise(mode = Mode(round(percent.variance,2)), 
+            HPDI_lower_50 = HPDinterval(as.mcmc(percent.variance), prob=0.5)[ ,1],
+            HPDI_upper_50 = HPDinterval(as.mcmc(percent.variance), prob=0.5)[ ,2],
+            HPDI_lower_95 = HPDinterval(as.mcmc(percent.variance), prob=0.95)[ ,1],
+            HPDI_upper_95 = HPDinterval(as.mcmc(percent.variance), prob=0.95)[ ,2])
+summary_traits$Response_ord <- factor(summary_traits$Response, levels = c("scale(Trait PC1)", "scale(Trait PC2)", "scale(log(Root C:N))"))
+
+traits_gg <- ggplot(summary_traits, aes(x=term_ord, y=mode, shape=Response_ord)) +
+  geom_linerange(aes(ymin=HPDI_lower_95, ymax=HPDI_upper_95), color="grey", size=0.5, position=position_dodge(width=0.75)) +
+  geom_linerange(aes(ymin=HPDI_lower_50, ymax=HPDI_upper_50), color="black", size=2, position=position_dodge(width=0.75)) +
+  geom_point(size=4, color="black", fill="grey", position=position_dodge(width=0.75)) +
   coord_flip() +
-  ylab("Effect size (SD)") +
-  scale_fill_manual(values=cbPalette[3:5], name="Trait response") +
-  scale_color_manual(values=cbPalette[3:5], name="Trait response") +
+  ylab("Variance Explained (%)") +
   xlab("") +
-  facet_wrap(~Experiment_Year, ncol=1, scales="free_y") 
+  scale_y_continuous(breaks = c(0, 0.1, 0.2, 0.3, 0.4, 0.5), labels=c(0, 10, 20, 30, 40, 50)) +
+  scale_shape_manual(values = c(21,22,23,24), name="Trait response", labels=c("Trait PC1","Trait PC2","Root C:N")) +
+  facet_wrap(~Experiment_Year, ncol=1, scales="free_y")  
+traits_gg
 
-plot_soil <- filter(varcomp.df, Response%in%c("Soil.PC1", "Soil.PC2"), term != "sd_plant_ID__Intercept") %>% 
-  droplevels() %>% 
-  mutate(Experiment_Year=paste(Experiment, Year, " "))
-
-soil_gg <- ggplot(plot_soil, aes(x=term_group_ord, y=SD_mean, fill=Response)) +
-  geom_linerange(aes(ymin=lower_95, ymax=upper_95, color=Response), size=0.5, position=position_dodge(width=0.75)) +
-  geom_linerange(aes(ymin=lower_50, ymax=upper_50, color=Response), size=2, position=position_dodge(width=0.75)) +
-  geom_point(size=4, color="black", shape=21, position=position_dodge(width=0.75)) +
+ggplot(summary_traits, aes(x=term_ord, y=mode)) +
+  geom_linerange(aes(ymin=HPDI_lower_95, ymax=HPDI_upper_95), color="grey", size=0.5, position=position_dodge(width=0.75)) +
+  geom_linerange(aes(ymin=HPDI_lower_50, ymax=HPDI_upper_50), color="black", size=2, position=position_dodge(width=0.75)) +
+  geom_point(size=4, color="black", fill="grey", shape = 21, position=position_dodge(width=0.75)) +
   coord_flip() +
-  ylab("Effect size (SD)") +
-  scale_fill_manual(values=cbPalette[8:9], name="Soil response") + 
-  scale_color_manual(values=cbPalette[8:9], name="Soil response") +
+  ylab("Variance Explained (%)") +
   xlab("") +
-  facet_grid(~Experiment_Year, scales="free_y")
+  scale_y_continuous(breaks = c(0, 0.1, 0.2, 0.3, 0.4, 0.5), labels=c(0, 10, 20, 30, 40, 50)) +
+  #scale_shape_manual(values = c(21,22,23,24), name="Trait response", labels=c("Trait PC1","Trait PC2","Root C:N")) +
+  facet_grid(Experiment_Year~Response_ord, scales="free_y")
+
+summary_soil <- var.soil %>%
+  group_by(Experiment_Year, Response, term, term_ord) %>%
+  summarise(mode = Mode(round(percent.variance,2)), 
+            HPDI_lower_50 = HPDinterval(as.mcmc(percent.variance), prob=0.5)[ ,1],
+            HPDI_upper_50 = HPDinterval(as.mcmc(percent.variance), prob=0.5)[ ,2],
+            HPDI_lower_95 = HPDinterval(as.mcmc(percent.variance), prob=0.95)[ ,1],
+            HPDI_upper_95 = HPDinterval(as.mcmc(percent.variance), prob=0.95)[ ,2])
+summary_soil$Response_ord <- factor(summary_soil$Response, levels = c("scale(log(Soil PC1 + min(Soil PC1) + 1))", "scale(Soil PC2)"))
+
+soil_gg <- ggplot(summary_soil, aes(x=term_ord, y=mode, shape=Response_ord)) +
+  geom_linerange(aes(ymin=HPDI_lower_95, ymax=HPDI_upper_95), color="grey", size=0.5, position=position_dodge(width=0.75)) +
+  geom_linerange(aes(ymin=HPDI_lower_50, ymax=HPDI_upper_50), color="black", size=2, position=position_dodge(width=0.75)) +
+  geom_point(size=4, color="black", fill="grey", position=position_dodge(width=0.75)) +
+  coord_flip() +
+  ylab("Variance Explained (%)") +
+  xlab("") +
+  scale_y_continuous(breaks = c(0, 0.2, 0.4, 0.6), labels=c(0, 20, 40, 60)) +
+  scale_shape_manual(values = c(21,22), name="Soil response", labels=c("Soil PC1","Soil PC2")) +
+  facet_wrap(~Experiment_Year, ncol=1, scales="free_y")
+soil_gg
 
 plot_grid(traits_gg, soil_gg, ncol=1, align = 'v', labels = "AUTO", rel_heights=c(1,0.25))
 
 ## TRAIT - COMMUNITY RELATIONSHIPS ----
+
+summary_aa_trait.reg <- filter(var.df, Model%in%"trait_reg", Experiment == "Ant-Aphid") %>% #Experiment == "Ant-Aphid", Year=="2012") %>%
+  group_by(Experiment_Year, Response, term, term_ord) %>%
+  summarise(mode = Mode(round(percent.variance,2)), 
+            HPDI_lower_50 = HPDinterval(as.mcmc(percent.variance), prob=0.5)[ ,1],
+            HPDI_upper_50 = HPDinterval(as.mcmc(percent.variance), prob=0.5)[ ,2],
+            HPDI_lower_95 = HPDinterval(as.mcmc(percent.variance), prob=0.95)[ ,1],
+            HPDI_upper_95 = HPDinterval(as.mcmc(percent.variance), prob=0.95)[ ,2])
+  
+aa.trait.reg_gg <- ggplot(summary_aa_trait.reg, aes(x=term_ord, y=mode)) +
+  geom_linerange(aes(ymin=HPDI_lower_95, ymax=HPDI_upper_95), color="grey", size=0.5, position=position_dodge(width=0.75)) +
+  geom_linerange(aes(ymin=HPDI_lower_50, ymax=HPDI_upper_50), color="black", size=2, position=position_dodge(width=0.75)) +
+  geom_point(size=4, color="black", fill="grey", shape = 21, position=position_dodge(width=0.75)) +
+  coord_flip() +
+  ylab("Variance Explained (%)") +
+  xlab("") +
+  #scale_y_continuous(breaks = c(0, 0.1, 0.2, 0.3, 0.4, 0.5), labels=c(0, 10, 20, 30, 40, 50)) #+
+  #scale_shape_manual(values = c(21,22)) + #, name="Trait response", labels=c("Trait PC1","Trait PC2","Root C:N")) #+
+  facet_wrap(~Experiment_Year, ncol=1, scales="free_y")  
+aa.trait.reg_gg
+
+summary_w_trait.reg <- filter(var.df, Model=="trait_reg", Experiment == "Wind", Response == "scale(log(Arthropod Richness + 1))") %>% #Experiment == "Ant-Aphid", Year=="2012") %>%
+  group_by(Year, Response, term, term_ord) %>%
+  summarise(mode = Mode(round(percent.variance,2)), 
+            HPDI_lower_50 = HPDinterval(as.mcmc(percent.variance), prob=0.5)[ ,1],
+            HPDI_upper_50 = HPDinterval(as.mcmc(percent.variance), prob=0.5)[ ,2],
+            HPDI_lower_95 = HPDinterval(as.mcmc(percent.variance), prob=0.95)[ ,1],
+            HPDI_upper_95 = HPDinterval(as.mcmc(percent.variance), prob=0.95)[ ,2])
+
+w.trait.reg_gg <- ggplot(summary_w_trait.reg, aes(x=term_ord, y=mode)) +
+  geom_linerange(aes(ymin=HPDI_lower_95, ymax=HPDI_upper_95), color="grey", size=0.5, position=position_dodge(width=0.75)) +
+  geom_linerange(aes(ymin=HPDI_lower_50, ymax=HPDI_upper_50), color="black", size=2, position=position_dodge(width=0.75)) +
+  geom_point(size=4, color="black", fill="grey", shape = 21, position=position_dodge(width=0.75)) +
+  coord_flip() +
+  ylab("Variance Explained (%)") +
+  xlab("") +
+  #scale_y_continuous(breaks = c(0, 0.1, 0.2, 0.3, 0.4, 0.5), labels=c(0, 10, 20, 30, 40, 50)) #+
+  #scale_shape_manual(values = c(21,22)) + #, name="Trait response", labels=c("Trait PC1","Trait PC2","Root C:N")) #+
+  facet_wrap(~Year, ncol=1, scales="free_y")  
+w.trait.reg_gg
+
+summary_w.below_trait.reg <- filter(var.df, Model%in%"trait_reg", Response != "scale(log(Arthropod Richness + 1))") %>% #Experiment == "Ant-Aphid", Year=="2012") %>%
+  group_by(Experiment, Year, Response, term, term_ord) %>%
+  summarise(mode = Mode(round(percent.variance,2)), 
+            HPDI_lower_50 = HPDinterval(as.mcmc(percent.variance), prob=0.5)[ ,1],
+            HPDI_upper_50 = HPDinterval(as.mcmc(percent.variance), prob=0.5)[ ,2],
+            HPDI_lower_95 = HPDinterval(as.mcmc(percent.variance), prob=0.95)[ ,1],
+            HPDI_upper_95 = HPDinterval(as.mcmc(percent.variance), prob=0.95)[ ,2])
+
+w.below.trait.reg_gg <- ggplot(summary_w.below_trait.reg, aes(x=term_ord, y=mode)) +
+  geom_linerange(aes(ymin=HPDI_lower_95, ymax=HPDI_upper_95), color="grey", size=0.5, position=position_dodge(width=0.75)) +
+  geom_linerange(aes(ymin=HPDI_lower_50, ymax=HPDI_upper_50), color="black", size=2, position=position_dodge(width=0.75)) +
+  geom_point(size=4, color="black", fill="grey", shape = 21, position=position_dodge(width=0.75)) +
+  coord_flip() +
+  ylab("Variance Explained (%)") +
+  xlab("") +
+  #scale_y_continuous(breaks = c(0, 0.1, 0.2, 0.3, 0.4, 0.5), labels=c(0, 10, 20, 30, 40, 50)) #+
+  #scale_shape_manual(values = c(21,22)) + #, name="Trait response", labels=c("Trait PC1","Trait PC2","Root C:N")) #+
+  facet_wrap(~Response, ncol=1, scales="free_y")  
+w.below.trait.reg_gg
+
+plot_grid(aa.trait.reg_gg, w.trait.reg_gg, w.below.trait.reg_gg, ncol=3, align="hv")
 
 ## NEED RELEVANT TRAIT/PC DATA FOR VARIANCE EXPLAINED AND LOADINGS
 ## NEED REGRESSIONS FROM BRM ANALYSIS FOR REGRESSION PLOTS
