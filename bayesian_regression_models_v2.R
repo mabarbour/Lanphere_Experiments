@@ -160,36 +160,9 @@ posterior_SDs <- function(brm_model, df, FE_formula){
   return(SD_df)
 }
 
-ant.aphid_posterior_SDs <- function(brm_model, df, FE_formula="~sc.Aphid.treatment*sc.Ant.mound.dist"){
-  Fixed_Effects <- posterior_samples(brm_model, pars = "^b")
-  sample_size <- dim(Fixed_Effects)[1]
-  
-  get_model_matrix <- model.matrix(as.formula(FE_formula), data=df)
-  
-  model_size <- dim(get_model_matrix)[2]
-  
-  FE_SD_list <- list()
-  for(i in 1:model_size){
-    FE_SD_vector <- c()
-    for(j in 1:sample_size){
-      FE_SD_vector[j] <- sd(as.vector(Fixed_Effects[j,i] * t(get_model_matrix)[i, ]))
-    }
-    FE_SD_list[[i]] <- FE_SD_vector
-  }
-  SD_df <- data.frame(sample = 1:4000,
-                      sd_sc.Aphid.treatment=FE_SD_list[[2]], 
-                      sd_sc.Ant.mound.dist=FE_SD_list[[3]], 
-                      sd_sc.Aphid.x.sc.Ant=FE_SD_list[[4]],
-                      posterior_samples(brm_model, pars = "^sd"),          # random effects
-                      posterior_samples(brm_model, pars = "sigma")) #%>%    # residual variance                                                      
-    #gather(key=term, value=posterior_samples, -sample)
-  return(SD_df)
-}
-
 
 ## WIND TRAIT PC1 2012 ANALYSIS ----
 hist(w.trait.2012$sc.Trait.PC1)
-colnames(posterior_samples(trait.PC1.wind.2012.brm, pars = "sigma"))
 
 trait.PC1.wind.2012.brm <- general_brm(sc.Trait.PC1~sc.Wind.Exposure+(1+sc.Wind.Exposure|Genotype)+(1|Block)+(1|Plot_code), data=w.trait.2012)
 summary(trait.PC1.wind.2012.brm)
@@ -480,7 +453,7 @@ yrep_w.soil.PC2 <- posterior_predict(soil.PC2.wind.brm, nsamples=100)
 aa.trait.arth.2012 <- left_join(aa.arth.df, select(aa.trait.2012, plant_ID, sc.Trait.PC1, sc.Trait.PC2), by="plant_ID") %>%
   mutate(fact.Ant.mound.dist = factor(Ant.mound.dist))
 
-trait.rich.aa.2012.brm <- general_brm(sc.log1.Arthropod.Rich~sc.Trait.PC1+sc.Trait.PC2+(1|Genotype)+(1|Block)+(1|Plot_code), data=aa.trait.arth.2012)
+trait.rich.aa.2012.brm <- general_brm(sc.log1.Arthropod.Rich~sc.Trait.PC1+sc.Trait.PC2+sc.Aphid.treatment*sc.Ant.mound.dist+(1+sc.Aphid.treatment*sc.Ant.mound.dist|Genotype)+(1|Block)+(1|Plot_code), data=aa.trait.arth.2012)
 summary(trait.rich.aa.2012.brm) # trait.PC1 is key driver, but there is also a weak effect of trait.PC2
 
 y_aa.trait.rich.2012 <- aa.trait.arth.2012$sc.log1.Arthropod.Rich
@@ -492,9 +465,9 @@ plot(marginal_effects(trait.rich.aa.2012.brm, effects = "sc.Trait.PC2"), points=
 
 
 ## WIND TRAIT-ARTHROPOD 2012 ANALYSIS ----
-w.trait.arth.2012 <- left_join(w.arth.2012, select(w.trait.2012, plant_ID, sc.Trait.PC1, sc.log.trans.Trait.PC2), by="plant_ID") 
+w.trait.arth.2012 <- left_join(w.arth.2012, select(w.trait.2012, plant_ID, sc.Trait.PC1, sc.Trait.PC2 = sc.log.trans.Trait.PC2), by="plant_ID") 
 
-trait.rich.wind.2012.brm <- general_brm(sc.log1.Arthropod.Rich~sc.Trait.PC1+sc.log.trans.Trait.PC2+sc.Wind.Exposure+(1|Genotype)+(1|Block)+(1|Plot_code), data=w.trait.arth.2012)
+trait.rich.wind.2012.brm <- general_brm(sc.log1.Arthropod.Rich~sc.Trait.PC1+sc.Trait.PC2+sc.Wind.Exposure+(1+sc.Wind.Exposure|Genotype)+(1|Block)+(1|Plot_code), data=w.trait.arth.2012)
 summary(trait.rich.wind.2012.brm) # trait.PC1 is primary effect
 
 y_w.trait.rich.2012 <- w.trait.arth.2012$sc.log1.Arthropod.Rich
@@ -507,17 +480,21 @@ plot(marginal_effects(trait.rich.wind.2012.brm, effects = "sc.Trait.PC1"), point
 ## WIND TRAIT-ARTHROPOD 2013 ANALYSIS ----
 w.trait.arth.2013 <- left_join(w.arth.2013, select(w.trait.2013, plant_ID, sc.Trait.PC1, sc.Trait.PC2), by="plant_ID") 
 
-trait.rich.wind.2013.brm <- general_brm(sc.log1.Arthropod.Rich~sc.Trait.PC1+sc.Trait.PC2+sc.Wind.Exposure+(1|Genotype)+(1|Block)+(1|Plot_code), data=w.trait.arth.2013)
+trait.rich.wind.2013.brm <- general_brm(sc.log1.Arthropod.Rich~sc.Trait.PC1+sc.Trait.PC2+sc.Wind.Exposure+(1+sc.Wind.Exposure|Genotype)+(1|Block)+(1|Plot_code), data=w.trait.arth.2013)
 summary(trait.rich.wind.2013.brm) # trait.PC1 is the primary effect
+
+# pretty close approximation...
+mean(posterior_samples(trait.rich.wind.2013.brm, pars = "^b")$b_sc.Trait.PC1)
+sd(as.numeric(mean(posterior_samples(trait.rich.wind.2013.brm, pars = "^b")$b_sc.Trait.PC1) * t(model.matrix(~sc.Trait.PC1, data = w.trait.arth.2013))[2,]))
 
 plot(marginal_effects(trait.rich.wind.2013.brm, effects = "sc.Trait.PC1"), points=T)
 
 
 ## WIND TRAIT/SOIL-FUNGAL 2013 ANALYSIS ----
 w.trait.fung.2013 <- left_join(fungal.df, select(w.trait.2013, plant_ID, sc.Trait.PC1, sc.Trait.PC2, sc.log.Root.CN), by="plant_ID") %>%
-  left_join(., select(w.soil, sc.log.trans.Soil.PC1, sc.Soil.PC2, Plot_code)) 
+  left_join(., select(w.soil, sc.Soil.PC1 = sc.log.trans.Soil.PC1, sc.Soil.PC2, Plot_code)) 
 
-trait.rarerich.wind.2013.brm <- general_brm(sc.Fungi.Rarerich~sc.log.trans.Soil.PC1+sc.Soil.PC2+sc.log.Root.CN+sc.Wind.Exposure+(1|Genotype)+(1|Block)+(1|Plot_code), data=w.trait.fung.2013)
+trait.rarerich.wind.2013.brm <- general_brm(sc.Fungi.Rarerich~sc.log.Root.CN+sc.Wind.Exposure+(1+sc.Wind.Exposure|Genotype)+(1|Block)+(1|Plot_code), data=w.trait.fung.2013) # sc.log.trans.Soil.PC1+sc.Soil.PC2+
 summary(trait.rarerich.wind.2013.brm) # log_root_CN and soil.PC1 to a lesser extent
 
 plot(marginal_effects(trait.rarerich.wind.2013.brm, effects = "sc.log.Root.CN"), points=T)
@@ -526,9 +503,9 @@ plot(marginal_effects(trait.rarerich.wind.2013.brm, effects = "sc.log.trans.Soil
 
 ## WIND TRAIT/SOIL-BACTERIA 2013 ANALYSIS ----
 w.trait.bact.2013 <- left_join(bacteria.df, select(w.trait.2013, plant_ID, sc.Trait.PC1, sc.Trait.PC2, sc.log.Root.CN), by="plant_ID") %>%
-  left_join(., select(w.soil, sc.log.trans.Soil.PC1, sc.Soil.PC2, Plot_code)) 
+  left_join(., select(w.soil, sc.Soil.PC1 = sc.log.trans.Soil.PC1, sc.Soil.PC2, Plot_code)) 
 
-bact.trait.rarerich.wind.2013.brm <- general_brm(sc.Bacteria.Rarerich~sc.log.trans.Soil.PC1+sc.Soil.PC2+sc.log.Root.CN+sc.Wind.Exposure+(1|Genotype)+(1|Block)+(1|Plot_code), data=w.trait.bact.2013)
+bact.trait.rarerich.wind.2013.brm <- general_brm(sc.Bacteria.Rarerich~sc.log.Root.CN+sc.Wind.Exposure+(1+sc.Wind.Exposure|Genotype)+(1|Block)+(1|Plot_code), data=w.trait.bact.2013) # sc.log.trans.Soil.PC1+sc.Soil.PC2+
 summary(bact.trait.rarerich.wind.2013.brm) # strong effect of soil.PC2
 
 plot(marginal_effects(bact.trait.rarerich.wind.2013.brm, effects = "sc.Soil.PC2"), points=T)
@@ -536,33 +513,33 @@ plot(marginal_effects(bact.trait.rarerich.wind.2013.brm, effects = "sc.Soil.PC2"
 
 ## TIDY AND SAVE OUTPUT ----
 wind_SDs <- bind_rows(
-  mutate(posterior_SDs(trait.PC1.wind.2012.brm, df=w.trait.2012, FE_formula = "~sc.Wind.Exposure"), Experiment="Wind", Year="2012", Response="scale(Trait PC1)"),
-  mutate(posterior_SDs(trait.PC2.wind.2012.brm, df=w.trait.2012, FE_formula = "~sc.Wind.Exposure"), Experiment="Wind", Year="2012", Response="scale(log(Trait PC2 + min(Trait PC2) + 1))"),
-  mutate(posterior_SDs(trait.PC1.wind.2013.brm, df=w.trait.2013, FE_formula = "~sc.Wind.Exposure"), Experiment="Wind", Year="2013", Response="scale(Trait PC1)"),
-  mutate(posterior_SDs(trait.PC2.wind.2013.brm, df=w.trait.2013, FE_formula = "~sc.Wind.Exposure"), Experiment="Wind", Year="2013", Response="scale(Trait PC2)"),
-  mutate(posterior_SDs(soil.PC1.wind.brm, df=w.soil, FE_formula = "~sc.Wind.Exposure"), Experiment="Wind", Year="2013", Response="scale(log(Soil PC1 + min(Soil PC1) + 1))"),
-  mutate(posterior_SDs(soil.PC2.wind.brm, df=w.soil, FE_formula = "~sc.Wind.Exposure"), Experiment="Wind", Year="2013", Response="scale(Soil PC2)"),
-  mutate(posterior_SDs(root_CN.wind.2013.brm, df=w.trait.2013, FE_formula = "~sc.Wind.Exposure"), Experiment="Wind", Year="2013", Response="scale(log(Root C:N))"),
-  mutate(posterior_SDs(arth.rich.wind.2012.brm, df=w.arth.2012, FE_formula = "~sc.Wind.Exposure"), Experiment="Wind", Year="2012", Response="scale(log(Arthropod Richness + 1))"),
-  mutate(posterior_SDs(arth.rich.wind.2013.brm, df=w.arth.2013, FE_formula = "~sc.Wind.Exposure"), Experiment="Wind", Year="2013", Response="scale(log(Arthropod Richness + 1))"),
-  mutate(posterior_SDs(fungal.rarerich.wind.2013.brm, df=fungal.df, FE_formula = "~sc.Wind.Exposure"), Experiment="Wind", Year="2013", Response="scale(Fungi Rarefied Richness)"),
-  mutate(posterior_SDs(bacteria.rarerich.wind.2013.brm, df=bacteria.df, FE_formula = "~sc.Wind.Exposure"), Experiment="Wind", Year="2013", Response="scale(Bacteria Rarefied Richness)")
+  mutate(posterior_SDs(trait.PC1.wind.2012.brm, df=w.trait.2012, FE_formula = "~sc.Wind.Exposure"), Experiment="Wind", Year="2012", Response="Trait PC1"), #Response="scale(Trait PC1)"),
+  mutate(posterior_SDs(trait.PC2.wind.2012.brm, df=w.trait.2012, FE_formula = "~sc.Wind.Exposure"), Experiment="Wind", Year="2012", Response="Trait PC2"), #Response="scale(log(Trait PC2 + min(Trait PC2) + 1))"),
+  mutate(posterior_SDs(trait.PC1.wind.2013.brm, df=w.trait.2013, FE_formula = "~sc.Wind.Exposure"), Experiment="Wind", Year="2013", Response="Trait PC1"), #Response="scale(Trait PC1)"),
+  mutate(posterior_SDs(trait.PC2.wind.2013.brm, df=w.trait.2013, FE_formula = "~sc.Wind.Exposure"), Experiment="Wind", Year="2013", Response="Trait PC2"), #Response="scale(Trait PC2)"),
+  mutate(posterior_SDs(soil.PC1.wind.brm, df=w.soil, FE_formula = "~sc.Wind.Exposure"), Experiment="Wind", Year="2013", Response="Soil PC1"), #Response="scale(log(Soil PC1 + min(Soil PC1) + 1))"), 
+  mutate(posterior_SDs(soil.PC2.wind.brm, df=w.soil, FE_formula = "~sc.Wind.Exposure"), Experiment="Wind", Year="2013", Response="Soil PC2"), #Response="scale(Soil PC2)"),
+  mutate(posterior_SDs(root_CN.wind.2013.brm, df=w.trait.2013, FE_formula = "~sc.Wind.Exposure"), Experiment="Wind", Year="2013", Response="Root C:N"), #Response="scale(log(Root C:N))"),
+  mutate(posterior_SDs(arth.rich.wind.2012.brm, df=w.arth.2012, FE_formula = "~sc.Wind.Exposure"), Experiment="Wind", Year="2012", Response="Arthropod Richness"), #Response="scale(log(Arthropod Richness + 1))"),
+  mutate(posterior_SDs(arth.rich.wind.2013.brm, df=w.arth.2013, FE_formula = "~sc.Wind.Exposure"), Experiment="Wind", Year="2013", Response="Arthropod Richness"), #Response="scale(log(Arthropod Richness + 1))"),
+  mutate(posterior_SDs(fungal.rarerich.wind.2013.brm, df=fungal.df, FE_formula = "~sc.Wind.Exposure"), Experiment="Wind", Year="2013", Response="Fungi Rarefied Richness"), #Response="scale(Fungi Rarefied Richness)"),
+  mutate(posterior_SDs(bacteria.rarerich.wind.2013.brm, df=bacteria.df, FE_formula = "~sc.Wind.Exposure"), Experiment="Wind", Year="2013", Response="Bacteria Rarefied Richness") #Response="scale(Bacteria Rarefied Richness)")
 )
 write_csv(wind_SDs, path="output_brms/wind_SDs.csv")
 
 ant.aphid_SDs <- bind_rows(
-  mutate(posterior_SDs(trait.PC1.aa.2012.brm, df=aa.trait.2012, FE_formula = "~sc.Aphid.treatment*sc.Ant.mound.dist"), Experiment="Ant-Aphid", Year="2012", Response="scale(Trait PC1)"),
-  mutate(posterior_SDs(trait.PC2.aa.2012.brm, df=aa.trait.2012, FE_formula = "~sc.Aphid.treatment*sc.Ant.mound.dist"), Experiment="Ant-Aphid", Year="2012", Response="scale(Trait PC2)"),
-  mutate(posterior_SDs(arth.rich.aa.2012.brm, df=aa.arth.df, FE_formula = "~sc.Aphid.treatment*sc.Ant.mound.dist"), Experiment="Ant-Aphid", Year="2012", Response="scale(log(Arthropod Richness + 1))")#,
+  mutate(posterior_SDs(trait.PC1.aa.2012.brm, df=aa.trait.2012, FE_formula = "~sc.Aphid.treatment*sc.Ant.mound.dist"), Experiment="Ant-Aphid", Year="2012", Response="Trait PC1"), #Response="scale(Trait PC1)"),
+  mutate(posterior_SDs(trait.PC2.aa.2012.brm, df=aa.trait.2012, FE_formula = "~sc.Aphid.treatment*sc.Ant.mound.dist"), Experiment="Ant-Aphid", Year="2012", Response="Trait PC2"), #Response="scale(Trait PC2)"),
+  mutate(posterior_SDs(arth.rich.aa.2012.brm, df=aa.arth.df, FE_formula = "~sc.Aphid.treatment*sc.Ant.mound.dist"), Experiment="Ant-Aphid", Year="2012", Response="Arthropod Richness") #Response="scale(log(Arthropod Richness + 1))")
 )
 write_csv(ant.aphid_SDs, path="output_brms/ant.aphid_SDs.csv")
 
 lanphere_trait_regs <- bind_rows(
-  mutate(posterior_SDs(trait.rich.aa.2012.brm, df=aa.trait.arth.2012, FE_formula = "~sc.Trait.PC1+sc.Trait.PC2"), Experiment="Ant-Aphid", Year="2012", Response="scale(log(Arthropod Richness + 1))"),
-  mutate(posterior_SDs(trait.rich.wind.2012.brm, df=w.trait.arth.2012, FE_formula = "~sc.Trait.PC1+sc.log.trans.Trait.PC2+sc.Wind.Exposure"), Experiment="Wind", Year="2012", Response="scale(log(Arthropod Richness + 1))"),
-  mutate(posterior_SDs(trait.rich.wind.2013.brm, df=w.trait.arth.2013, FE_formula = "~sc.Trait.PC1+sc.Trait.PC2+sc.Wind.Exposure"), Experiment="Wind", Year="2013", Response="scale(log(Arthropod Richness + 1))"),
-  mutate(posterior_SDs(trait.rarerich.wind.2013.brm, df=w.trait.fung.2013, FE_formula = "~sc.log.trans.Soil.PC1+sc.Soil.PC2+sc.log.Root.CN+sc.Wind.Exposure"), Experiment="Wind", Year="2013", Response="scale(Fungi Rarefied Richness)"),
-  mutate(posterior_SDs(bact.trait.rarerich.wind.2013.brm, df=w.trait.bact.2013, FE_formula = "~sc.log.trans.Soil.PC1+sc.Soil.PC2+sc.log.Root.CN+sc.Wind.Exposure"), Experiment="Wind", Year="2013", Response="scale(Bacteria Rarefied Richness)")
+  mutate(posterior_SDs(trait.rich.aa.2012.brm, df=aa.trait.arth.2012, FE_formula = "~sc.Trait.PC1+sc.Trait.PC2+sc.Aphid.treatment*sc.Ant.mound.dist"), Experiment="Ant-Aphid", Year="2012", Response="Arthropod Richness"), #Response="scale(log(Arthropod Richness + 1))"),
+  mutate(posterior_SDs(trait.rich.wind.2012.brm, df=w.trait.arth.2012, FE_formula = "~sc.Trait.PC1+sc.Trait.PC2+sc.Wind.Exposure"), Experiment="Wind", Year="2012", Response="Arthropod Richness"), #Response="scale(log(Arthropod Richness + 1))"),
+  mutate(posterior_SDs(trait.rich.wind.2013.brm, df=w.trait.arth.2013, FE_formula = "~sc.Trait.PC1+sc.Trait.PC2+sc.Wind.Exposure"), Experiment="Wind", Year="2013", Response="Arthropod Richness"), #Response="scale(log(Arthropod Richness + 1))"),
+  mutate(posterior_SDs(trait.rarerich.wind.2013.brm, df=w.trait.fung.2013, FE_formula = "~sc.log.Root.CN+sc.Wind.Exposure"), Experiment="Wind", Year="2013", Response="Fungi Rarefied Richness"), #Response="scale(Fungi Rarefied Richness)"),
+  mutate(posterior_SDs(bact.trait.rarerich.wind.2013.brm, df=w.trait.bact.2013, FE_formula = "~sc.log.Root.CN+sc.Wind.Exposure"), Experiment="Wind", Year="2013", Response="Bacteria Rarefied Richness") #Response="scale(Bacteria Rarefied Richness)")
 )
 write_csv(lanphere_trait_regs, path="output_brms/lanphere_trait_regs.csv")
 
