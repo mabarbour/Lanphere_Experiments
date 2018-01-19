@@ -9,6 +9,9 @@ Mode <- function(x) {
   ux[which.max(tabulate(match(x, ux)))]
 }
 
+# color-blind friendly palette
+cbPalette <- c("#000000", "#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+
 ## GET ANT-APHID DATA ----
 ant.aphid.trait.SD <- read.csv('output_brms/ant.aphid_SDs.csv') %>%
   gather(key = term, value = posterior_SD, -sample, -(Experiment:Response)) %>%
@@ -57,15 +60,22 @@ aa.trait.rich.2012 <- ant.aphid.arth.SD.modes %>%
   filter(term %in% c("sd_sc.Trait.PC1","sd_sc.Trait.PC2"), Year == "2012") %>%
   spread(term, Arthropod.Richness)
 
-aa.trait.2012$Trait.PC1 <- aa.trait.2012$Trait.PC1*aa.trait.rich.2012$sd_sc.Trait.PC1
-aa.trait.2012$Trait.PC2 <- aa.trait.2012$Trait.PC2*aa.trait.rich.2012$sd_sc.Trait.PC2
-aa.trait.2012 %>%
-  gather(Traits, Effect_Size, -term, -Year, -Variation) %>%
-  ggplot(., aes(x=Variation, y=Effect_Size, fill=term))  +
-  geom_bar(stat="identity", color = "black", position = position_stack()) +
-  scale_fill_manual(values=cbPalette, name="Source of\nTrait variation", labels=c("Block", "Genotype (G)", "G x Ant", "G x Aphid", "G x Aphid x Ant", "Plot", "Ant", "Aphid", "Aphid x Ant")) +
+aa.partition.2012 <- aa.trait.2012
+aa.partition.2012$Trait.PC1 <- aa.partition.2012$Trait.PC1*aa.trait.rich.2012$sd_sc.Trait.PC1
+aa.partition.2012$Trait.PC2 <- aa.partition.2012$Trait.PC2*aa.trait.rich.2012$sd_sc.Trait.PC2
+aa.partition.2012$term_alt <- factor(c("Block","Genotype (G)","G x E","G x E", "G x E", "Plot", "Ant", "Aphid", "Aphid x Ant"),
+                                     levels=c("Genotype (G)","Aphid","Ant","Aphid x Ant","G x E","Block","Plot"))
+
+aa.pal <- c("#009E73","#F0E442","#D55E00","#CC79A7","#E69F00","#000000","#999999")
+plot_aa.partition.2012 <- aa.partition.2012 %>%
+  gather(Traits, Effect_Size, -term, -Year, -Variation, -term_alt) %>%
+  ggplot(., aes(x=Variation, y=Effect_Size, fill=term_alt))  +
+  geom_bar(stat="identity", color = "black", position = position_stack(reverse=TRUE)) +
+  scale_fill_manual(values=aa.pal, name="Source of\nTrait variation") + #  labels=c("Block", "Genotype (G)", "G x Ant", "G x Aphid", "G x Aphid x Ant", "Plot", "Ant", "Aphid", "Aphid x Ant")
   facet_wrap(~Traits, ncol=2) +
-  xlab("Intraspecific variation") + ylab("Trait effect size on arthropod richness")
+  xlab("Intraspecific variation") + ylab("Indirect effect on arthropod richness")
+
+save_plot(filename = "fig_1_ant-aphid_arthropods.png", plot = plot_aa.partition.2012, base_height = 6, base_width = 8.5)
 
 ## GET WIND DATA ----
 wind.trait.SD <- read.csv('output_brms/wind_SDs.csv') %>%
@@ -126,6 +136,8 @@ wind.below.SD.modes
 
 
 ## Plot sources of Trait PC1 and PC2 effects on Arthropod Richness in Wind 2012
+wind.pal <- c("#009E73","#56B4E9","#E69F00","#000000","#999999")
+
 w.trait.2012 <- wind.trait.SD.modes %>%
   select(-Root.C.N) %>%
   filter(Year == "2012", term != "sigma") %>%
@@ -135,15 +147,19 @@ w.trait.rich.2012 <- wind.arth.SD.modes %>%
   filter(term %in% c("sd_sc.Trait.PC1","sd_sc.Trait.PC2"), Year == "2012") %>%
   spread(term, Arthropod.Richness)
 
-w.trait.2012$Trait.PC1 <- w.trait.2012$Trait.PC1*w.trait.rich.2012$sd_sc.Trait.PC1
-w.trait.2012$Trait.PC2 <- w.trait.2012$Trait.PC2*w.trait.rich.2012$sd_sc.Trait.PC2
-w.trait.2012 %>%
-  gather(Traits, Effect_Size, -term, -Year, -Variation) %>%
-  ggplot(., aes(x=Variation, y=Effect_Size, fill=term))  +
-  geom_bar(stat="identity", color = "black", position = position_stack()) +
-  scale_fill_manual(values=cbPalette[c(1,5,6,2,4)], name="Source of\nTrait variation", labels=c("Block", "Genotype (G)", "G x Wind", "Plot", "Wind")) +
+w.partition.2012 <- w.trait.2012
+w.partition.2012$Trait.PC1 <- w.trait.2012$Trait.PC1*w.trait.rich.2012$sd_sc.Trait.PC1
+w.partition.2012$Trait.PC2 <- w.trait.2012$Trait.PC2*w.trait.rich.2012$sd_sc.Trait.PC2
+w.partition.2012$term_alt <- factor(c("Block","Genotype (G)","G x E","Plot", "Wind"),
+                                     levels=c("Genotype (G)","Wind","G x E","Block","Plot"))
+
+w.partition.2012 %>%
+  gather(Traits, Effect_Size, -term, -Year, -Variation, -term_alt) %>%
+  ggplot(., aes(x=Variation, y=Effect_Size, fill=term_alt))  +
+  geom_bar(stat="identity", color = "black", position = position_stack(reverse=TRUE)) +
+  scale_fill_manual(values=wind.pal, name="Source of\nTrait variation") + 
   facet_wrap(~Traits, ncol=2) +
-  xlab("Intraspecific variation") + ylab("Trait effect size on arthropod richness")
+  xlab("Intraspecific variation") + ylab("Indirect effect on arthropod richness")
 
 ## Plot sources of Trait PC1 and PC2 effects on Arthropod Richness in Wind 2013
 w.trait.2013 <- wind.trait.SD.modes %>%
@@ -155,15 +171,28 @@ w.trait.rich.2013 <- wind.arth.SD.modes %>%
   filter(term %in% c("sd_sc.Trait.PC1","sd_sc.Trait.PC2"), Year == "2013") %>%
   spread(term, Arthropod.Richness)
 
-w.trait.2013$Trait.PC1 <- w.trait.2013$Trait.PC1*w.trait.rich.2013$sd_sc.Trait.PC1
-w.trait.2013$Trait.PC2 <- w.trait.2013$Trait.PC2*w.trait.rich.2013$sd_sc.Trait.PC2
-w.trait.2013 %>%
-  gather(Traits, Effect_Size, -term, -Year, -Variation) %>%
-  ggplot(., aes(x=Variation, y=Effect_Size, fill=term))  +
-  geom_bar(stat="identity", color = "black", position = position_stack()) +
-  scale_fill_manual(values=cbPalette[c(1,5,6,2,4)], name="Source of\nTrait variation", labels=c("Block", "Genotype (G)", "G x Wind", "Plot", "Wind")) +
+w.partition.2013 <- w.trait.2013
+w.partition.2013$Trait.PC1 <- w.trait.2013$Trait.PC1*w.trait.rich.2013$sd_sc.Trait.PC1
+w.partition.2013$Trait.PC2 <- w.trait.2013$Trait.PC2*w.trait.rich.2013$sd_sc.Trait.PC2
+w.partition.2013$term_alt <- factor(c("Block","Genotype (G)","G x E","Plot", "Wind"),
+                                    levels=c("Genotype (G)","Wind","G x E","Block","Plot"))
+w.partition.2013 %>%
+  gather(Traits, Effect_Size, -term, -Year, -Variation, -term_alt) %>%
+  ggplot(., aes(x=Variation, y=Effect_Size, fill=term_alt))  +
+  geom_bar(stat="identity", color = "black", position = position_stack(reverse = TRUE)) +
+  scale_fill_manual(values=wind.pal, name="Source of\nTrait variation") + #, labels=c("Block", "Genotype (G)", "G x Wind", "Plot", "Wind")) +
   facet_wrap(~Traits, ncol=2) +
-  xlab("Intraspecific variation") + ylab("Trait effect size on arthropod richness")
+  xlab("Intraspecific variation") + ylab("Indirect effect on arthropod richness")
+
+plot_w.partitions <- bind_rows(w.partition.2012, w.partition.2013) %>%
+  gather(Traits, Effect_Size, -term, -Year, -Variation, -term_alt) %>%
+  ggplot(., aes(x=Variation, y=Effect_Size, fill=term_alt))  +
+  geom_bar(stat="identity", color = "black", position = position_stack(reverse = TRUE)) +
+  scale_fill_manual(values=wind.pal, name="Source of\nTrait variation") + #, labels=c("Block", "Genotype (G)", "G x Wind", "Plot", "Wind")) +
+  facet_grid(Year~Traits) +
+  xlab("Intraspecific variation") + ylab("Indirect effect on arthropod richness")
+
+save_plot(filename = "fig_2_wind_arthropods.png", plot = plot_w.partitions, base_height = 8.5, base_width = 8.5)
 
 ## Plot sources of Root C:N effects on Fungi and Bacteria Rarefied Richness in Wind 2013
 w.root.2013 <- wind.trait.SD.modes %>%
@@ -175,71 +204,23 @@ w.trait.microbe.2013 <- filter(wind.below.SD.modes, term == "sd_sc.log.Root.CN")
 
 w.root.Fungi.2013 <- w.root.2013  
 w.root.Fungi.2013$Root.C.N <- w.root.2013$Root.C.N*w.trait.microbe.2013$Fungi.Rarefied.Richness
+w.root.Fungi.2013$term_alt <- factor(c("Block","Genotype (G)","G x E","Plot", "Wind"),
+                                    levels=c("Genotype (G)","Wind","G x E","Block","Plot"))
 
 w.root.Bacteria.2013 <- w.root.2013
 w.root.Bacteria.2013$Root.C.N <- w.root.2013$Root.C.N*w.trait.microbe.2013$Bacteria.Rarefied.Richness
+w.root.Bacteria.2013$term_alt <- factor(c("Block","Genotype (G)","G x E","Plot", "Wind"),
+                                     levels=c("Genotype (G)","Wind","G x E","Block","Plot"))
 
-w.root.microbes.2013 <- bind_rows(mutate(w.root.Fungi.2013, Community = "Fungi rarefied richness"),
-                                  mutate(w.root.Bacteria.2013, Community = "Bacteria rarefied richness"))
+w.root.microbes.2013 <- bind_rows(mutate(w.root.Fungi.2013, Community = "Root-fungi"),
+                                  mutate(w.root.Bacteria.2013, Community = "Root-bacteria"))
 
-w.root.microbes.2013 %>%
-  gather(Traits, Effect_Size, -term, -Year, -Variation, -Community) %>%
-  ggplot(., aes(x=Variation, y=Effect_Size, fill=term))  +
-  geom_bar(stat="identity", color = "black", position = position_stack()) +
-  scale_fill_manual(values=cbPalette[c(1,5,6,2,4)], name="Source of\nRoot C:N variation", labels=c("Block", "Genotype (G)", "G x Wind", "Plot", "Wind")) +
+plot_w.root.microbes.2013 <- w.root.microbes.2013 %>%
+  gather(Traits, Effect_Size, -term, -Year, -Variation, -Community, -term_alt) %>%
+  ggplot(., aes(x=Variation, y=Effect_Size, fill=term_alt))  +
+  geom_bar(stat="identity", color = "black", position = position_stack(reverse=TRUE)) +
+  scale_fill_manual(values=wind.pal, name="Source of\nRoot C:N variation") + #, labels=c("Block", "Genotype (G)", "G x Wind", "Plot", "Wind")) +
   facet_wrap(~Community) +
-  ylab("Root C:N effect size on Root-Microbes") +
+  ylab("Indirect effect on microbial rarefied richness") +
   xlab("Intraspecific variation")
-
-
-## LIKELY MORGUE ----
-heritable.wind.arth.2012 <- wind.trait.SD.modes %>%
-  filter(Year=="2012", term=="sd_Genotype__Intercept") %>%
-  mutate(Variation.Source = "Heritable traits")
-heritable.wind.arth.2012$Trait.PC1 <- heritable.wind.arth.2012$Trait.PC1 * filter(wind.arth.SD.modes, Year=="2012", term=="sd_sc.Trait.PC1")$Arthropod.Richness
-heritable.wind.arth.2012$Trait.PC2 <- heritable.wind.arth.2012$Trait.PC2 * filter(wind.arth.SD.modes, Year=="2012", term=="sd_sc.Trait.PC2")$Arthropod.Richness
-heritable.wind.arth.2012 <- heritable.wind.arth.2012 %>%
-  gather(traits, effect_size, -term, -Year, -Variation.Source)
-heritable.wind.arth.2012.unk <- wind.arth.SD.modes %>%
-  filter(Year=="2012", term=="sd_Genotype__Intercept") %>%
-  mutate(traits = NA, Variation.Source = "Heritable traits") %>%
-  rename(effect_size = Arthropod.Richness)
-heritable.wind.arth.2012 <- bind_rows(heritable.wind.arth.2012, heritable.wind.arth.2012.unk)
-
-plasticity.wind.arth.2012 <- wind.trait.SD.modes %>%
-  filter(Year=="2012", term%in%c("sd_sc.Wind.Exposure","sd_Genotype__sc.Wind.Exposure","sd_Block__Intercept","sd_Plot_code__Intercept")) %>%
-  mutate(Variation.Source = "Plastic traits")
-plasticity.wind.arth.2012$Trait.PC1 <- plasticity.wind.arth.2012$Trait.PC1 * filter(wind.arth.SD.modes, Year=="2012", term=="sd_sc.Trait.PC1")$Arthropod.Richness
-plasticity.wind.arth.2012$Trait.PC2 <- plasticity.wind.arth.2012$Trait.PC2 * filter(wind.arth.SD.modes, Year=="2012", term=="sd_sc.Trait.PC2")$Arthropod.Richness
-plasticity.wind.arth.2012 <- plasticity.wind.arth.2012 %>%
-  gather(traits, effect_size, -term, -Year, -Variation.Source)
-
-environment.wind.arth.2012 <- wind.arth.SD.modes %>%
-  filter(Year=="2012", term%in%c("sd_sc.Wind.Exposure","sd_Genotype__sc.Wind.Exposure","sd_Block__Intercept","sd_Plot_code__Intercept")) %>%
-  mutate(Variation.Source = "Direct/Indirect Environment", traits = NA) %>%
-  rename(effect_size = Arthropod.Richness)
-environment.wind.arth.2012
-
-bind_rows(heritable.wind.arth.2012, plasticity.wind.arth.2012, environment.wind.arth.2012) %>%
-  ggplot(., aes(x = Variation.Source, y=effect_size, fill=traits)) +
-  geom_bar(stat="identity", position = position_stack())
-
-bind_rows(heritable.wind.arth.2012, plasticity.wind.arth.2012, environment.wind.arth.2012) %>%
-  ggplot(., aes(x = traits, y=effect_size, fill=Variation.Source)) +
-  geom_bar(stat="identity", position = position_stack())
-
-bind_rows(heritable.wind.arth.2012, plasticity.wind.arth.2012, environment.wind.arth.2012) %>%
-  ggplot(., aes(x = traits, y=effect_size, fill=term)) +
-  geom_bar(stat="identity", position = position_stack()) +
-  coord_flip() + 
-  facet_wrap(~Variation.Source, ncol=1)
-
-cbPalette <- c("#000000", "#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
-
-bind_rows(heritable.wind.arth.2012, plasticity.wind.arth.2012, environment.wind.arth.2012) %>%
-  filter(traits %in% c("Trait.PC1","Trait.PC2")) %>%
-  ggplot(., aes(x = Variation.Source, y=effect_size, fill=term)) +
-  geom_bar(stat="identity", color = "black", position = position_stack()) +
-  scale_fill_manual(values=cbPalette[c(1,5,6,2,4)]) +
-  #coord_flip() +
-  facet_wrap(~traits, ncol=2)
+save_plot(filename = "fig_3_microbes.png", plot = plot_w.root.microbes.2013, base_height = 6, base_width = 8.5)
