@@ -455,6 +455,7 @@ aa.trait.arth.2012 <- left_join(aa.arth.df, select(aa.trait.2012, plant_ID, sc.T
 
 trait.rich.aa.2012.brm <- general_brm(sc.log1.Arthropod.Rich~sc.Trait.PC1+sc.Trait.PC2+sc.Aphid.treatment*sc.Ant.mound.dist+(1+sc.Aphid.treatment*sc.Ant.mound.dist|Genotype)+(1|Block)+(1|Plot_code), data=aa.trait.arth.2012)
 summary(trait.rich.aa.2012.brm) # trait.PC1 is key driver, but there is also a weak effect of trait.PC2
+trait.rich.aa.12 <- posterior_samples(trait.rich.aa.2012.brm, pars = "^b")
 
 y_aa.trait.rich.2012 <- aa.trait.arth.2012$sc.log1.Arthropod.Rich
 yrep_aa.trait.rich.2012 <- posterior_predict(trait.rich.aa.2012.brm, nsamples=100)
@@ -469,6 +470,7 @@ w.trait.arth.2012 <- left_join(w.arth.2012, select(w.trait.2012, plant_ID, sc.Tr
 
 trait.rich.wind.2012.brm <- general_brm(sc.log1.Arthropod.Rich~sc.Trait.PC1+sc.Trait.PC2+sc.Wind.Exposure+(1+sc.Wind.Exposure|Genotype)+(1|Block)+(1|Plot_code), data=w.trait.arth.2012)
 summary(trait.rich.wind.2012.brm) # trait.PC1 is primary effect
+trait.rich.wind.12 <- posterior_samples(trait.rich.wind.2012.brm, pars = "^b")
 
 y_w.trait.rich.2012 <- w.trait.arth.2012$sc.log1.Arthropod.Rich
 yrep_w.trait.rich.2012 <- posterior_predict(trait.rich.wind.2012.brm, nsamples=100)
@@ -482,6 +484,7 @@ w.trait.arth.2013 <- left_join(w.arth.2013, select(w.trait.2013, plant_ID, sc.Tr
 
 trait.rich.wind.2013.brm <- general_brm(sc.log1.Arthropod.Rich~sc.Trait.PC1+sc.Trait.PC2+sc.Wind.Exposure+(1+sc.Wind.Exposure|Genotype)+(1|Block)+(1|Plot_code), data=w.trait.arth.2013)
 summary(trait.rich.wind.2013.brm) # trait.PC1 is the primary effect
+trait.rich.wind.13 <- posterior_samples(trait.rich.wind.2013.brm, pars = "^b")
 
 # pretty close approximation...
 mean(posterior_samples(trait.rich.wind.2013.brm, pars = "^b")$b_sc.Trait.PC1)
@@ -496,6 +499,7 @@ w.trait.fung.2013 <- left_join(fungal.df, select(w.trait.2013, plant_ID, sc.Trai
 
 trait.rarerich.wind.2013.brm <- general_brm(sc.Fungi.Rarerich~sc.log.Root.CN+sc.Wind.Exposure+(1+sc.Wind.Exposure|Genotype)+(1|Block)+(1|Plot_code), data=w.trait.fung.2013) # sc.log.trans.Soil.PC1+sc.Soil.PC2+
 summary(trait.rarerich.wind.2013.brm) # log_root_CN and soil.PC1 to a lesser extent
+trait.rarerich.wind.13 <- posterior_samples(trait.rarerich.wind.2013.brm, pars = "^b")
 
 plot(marginal_effects(trait.rarerich.wind.2013.brm, effects = "sc.log.Root.CN"), points=T)
 plot(marginal_effects(trait.rarerich.wind.2013.brm, effects = "sc.log.trans.Soil.PC1"), points=T)
@@ -507,6 +511,7 @@ w.trait.bact.2013 <- left_join(bacteria.df, select(w.trait.2013, plant_ID, sc.Tr
 
 bact.trait.rarerich.wind.2013.brm <- general_brm(sc.Bacteria.Rarerich~sc.log.Root.CN+sc.Wind.Exposure+(1+sc.Wind.Exposure|Genotype)+(1|Block)+(1|Plot_code), data=w.trait.bact.2013) # sc.log.trans.Soil.PC1+sc.Soil.PC2+
 summary(bact.trait.rarerich.wind.2013.brm) # strong effect of soil.PC2
+bact.trait.rarerich.wind.13 <- posterior_samples(bact.trait.rarerich.wind.2013.brm, pars = "^b")
 
 plot(marginal_effects(bact.trait.rarerich.wind.2013.brm, effects = "sc.Soil.PC2"), points=T)
 
@@ -551,6 +556,44 @@ write_csv(lanphere_trait_regs, path="output_brms/lanphere_trait_regs.csv")
 #  mutate(posterior_samples(bact.trait.rarerich.wind.2013.brm, pars = "^b"), Experiment="Wind", Year="2013", Response="scale(Bacteria Rarefied Richness)")
 #)
 #write_csv(lanphere_trait_regs, path="output_brms/lanphere_trait_regs.csv")
+
+## PLOT TRAIT EFFECTS
+library(cowplot)
+library(coda)
+
+Mode <- function(x) {
+  ux <- unique(x)
+  ux[which.max(tabulate(match(x, ux)))]
+}
+
+trait.effects.df <- bind_rows(mutate(gather(select(trait.rich.aa.12, b_sc.Trait.PC1, b_sc.Trait.PC2), Trait, Effect_Size), Response = "Arthropod Richness", Experiment_Year = "Ant-Aphid 2012"), 
+          mutate(gather(select(trait.rich.wind.12, b_sc.Trait.PC1, b_sc.Trait.PC2), Trait, Effect_Size), Response = "Arthropod Richness", Experiment_Year = "Wind 2012"), 
+          mutate(gather(select(trait.rich.wind.13, b_sc.Trait.PC1, b_sc.Trait.PC2), Trait, Effect_Size), Response = "Arthropod Richness", Experiment_Year = "Wind 2013"), 
+          mutate(gather(select(trait.rarerich.wind.13, b_sc.log.Root.CN), Trait, Effect_Size), Response = "Fungi Rarefied Richness", Experiment_Year = "Wind 2013"), 
+          mutate(gather(select(bact.trait.rarerich.wind.13, b_sc.log.Root.CN), Trait, Effect_Size), Response = "Bacteria Rarefied Richness", Experiment_Year = "Wind 2013")) %>%
+  separate(Experiment_Year, into=c("Experiment","Year"), sep = " ", remove=F) %>%
+  group_by(Experiment_Year, Experiment, Year, Response, Trait) %>%
+  summarise(mode = Mode(round(Effect_Size,2)), 
+            HPDI_lower_50 = HPDinterval(as.mcmc(Effect_Size), prob=0.5)[ ,1],
+            HPDI_upper_50 = HPDinterval(as.mcmc(Effect_Size), prob=0.5)[ ,2],
+            HPDI_lower_95 = HPDinterval(as.mcmc(Effect_Size), prob=0.95)[ ,1],
+            HPDI_upper_95 = HPDinterval(as.mcmc(Effect_Size), prob=0.95)[ ,2])
+trait.effects.df$Trait <- factor(trait.effects.df$Trait, 
+                                 levels = rev(c("b_sc.Trait.PC1","b_sc.Trait.PC2","b_sc.log.Root.CN")),
+                                 labels = rev(c("Trait PC1", "Trait PC2", "Root C:N")))
+
+plot_trait.effects <- ggplot(trait.effects.df, aes(x = Trait, y=mode, shape=Response)) +
+  geom_linerange(aes(ymin=HPDI_lower_95, ymax=HPDI_upper_95), color="grey", size=0.5, position=position_dodge(width=0.75)) +
+  geom_linerange(aes(ymin=HPDI_lower_50, ymax=HPDI_upper_50), color="black", size=2, position=position_dodge(width=0.75)) +
+  geom_point(size=3.5, fill="grey", position=position_dodge(width=0.75)) +
+  coord_flip() + 
+  scale_shape_manual(values = c(21,23,24)) +
+  geom_hline(yintercept = 0, linetype="dotted") +
+  xlab("") +
+  ylab("Standardized Effect Size") +
+  facet_wrap(~Experiment_Year, ncol=1, scales = "free_y")
+save_plot(filename = "fig_trait_effects.png", plot = plot_trait.effects, base_height = 6, base_width = 8.5)
+
 
 ## MAY BE USEFUL... ----
 lanphere_BLUPs <- bind_rows(
