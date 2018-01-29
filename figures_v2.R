@@ -24,15 +24,15 @@ wind.var.soil <- read.csv('output_brms/wind_SDs.csv') %>%
   mutate(Model = "experimental_design")
 
 aa.var.df <- read.csv('output_brms/ant.aphid_SDs.csv') %>% 
-  transmute("Genotype (G)" =    sd_Genotype__Intercept^2 /                            (sd_Genotype__Intercept^2 + sd_sc.Aphid.treatment^2 + sd_sc.Ant.mound.dist^2 + sd_sc.Aphid.x.sc.Ant^2 + sd_Genotype__sc.Aphid.treatment^2 + sd_Genotype__sc.Ant.mound.dist^2 + sd_Genotype__sc.Aphid.treatment.sc.Ant.mound.dist^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
-            Aphid =             sd_sc.Aphid.treatment^2 /                             (sd_Genotype__Intercept^2 + sd_sc.Aphid.treatment^2 + sd_sc.Ant.mound.dist^2 + sd_sc.Aphid.x.sc.Ant^2 + sd_Genotype__sc.Aphid.treatment^2 + sd_Genotype__sc.Ant.mound.dist^2 + sd_Genotype__sc.Aphid.treatment.sc.Ant.mound.dist^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
-            Ant =               sd_sc.Ant.mound.dist^2 /                              (sd_Genotype__Intercept^2 + sd_sc.Aphid.treatment^2 + sd_sc.Ant.mound.dist^2 + sd_sc.Aphid.x.sc.Ant^2 + sd_Genotype__sc.Aphid.treatment^2 + sd_Genotype__sc.Ant.mound.dist^2 + sd_Genotype__sc.Aphid.treatment.sc.Ant.mound.dist^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
-            "Aphid x Ant" =     sd_sc.Aphid.x.sc.Ant^2 /                              (sd_Genotype__Intercept^2 + sd_sc.Aphid.treatment^2 + sd_sc.Ant.mound.dist^2 + sd_sc.Aphid.x.sc.Ant^2 + sd_Genotype__sc.Aphid.treatment^2 + sd_Genotype__sc.Ant.mound.dist^2 + sd_Genotype__sc.Aphid.treatment.sc.Ant.mound.dist^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
-            "G x Aphid" =       sd_Genotype__sc.Aphid.treatment^2 /                   (sd_Genotype__Intercept^2 + sd_sc.Aphid.treatment^2 + sd_sc.Ant.mound.dist^2 + sd_sc.Aphid.x.sc.Ant^2 + sd_Genotype__sc.Aphid.treatment^2 + sd_Genotype__sc.Ant.mound.dist^2 + sd_Genotype__sc.Aphid.treatment.sc.Ant.mound.dist^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
-            "G x Ant" =         sd_Genotype__sc.Ant.mound.dist^2 /                    (sd_Genotype__Intercept^2 + sd_sc.Aphid.treatment^2 + sd_sc.Ant.mound.dist^2 + sd_sc.Aphid.x.sc.Ant^2 + sd_Genotype__sc.Aphid.treatment^2 + sd_Genotype__sc.Ant.mound.dist^2 + sd_Genotype__sc.Aphid.treatment.sc.Ant.mound.dist^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
-            "G x Aphid x Ant" = sd_Genotype__sc.Aphid.treatment.sc.Ant.mound.dist^2 / (sd_Genotype__Intercept^2 + sd_sc.Aphid.treatment^2 + sd_sc.Ant.mound.dist^2 + sd_sc.Aphid.x.sc.Ant^2 + sd_Genotype__sc.Aphid.treatment^2 + sd_Genotype__sc.Ant.mound.dist^2 + sd_Genotype__sc.Aphid.treatment.sc.Ant.mound.dist^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
-            Block =             sd_Block__Intercept^2 /                               (sd_Genotype__Intercept^2 + sd_sc.Aphid.treatment^2 + sd_sc.Ant.mound.dist^2 + sd_sc.Aphid.x.sc.Ant^2 + sd_Genotype__sc.Aphid.treatment^2 + sd_Genotype__sc.Ant.mound.dist^2 + sd_Genotype__sc.Aphid.treatment.sc.Ant.mound.dist^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
-            Plot =              sd_Plot_code__Intercept^2 /                           (sd_Genotype__Intercept^2 + sd_sc.Aphid.treatment^2 + sd_sc.Ant.mound.dist^2 + sd_sc.Aphid.x.sc.Ant^2 + sd_Genotype__sc.Aphid.treatment^2 + sd_Genotype__sc.Ant.mound.dist^2 + sd_Genotype__sc.Aphid.treatment.sc.Ant.mound.dist^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
+  transmute("Genotype (G)" =    sd_Genotype__Intercept^2 /                            (sd_Genotype__Intercept^2 + sd_sc.Aphid.treatment^2 + sd_sc.Ant.mound.dist^2 + sd_sc.Aphid.treatment.sc.Ant.mound.dist^2 + sd_Genotype__sc.Aphid.treatment^2 + sd_Genotype__sc.Ant.mound.dist^2 + sd_Genotype__sc.Aphid.treatment.sc.Ant.mound.dist^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
+            Aphid =             sd_sc.Aphid.treatment^2 /                             (sd_Genotype__Intercept^2 + sd_sc.Aphid.treatment^2 + sd_sc.Ant.mound.dist^2 + sd_sc.Aphid.treatment.sc.Ant.mound.dist^2 + sd_Genotype__sc.Aphid.treatment^2 + sd_Genotype__sc.Ant.mound.dist^2 + sd_Genotype__sc.Aphid.treatment.sc.Ant.mound.dist^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
+            Ant =               sd_sc.Ant.mound.dist^2 /                              (sd_Genotype__Intercept^2 + sd_sc.Aphid.treatment^2 + sd_sc.Ant.mound.dist^2 + sd_sc.Aphid.treatment.sc.Ant.mound.dist^2 + sd_Genotype__sc.Aphid.treatment^2 + sd_Genotype__sc.Ant.mound.dist^2 + sd_Genotype__sc.Aphid.treatment.sc.Ant.mound.dist^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
+            "Aphid x Ant" =     sd_sc.Aphid.treatment.sc.Ant.mound.dist^2 /           (sd_Genotype__Intercept^2 + sd_sc.Aphid.treatment^2 + sd_sc.Ant.mound.dist^2 + sd_sc.Aphid.treatment.sc.Ant.mound.dist^2 + sd_Genotype__sc.Aphid.treatment^2 + sd_Genotype__sc.Ant.mound.dist^2 + sd_Genotype__sc.Aphid.treatment.sc.Ant.mound.dist^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
+            "G x Aphid" =       sd_Genotype__sc.Aphid.treatment^2 /                   (sd_Genotype__Intercept^2 + sd_sc.Aphid.treatment^2 + sd_sc.Ant.mound.dist^2 + sd_sc.Aphid.treatment.sc.Ant.mound.dist^2 + sd_Genotype__sc.Aphid.treatment^2 + sd_Genotype__sc.Ant.mound.dist^2 + sd_Genotype__sc.Aphid.treatment.sc.Ant.mound.dist^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
+            "G x Ant" =         sd_Genotype__sc.Ant.mound.dist^2 /                    (sd_Genotype__Intercept^2 + sd_sc.Aphid.treatment^2 + sd_sc.Ant.mound.dist^2 + sd_sc.Aphid.treatment.sc.Ant.mound.dist^2 + sd_Genotype__sc.Aphid.treatment^2 + sd_Genotype__sc.Ant.mound.dist^2 + sd_Genotype__sc.Aphid.treatment.sc.Ant.mound.dist^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
+            "G x Aphid x Ant" = sd_Genotype__sc.Aphid.treatment.sc.Ant.mound.dist^2 / (sd_Genotype__Intercept^2 + sd_sc.Aphid.treatment^2 + sd_sc.Ant.mound.dist^2 + sd_sc.Aphid.treatment.sc.Ant.mound.dist^2 + sd_Genotype__sc.Aphid.treatment^2 + sd_Genotype__sc.Ant.mound.dist^2 + sd_Genotype__sc.Aphid.treatment.sc.Ant.mound.dist^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
+            Block =             sd_Block__Intercept^2 /                               (sd_Genotype__Intercept^2 + sd_sc.Aphid.treatment^2 + sd_sc.Ant.mound.dist^2 + sd_sc.Aphid.treatment.sc.Ant.mound.dist^2 + sd_Genotype__sc.Aphid.treatment^2 + sd_Genotype__sc.Ant.mound.dist^2 + sd_Genotype__sc.Aphid.treatment.sc.Ant.mound.dist^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
+            Plot =              sd_Plot_code__Intercept^2 /                           (sd_Genotype__Intercept^2 + sd_sc.Aphid.treatment^2 + sd_sc.Ant.mound.dist^2 + sd_sc.Aphid.treatment.sc.Ant.mound.dist^2 + sd_Genotype__sc.Aphid.treatment^2 + sd_Genotype__sc.Ant.mound.dist^2 + sd_Genotype__sc.Aphid.treatment.sc.Ant.mound.dist^2 + sd_Block__Intercept^2 + sd_Plot_code__Intercept^2 + sigma),
             sample = sample, Experiment = Experiment, Year = Year, Response = Response) %>%
   gather(key = term, value = percent.variance, -(sample:Response)) %>%
   mutate(Model = "experimental_design")
@@ -84,12 +84,44 @@ w.microbe.trait.soil.var <- read.csv("output_brms/lanphere_trait_regs.csv") %>%
   gather(key = term, value = percent.variance, -(sample:Response)) %>%
   mutate(Model = "trait_reg")
 
-var.df <- bind_rows(wind.var.df, aa.var.df, aa.arth.trait.var, w.arth.trait.var.2012, w.arth.trait.var.2013, w.microbe.trait.soil.var) %>%
+var.df <- bind_rows(wind.var.df, aa.var.df) %>% #, aa.arth.trait.var, w.arth.trait.var.2012, w.arth.trait.var.2013, w.microbe.trait.soil.var) %>%
   unite(Experiment_Year, Experiment, Year, sep = " ", remove = F)
 var.df$term <- factor(var.df$term)
 levels(var.df$term)
-var.df$term_ord <- factor(var.df$term, levels=c("Plot","Block","Soil PC2","Soil PC1","Root C:N","Trait PC2","Trait PC1","G x Aphid x Ant","G x Ant","G x Aphid","G x Wind","Aphid x Ant","Ant","Aphid","Wind","Genotype (G)"))
+var.df$term_ord <- factor(var.df$term, levels=c("Plot","Block","G x Aphid x Ant","G x Ant","G x Aphid","G x Wind","Aphid x Ant","Ant","Aphid","Wind","Genotype (G)")) # "Soil PC2","Soil PC1", "Root C:N","Trait PC2","Trait PC1"
 levels(var.df$term_ord)
+
+## FIGURE: VARIANCE EXPLAINED IN PLANT TRAITS ----
+plot_traits <- filter(var.df, Model%in%"experimental_design", Response%in%c("Trait PC1","Trait PC2","Root C:N"))
+
+Mode <- function(x) {
+  ux <- unique(x)
+  ux[which.max(tabulate(match(x, ux)))]
+}
+
+summary_traits <- plot_traits %>%
+  group_by(Experiment_Year, Response, term, term_ord) %>%
+  summarise(mode = Mode(round(percent.variance,2)), 
+            HPDI_lower_50 = HPDinterval(as.mcmc(percent.variance), prob=0.5)[ ,1],
+            HPDI_upper_50 = HPDinterval(as.mcmc(percent.variance), prob=0.5)[ ,2],
+            HPDI_lower_95 = HPDinterval(as.mcmc(percent.variance), prob=0.95)[ ,1],
+            HPDI_upper_95 = HPDinterval(as.mcmc(percent.variance), prob=0.95)[ ,2])
+summary_traits$Response_ord <- factor(summary_traits$Response, levels = c("Trait PC1","Trait PC2", "Root C:N"))
+
+theme_set(theme_grey())
+traits_gg <- ggplot(summary_traits, aes(x=term_ord, y=mode)) + # , fill=Response_ord
+  geom_linerange(aes(ymin=HPDI_lower_95, ymax=HPDI_upper_95), color="grey", size=0.5, position=position_dodge(width=0.75)) +
+  geom_linerange(aes(ymin=HPDI_lower_50, ymax=HPDI_upper_50), color="black", size=2, position=position_dodge(width=0.75)) +
+  geom_point(size=3, shape=21, fill="grey", color="black", position=position_dodge(width=0.75)) + #
+  coord_flip() +
+  ylab("Variance Explained (%)") +
+  xlab("") +
+  scale_y_continuous(breaks = c(0, 0.1, 0.2, 0.3, 0.4, 0.5), labels=c(0, 10, 20, 30, 40, 50)) +
+  #scale_shape_manual(values = c(21,22,23), name="Plant trait") +
+  facet_grid(Experiment_Year ~ Response_ord, scales="free_y") + 
+  theme_cowplot()# + theme(panel.border = element_rect(colour="black")) # not working for some reason
+traits_gg 
+save_plot(filename = "fig_trait_variance.png", plot = traits_gg, base_height = 6, base_width = 8)
 
 # something weird is going on when I try to use wind.var.soil in above var.df. It keeps Genotype and G x Wind and reports NA
 var.soil <- unite(wind.var.soil, Experiment_Year, Experiment, Year, sep = " ", remove = F)
