@@ -448,6 +448,34 @@ y_w.soil.PC2 <- w.soil$sc.Soil.PC2
 yrep_w.soil.PC2 <- posterior_predict(soil.PC2.wind.brm, nsamples=100)
 #launch_shinystan(soil.PC2.wind.brm)
 
+## LOOK AT NUTRIENT RELATIONSHIPS
+belowground <- left_join(select(fungal.df, Block:fungal.rarerich), select(bacteria.df, plant_ID, bacteria.rarerich), by="plant_ID") %>%
+  left_join(., transmute(w.soil, Plot_code, sc.log.trans.Soil.PC1=as.numeric(sc.log.trans.Soil.PC1), sc.Soil.PC2=as.numeric(sc.Soil.PC2), Total.N, NO3.N, NH4.N)) %>%
+  left_join(., transmute(w.trait.2013, plant_ID, sc.log.Root.CN = as.numeric(sc.log.Root.CN), root_C.perc, root_N.perc))
+
+ggplot(belowground, aes(x=log(root_N.perc), y=sc.log.Root.CN)) + geom_point()
+ggplot(belowground, aes(x=root_C.perc, y=sc.log.Root.CN)) + geom_point()
+
+plot_bg <- group_by(belowground, Plot_code) %>%
+  summarise_at(vars(fungal.rarerich, bacteria.rarerich, sc.log.Root.CN, root_N.perc, Total.N, NO3.N, NH4.N, sc.log.trans.Soil.PC1, sc.Soil.PC2), mean, na.rm=T) %>%
+  ungroup()
+
+ggplot(w.trait.2013, aes(x=sc.log.Root.CN, y=log(leaf_C_N))) + geom_point() + geom_smooth()
+
+ggplot(plot_bg, aes(x=NH4.N, y=sc.log.Root.CN)) + geom_point() + geom_smooth(method="lm")
+ggplot(plot_bg, aes(x=fungal.rarerich, y=sc.log.Root.CN)) + geom_point() + geom_smooth()
+ggplot(plot_bg, aes(x=sc.log.trans.Soil.PC1, y=sc.log.Root.CN)) + geom_point() + geom_smooth()
+ggplot(plot_bg, aes(x=sc.Soil.PC2, y=sc.log.Root.CN)) + geom_point() + geom_smooth()
+ggplot(plot_bg, aes(x=sc.log.trans.Soil.PC1, y=fungal.rarerich)) + geom_point() + geom_smooth()
+ggplot(plot_bg, aes(x=sc.log.trans.Soil.PC1, y=bacteria.rarerich)) + geom_point() + geom_smooth()
+ggplot(plot_bg, aes(x=sc.Soil.PC2, y=fungal.rarerich)) + geom_point() + geom_smooth()
+ggplot(plot_bg, aes(x=sc.Soil.PC2, y=bacteria.rarerich)) + geom_point() + geom_smooth()
+
+ggplot(plot_bg, aes(x=sc.log.Root.CN, y=fungal.rarerich)) + geom_point() + geom_smooth()
+ggplot(plot_bg, aes(x=sc.log.Root.CN, y=bacteria.rarerich)) + geom_point() + geom_smooth()
+
+ggplot(belowground, aes(x=sc.log.Root.CN, y=fungal.rarerich)) + geom_point() + geom_smooth()
+ggplot(belowground, aes(x=sc.log.Root.CN, y=bacteria.rarerich)) + geom_point() + geom_smooth()
 
 ## ANT-APHID TRAIT-ARTHROPOD 2012 ANALYSIS ----
 aa.trait.arth.2012 <- left_join(aa.arth.df, select(aa.trait.2012, plant_ID, sc.Trait.PC1, sc.Trait.PC2), by="plant_ID") %>%
