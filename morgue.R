@@ -82,7 +82,7 @@ yrep_w.soil.PC2 <- posterior_predict(soil.PC2.wind.brm, nsamples=100)
 ## LOOK AT NUTRIENT RELATIONSHIPS
 belowground <- left_join(select(fungal.df, Block:fungal.rarerich), select(bacteria.df, plant_ID, bacteria.rarerich), by="plant_ID") %>%
   left_join(., transmute(w.soil, Plot_code, sc.log.trans.Soil.PC1=as.numeric(sc.log.trans.Soil.PC1), sc.Soil.PC2=as.numeric(sc.Soil.PC2), Total.N, NO3.N, NH4.N)) %>%
-  left_join(., transmute(w.trait.2013, plant_ID, sc.log.Root.CN = as.numeric(sc.log.Root.CN), root_C.perc, root_N.perc))
+  left_join(., transmute(w.trait.2013, plant_ID, sc.log.Root.CN=as.numeric(sc.log.Root.CN), root_C.perc, root_N.perc))
 
 ggplot(belowground, aes(x=log(root_N.perc), y=sc.log.Root.CN)) + geom_point()
 ggplot(belowground, aes(x=root_C.perc, y=sc.log.Root.CN)) + geom_point()

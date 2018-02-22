@@ -189,6 +189,13 @@ summary(trait.PC2.wind.2013.brm)
 root_CN.wind.2013.brm <- general_brm(sc.log.Root.CN~sc.Wind.Exposure+(1+sc.Wind.Exposure|Genotype)+(1|Block)+(1|Plot_code), data=w.trait.2013) 
 summary(root_CN.wind.2013.brm) 
 
+belowground <- left_join(transmute(w.trait.2013, Block, sc.Wind.Exposure=scale(as.numeric(Wind.Exposure)), Genotype, plant_ID, Plot_code=paste(Block,ifelse(Wind.Exposure=="Exposed","E","U"),sep="."), sc.log.Root.CN = as.numeric(sc.log.Root.CN), root_C.perc, root_N.perc),
+                         transmute(w.soil, Plot_code, sc.log.trans.Soil.PC1=as.numeric(sc.log.trans.Soil.PC1), sc.Soil.PC2=as.numeric(sc.Soil.PC2), Total.N, NO3.N, NH4.N)) # %>%
+ # left_join(., transmute(fungal.df, fungal_rarerich))
+
+root_CN.wind.2013 <- general_brm(sc.log.Root.CN~sc.Wind.Exposure+sc.log.trans.Soil.PC1+sc.Soil.PC2+(1+sc.Wind.Exposure|Genotype)+(1|Block)+(1|Plot_code), data=belowground) 
+summary(root_CN.wind.2013)
+
 ## WIND 2013 - SEPARATE TRAIT ANALYSES ----
 
 leafCN.w.2013 <- general_brm(scale(log(leaf_C_N))~sc.Wind.Exposure+(1+sc.Wind.Exposure|Genotype)+(1|Block)+(1|Plot_code), data=w.trait.2013)
