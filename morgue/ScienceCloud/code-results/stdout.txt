@@ -1,0 +1,6 @@
+
+SAMPLING FOR MODEL 'gaussian(identity) brms-model' NOW (CHAIN 2).
+
+SAMPLING FOR MODEL 'gaussian(identity) brms-model' NOW (CHAIN 3).
+
+SAMPLING FOR MODEL 'gaussian(identity) brms-model' NOW (CHAIN 4).
