@@ -1,24 +1,8 @@
-# Specifying an R environment with a runtime.txt file
+# Lanphere_Experiments
+[![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/mabarbour/Lanphere_Experiments/master)
 
-Jupyter+R: [![Binder](http://mybinder.org/badge.svg)](http://beta.mybinder.org/v2/gh/binder-examples/r/master?filepath=index.ipynb)
+This repository contains data and R-scripts to reproduce results reported in the manuscript, "Partioning plant genetic and environmental drivers of above and belowground community assembly". 
 
-RStudio: [![Binder](http://mybinder.org/badge.svg)](http://beta.mybinder.org/v2/gh/binder-examples/r/master?urlpath=rstudio)
+bioRxiv preprint can be found at https://doi.org/10.1101/173500
 
-Binder supports using R + RStudio, with libraries pinned to a specific 
-snapshot on [MRAN](https://mran.microsoft.com/documents/rro/reproducibility).
-
-You need to have a `runtime.txt` file that is formatted like:
-
-```
-r-<YYYY>-<MM>-<DD>
-```
-
-where YYYY-MM-DD is a snapshot at MRAN that will be used for installing
-libraries.
-
-You can also have an `install.R` file that will be executed during build,
-and can be used to install libraries.
-
-Both [RStudio](https://www.rstudio.com/) and [IRKernel](https://irkernel.github.io/)
-are installed by default, so you can use either the Jupyter notebook interface or
-the RStudio interface.
+The release associated with the preprint posted on bioRxiv can be found at [![DOI](https://zenodo.org/badge/15195239.svg)](https://zenodo.org/badge/latestdoi/15195239)
