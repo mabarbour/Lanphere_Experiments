@@ -109,7 +109,7 @@ general_brm <- function(formula, family, data, ...) {
   brm(formula=formula, data=data, family=gaussian(link="identity"), 
       prior=c(prior(normal(0,1), class=b),
               prior(normal(0,1), class=sd)),
-      control=list(adapt_delta=0.99),
+      control=list(adapt_delta=0.999),
       chains=4)
   # all other brm parameters correspond to the defaults
 }
@@ -213,7 +213,7 @@ trait.effects.df <- bind_rows(mutate(gather(select(trait.rich.aa.12, b_sc.Trait.
   separate(Experiment_Year, into=c("Experiment","Year"), sep = " ", remove=F) 
 trait.effects.df$Trait <- factor(trait.effects.df$Trait, 
                                  levels = rev(c("b_sc.Trait.PC1","b_sc.Trait.PC2","b_sc.log.Root.CN")),
-                                 labels = rev(c("Plant size PC)", "Leaf quality PC", "Root C:N")))
+                                 labels = rev(c("Plant size PC", "Leaf quality PC", "Root C:N")))
 
 ## MAKE PLOT ----
 
@@ -358,7 +358,7 @@ var.df$term <- factor(var.df$term)
 var.df$term_ord <- factor(var.df$term, levels=c("Plot","Block","G x Aphid x Ant","G x Ant","G x Aphid","G x Wind","Aphid x Ant","Ant","Aphid","Wind","Genotype (G)")) # "Soil PC2","Soil PC1", "Root C:N","Trait PC2","Trait PC1"
 
 plot_traits <- filter(var.df, Response%in%c("Trait PC1","Trait PC2","Root C:N"))
-plot_traits$Response_ord <- factor(plot_traits$Response, levels = c("Trait PC1","Trait PC2", "Root C:N"), labels = c("Plant size PC)","Leaf quality PC2", "Root C:N")) 
+plot_traits$Response_ord <- factor(plot_traits$Response, levels = c("Trait PC1","Trait PC2", "Root C:N"), labels = c("Plant size PC","Leaf quality PC2", "Root C:N")) 
 
 
 ## MAKE PLOT ----
@@ -549,7 +549,7 @@ var_data <- bind_rows(gather(mutate(aa.partition.2012, Community = "Arthropods",
   filter(Community %in% c("Arthropods","Root-fungi")) # only keeping Root-Fungi because it Root C:N had the largest effect on it, plus the relative importance of Genetic vs. plastic trait variation is the same as for root-microbes
 var_data$term_alt <- factor(var_data$term_alt)
 var_data$Traits <- factor(var_data$Traits) 
-var_data$Traits <- factor(var_data$Traits, levels=c("Trait.PC1","Trait.PC2","Root.C.N"), labels=c("Plant size PC","Plant size PC", "Root C:N"))
+var_data$Traits <- factor(var_data$Traits, levels=c("Trait.PC1","Trait.PC2","Root.C.N"), labels=c("Plant size PC","Leaf quality PC", "Root C:N"))
 var_data$term_alt_ord <- factor(var_data$term_alt, levels = c("Genotype (G)", "Aphid", "Ant", "Aphid x Ant", "Wind", "G x E", "Block", "Plot"))
 
 # color-blind friendly palette
@@ -728,7 +728,7 @@ plot.leaf.quality <- ggplot(leaf.quality, aes(x=term_ord, y=percent.variance)) +
   facet_grid(Experiment_Year~Response_ord, scales = "free_y") +
   theme_cowplot()
 plot.leaf.quality
-# save_plot(filename = "manuscript/figures/fig_quality_traits_GxE.png", plot = plot.leaf.quality, base_height = 6, base_width = 8)
+save_plot(filename = "manuscript/figures/fig_quality_traits_GxE.png", plot = plot.leaf.quality, base_height = 6, base_width = 8)
 ```
 
 Analyses and plots that quantify sources of variation in sallow aphid (*Aphis farinosa*) and western-thatch ant (*Formica obscuripes*) abundances in the ant-aphid experiment.
@@ -793,7 +793,7 @@ ant_aphid.GxE <- ggplot(ant_aphid.var, aes(x=term_ord, y=percent.variance)) +
   scale_y_continuous(breaks = c(0, 0.05, 0.1, 0.15, 0.2), labels=c(0, 5, 10, 15, 20)) +
   facet_wrap(~Response, ncol=1, scales = "free_y")
 ant_aphid.GxE
-# save_plot(filename = "manuscript/figures/fig_ant-aphid_GxE.png", plot = ant_aphid.GxE, base_height = 6, base_width = 8)
+save_plot(filename = "manuscript/figures/fig_ant-aphid_GxE.png", plot = ant_aphid.GxE, base_height = 6, base_width = 8)
 ```
 
 Analyses and plots that quantify sources of variation in arthropod species richness. Note that this analysis ignores measured trait variation, but is useful for assessing the effects of genetic variation in unmeasured plant traits. 
@@ -866,5 +866,5 @@ arth.GxE <- filter(var.df, Response == "Arthropod Richness") %>%
   scale_y_continuous(breaks = c(0, 0.1, 0.2, 0.3), labels=c(0, 10, 20, 30)) +
   facet_wrap(~Experiment_Year, ncol=1, scales = "free_y")
 arth.GxE
-# save_plot(filename = "manuscript/figures/fig_arthropod_GxE.png", plot = arth.GxE, base_height = 6, base_width = 8)
+save_plot(filename = "manuscript/figures/fig_arthropod_GxE.png", plot = arth.GxE, base_height = 6, base_width = 8)
 ```
