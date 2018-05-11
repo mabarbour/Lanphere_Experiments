@@ -37,3 +37,6 @@ vignettes/*.pdf
 
 
 # End of https://www.gitignore.io/api/r
+
+# Ignoring ipython notebook checkpoints (https://stackoverflow.com/questions/35916658/how-to-git-ignore-ipython-notebook-checkpoints-anywhere-in-repository)
+.ipynb_checkpoints
