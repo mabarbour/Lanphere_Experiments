@@ -1,1 +1,0 @@
-template.py microbial_composition_analysis.R bacteria.df.csv -r sciencecloud --max-running 32 -C 5 -v
